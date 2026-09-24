@@ -1,0 +1,68 @@
+# Local development stack.
+#   docker compose up -d            -> db (PostGIS) + redis + api
+#   docker compose up -d redis api  -> when DATABASE_URL points to a Supabase project
+name: jer
+
+services:
+  db:
+    # Multi-arch build of the official PostGIS image (native on Apple Silicon and x86_64).
+    image: ${POSTGIS_IMAGE:-imresamu/postgis:15-3.4}
+    environment:
+      POSTGRES_USER: jer
+      POSTGRES_PASSWORD: jer
+      POSTGRES_DB: jer
+    ports:
+      - "${DB_PORT:-54322}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./supabase/local-init.sql:/docker-entrypoint-initdb.d/00-local-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jer -d jer"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Inside the compose network the defaults point to the services above;
+      # override DATABASE_URL in .env to use Supabase instead.
+      DATABASE_URL: ${DATABASE_URL_DOCKER:-postgresql://jer:jer@db:5432/jer}
+      REDIS_URL: ${REDIS_URL_DOCKER:-redis://redis:6379/0}
+      RUN_MIGRATIONS_ON_START: "true"
+      SEED_ON_START: "true"
+      LOCAL_STORAGE_DIR: /data/storage
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      # Same folder the host-run API uses, so photo links work in both modes.
+      - ./apps/api/.storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+        required: false
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  db-data:
