@@ -289,10 +289,14 @@ async def test_stats_and_exports(client: AsyncClient, auth_headers: dict[str, st
     assert any(r["flagged"] for r in ndvi["readings"])
 
 
-async def test_inspection_act_pdf_in_both_languages(client: AsyncClient, auth_headers: dict[str, str]) -> None:
+async def test_inspection_act_pdf_in_both_languages(
+    client: AsyncClient, auth_headers: dict[str, str]
+) -> None:
     hit = await _search_one(client, auth_headers, "06:097:902:003")
     for lang in ("ru", "kk"):
-        resp = await client.get(f"{API}/parcels/{hit['id']}/act.pdf", params={"lang": lang}, headers=auth_headers)
+        resp = await client.get(
+            f"{API}/parcels/{hit['id']}/act.pdf", params={"lang": lang}, headers=auth_headers
+        )
         assert resp.status_code == 200
         assert resp.headers["content-type"] == "application/pdf"
         assert resp.content.startswith(b"%PDF")
