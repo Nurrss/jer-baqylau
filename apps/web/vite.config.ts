@@ -17,6 +17,7 @@ export default defineConfig({
     alias: { '@': path.resolve(root, 'src') },
   },
   server: { port: 5173 },
+  worker: { format: 'es' },
   build: {
     sourcemap: true,
     chunkSizeWarningLimit: 1600,

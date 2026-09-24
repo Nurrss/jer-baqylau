@@ -1,0 +1,30 @@
+## PDF: акт осмотра земельного участка
+
+act-org = Служба земельного контроля · демонстрационная версия «ЖерБақылау»
+act-title = АКТ ОСМОТРА ЗЕМЕЛЬНОГО УЧАСТКА
+act-number = № { $number } от { $date }
+act-intro = Осмотр провёл: { $inspector }. По результатам осмотра установлено следующее.
+act-section-parcel = 1. Сведения об участке
+act-section-findings = 2. Результаты осмотра
+act-section-signals = 3. Обращения граждан
+act-section-photos = 4. Фотофиксация
+act-field-cadastral = Кадастровый номер
+act-field-address = Адрес
+act-field-purpose = Целевое назначение
+act-field-area = Площадь
+act-field-owner = Вид права
+act-field-lease = Аренда до
+act-field-status = Текущий статус
+act-field-violation = Тип нарушения
+act-field-deadline = Срок устранения
+act-field-coords = Координаты (центр)
+act-area-value = { $value } га
+act-no-findings = Нарушений земельного законодательства не выявлено.
+act-no-signals = Обращений граждан по участку не поступало.
+act-no-photos = Фотоматериалы не приложены.
+act-signal-line = { $code } от { $date }: { $category } — { $status }
+act-photo-caption = { $source }, { $date }
+act-sign-inspector = Инспектор
+act-sign-owner = Правообладатель (представитель)
+act-sign-hint = подпись, ФИО
+act-footer = Сформировано автоматически в системе «ЖерБақылау» { $datetime }. Демонстрационные данные. Стр. { $page }

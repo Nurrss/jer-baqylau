@@ -175,6 +175,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/parcels/{parcel_id}/act.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Inspection act (PDF) in the interface language */
+        get: operations["inspection_act_api_v1_parcels__parcel_id__act_pdf_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/signals": {
         parameters: {
             query?: never;
@@ -564,7 +581,7 @@ export interface components {
              * Details
              * @default {}
              */
-            details: {
+            details?: {
                 [key: string]: unknown;
             };
         };
@@ -730,13 +747,11 @@ export interface components {
                 [key: string]: unknown;
             };
             centroid: components["schemas"]["LngLat"];
-            /** Bbox */
-            bbox: [
-                number,
-                number,
-                number,
-                number
-            ];
+            /**
+             * Bbox
+             * @description minLon, minLat, maxLon, maxLat
+             */
+            bbox: number[];
             /** Lease Until */
             lease_until: string | null;
             /** Inspector Id */
@@ -764,7 +779,7 @@ export interface components {
              * @default Feature
              * @constant
              */
-            type: "Feature";
+            type?: "Feature";
             /** Id */
             id: string;
             /** Geometry */
@@ -780,7 +795,7 @@ export interface components {
              * @default FeatureCollection
              * @constant
              */
-            type: "FeatureCollection";
+            type?: "FeatureCollection";
             /** Features */
             features: components["schemas"]["ParcelFeature"][];
         };
@@ -830,13 +845,11 @@ export interface components {
             address_kk: string;
             status: components["schemas"]["ParcelStatus"];
             centroid: components["schemas"]["LngLat"];
-            /** Bbox */
-            bbox: [
-                number,
-                number,
-                number,
-                number
-            ];
+            /**
+             * Bbox
+             * @description minLon, minLat, maxLon, maxLat
+             */
+            bbox: number[];
         };
         /**
          * ParcelStatus
@@ -862,7 +875,7 @@ export interface components {
              * Clear Deadline
              * @default false
              */
-            clear_deadline: boolean;
+            clear_deadline?: boolean;
         };
         /** PhotoOut */
         PhotoOut: {
@@ -1019,19 +1032,19 @@ export interface components {
             /** Lon */
             lon: number;
             /** @default DUMP */
-            category: components["schemas"]["SignalCategory"];
+            category?: components["schemas"]["SignalCategory"];
             /** Description */
             description?: string | null;
             /** Chat Id */
             chat_id?: number | null;
             /** @default ru */
-            lang: components["schemas"]["Lang"];
+            lang?: components["schemas"]["Lang"];
             /**
              * Photos
              * @description Number of generated placeholder photos
              * @default 1
              */
-            photos: number;
+            photos?: number;
         };
         /** SimulateSignalResponse */
         SimulateSignalResponse: {
@@ -1054,7 +1067,7 @@ export interface components {
              * @default bearer
              * @constant
              */
-            token_type: "bearer";
+            token_type?: "bearer";
             /** Expires In */
             expires_in: number;
             user: components["schemas"]["InspectorOut"];
@@ -1629,6 +1642,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CadastreRecord"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    inspection_act_api_v1_parcels__parcel_id__act_pdf_get: {
+        parameters: {
+            query?: {
+                lang?: components["schemas"]["Lang"];
+            };
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
                 };
             };
             /** @description Not authenticated */

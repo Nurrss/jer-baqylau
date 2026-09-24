@@ -163,7 +163,7 @@ async def search(session: AsyncSession, q: str, limit: int = 10) -> list[ParcelS
             address_kk=p.address_kk,
             status=p.status,
             centroid=LngLat(lon=x, lat=y),
-            bbox=(x0, y0, x1, y1),
+            bbox=[x0, y0, x1, y1],
         )
         for p, x, y, x0, y0, x1, y1 in rows
     ]
@@ -211,7 +211,7 @@ async def get_detail(session: AsyncSession, storage: StorageProvider, parcel_id:
         **_properties(parcel, is_overdue, open_signals),
         geometry=json.loads(geojson),
         centroid=LngLat(lon=cx, lat=cy),
-        bbox=(x0, y0, x1, y1),
+        bbox=[x0, y0, x1, y1],
         lease_until=parcel.lease_until,
         inspector_id=parcel.inspector_id,
         ndvi_scanned_at=parcel.ndvi_scanned_at,

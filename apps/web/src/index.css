@@ -1,1 +1,185 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design tokens. Strict "public service" look: deep sky-blue primary (flag of Kazakhstan),
+ * gold accent, neutral slate surfaces. Status colors are shared with the map layers.
+ */
+:root {
+  --background: #f5f7fa;
+  --foreground: #0f1b2d;
+  --card: #ffffff;
+  --card-foreground: #0f1b2d;
+  --muted: #eef2f6;
+  --muted-foreground: #5a6b80;
+  --border: #dde3ea;
+  --input: #cfd7e1;
+  --ring: #0b72b9;
+  --primary: #0b6aa8;
+  --primary-hover: #095a90;
+  --primary-foreground: #ffffff;
+  --secondary: #e8eef5;
+  --secondary-foreground: #13263d;
+  --accent: #f2b705;
+  --accent-foreground: #3a2c00;
+  --destructive: #c62828;
+  --destructive-foreground: #ffffff;
+  --success: #15803d;
+  --warning: #b45309;
+  --sidebar: #0d2a45;
+  --sidebar-foreground: #c9d8e8;
+  --sidebar-active: #174069;
+
+  --status-ok: #16a34a;
+  --status-under-check: #eab308;
+  --status-violation: #dc2626;
+  --status-in-remediation: #dc2626;
+  --status-resolved: #059669;
+  --status-returned: #5b7089;
+  --signal: #7c3aed;
+}
+
+.dark {
+  --background: #0b1420;
+  --foreground: #e6edf5;
+  --card: #111d2c;
+  --card-foreground: #e6edf5;
+  --muted: #16243599;
+  --muted-foreground: #93a4b8;
+  --border: #213247;
+  --input: #2a3d55;
+  --ring: #38a3e8;
+  --primary: #2f95dc;
+  --primary-hover: #4aa6e6;
+  --primary-foreground: #04121f;
+  --secondary: #1a2b40;
+  --secondary-foreground: #dbe6f2;
+  --accent: #f5c63c;
+  --accent-foreground: #231a00;
+  --destructive: #ef5350;
+  --destructive-foreground: #ffffff;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --sidebar: #08111c;
+  --sidebar-foreground: #9fb3c8;
+  --sidebar-active: #13263c;
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-status-ok: var(--status-ok);
+  --color-status-under-check: var(--status-under-check);
+  --color-status-violation: var(--status-violation);
+  --color-status-in-remediation: var(--status-in-remediation);
+  --color-status-resolved: var(--status-resolved);
+  --color-status-returned: var(--status-returned);
+  --color-signal: var(--signal);
+  --radius: 0.625rem;
+  --animate-pulse-ring: pulse-ring 1.6s ease-out infinite;
+  --animate-slide-in: slide-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.6);
+      opacity: 0.9;
+    }
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+  @keyframes slide-in {
+    from {
+      transform: translateX(24px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* MapLibre controls follow the theme */
+.maplibregl-ctrl-group {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.15) !important;
+}
+.dark .maplibregl-ctrl-group {
+  background: var(--card);
+}
+.dark .maplibregl-ctrl-group button + button {
+  border-top-color: var(--border);
+}
+.dark .maplibregl-ctrl-icon {
+  filter: invert(1) hue-rotate(180deg);
+}
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+}
+.dark .maplibregl-ctrl-attrib {
+  background: rgb(17 29 44 / 0.8) !important;
+  color: var(--muted-foreground);
+}
+.dark .maplibregl-ctrl-attrib a {
+  color: var(--muted-foreground);
+}
+.maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: 0.5rem !important;
+  background: var(--card) !important;
+  color: var(--card-foreground);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18) !important;
+}
+.maplibregl-popup-tip {
+  border-top-color: var(--card) !important;
+  border-bottom-color: var(--card) !important;
+}

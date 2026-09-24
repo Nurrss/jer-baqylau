@@ -787,6 +787,79 @@
         }
       }
     },
+    "/api/v1/parcels/{parcel_id}/act.pdf": {
+      "get": {
+        "tags": [
+          "parcels"
+        ],
+        "summary": "Inspection act (PDF) in the interface language",
+        "operationId": "inspection_act_api_v1_parcels__parcel_id__act_pdf_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/Lang",
+              "default": "ru"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/signals": {
       "get": {
         "tags": [
@@ -2643,24 +2716,14 @@
             "$ref": "#/components/schemas/LngLat"
           },
           "bbox": {
-            "prefixItems": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              }
-            ],
+            "items": {
+              "type": "number"
+            },
             "type": "array",
             "maxItems": 4,
             "minItems": 4,
-            "title": "Bbox"
+            "title": "Bbox",
+            "description": "minLon, minLat, maxLon, maxLat"
           },
           "lease_until": {
             "anyOf": [
@@ -2950,24 +3013,14 @@
             "$ref": "#/components/schemas/LngLat"
           },
           "bbox": {
-            "prefixItems": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              },
-              {
-                "type": "number"
-              }
-            ],
+            "items": {
+              "type": "number"
+            },
             "type": "array",
             "maxItems": 4,
             "minItems": 4,
-            "title": "Bbox"
+            "title": "Bbox",
+            "description": "minLon, minLat, maxLon, maxLat"
           }
         },
         "type": "object",

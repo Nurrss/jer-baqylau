@@ -26,3 +26,34 @@ application-status-UNDER_REVIEW = ⏳ на рассмотрении
 application-status-INSPECTION_SCHEDULED = 🚗 назначен выезд инспектора
 application-status-APPROVED = ✅ одобрено
 application-status-REJECTED = ❌ отказано
+
+## Справочники (акт, бот)
+
+purpose-IZHS = ИЖС
+purpose-AGRICULTURE = Сельскохозяйственное назначение
+purpose-COMMERCIAL = Коммерческая деятельность
+purpose-INDUSTRIAL = Промышленность
+purpose-LPH = ЛПХ
+owner-PRIVATE = Частная собственность
+owner-LEASE = Аренда
+owner-STATE = Государственная собственность
+violation-UNUSED = Неиспользование по назначению
+violation-SELF_SEIZURE = Самовольный захват
+violation-DUMP = Несанкционированная свалка
+violation-MISUSE = Нецелевое использование
+category-DUMP = Свалка
+category-ABANDONED = Заброшенный участок
+category-SELF_SEIZURE = Самозахват
+category-OTHER = Другое
+photo-source-INSPECTOR = Инспектор
+photo-source-CITIZEN = Житель
+pstatus-OK = Нарушений нет
+pstatus-UNDER_CHECK = На проверке
+pstatus-VIOLATION = Выявлено нарушение
+pstatus-IN_REMEDIATION = Нарушение устраняется
+pstatus-RESOLVED = Нарушение устранено
+pstatus-RETURNED_TO_STATE = Возвращён в госсобственность
+sstatus-NEW = новый
+sstatus-IN_REVIEW = в работе
+sstatus-CONFIRMED = подтверждён
+sstatus-REJECTED = отклонён

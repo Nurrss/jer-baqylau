@@ -30,7 +30,7 @@ def main() -> None:
     out = _bootstrap.WEB_DIR / "src" / "api" / "schema.d.ts"
     out.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(
-        [npx, "--yes", "openapi-typescript", str(target), "-o", str(out)],
+        [npx, "--yes", "openapi-typescript", str(target), "-o", str(out), "--default-non-nullable", "false"],
         check=True,
         cwd=_bootstrap.WEB_DIR,
         shell=sys.platform == "win32",

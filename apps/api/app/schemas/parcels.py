@@ -47,13 +47,13 @@ class ParcelSearchResult(ApiModel):
     address_kk: str
     status: ParcelStatus
     centroid: LngLat
-    bbox: tuple[float, float, float, float]
+    bbox: list[float] = Field(min_length=4, max_length=4, description="minLon, minLat, maxLon, maxLat")
 
 
 class ParcelDetail(ParcelProperties):
     geometry: dict[str, Any]
     centroid: LngLat
-    bbox: tuple[float, float, float, float]
+    bbox: list[float] = Field(min_length=4, max_length=4, description="minLon, minLat, maxLon, maxLat")
     lease_until: date | None
     inspector_id: str | None
     ndvi_scanned_at: datetime | None

@@ -65,5 +65,5 @@ jobs:
       - run: npm run build
       - name: Frontend types match the OpenAPI contract
         run: |
-          npx openapi-typescript ../api/openapi.json -o /tmp/schema.d.ts
+          npx openapi-typescript ../api/openapi.json -o /tmp/schema.d.ts --default-non-nullable false
           diff -q /tmp/schema.d.ts src/api/schema.d.ts || (echo "::error::schema.d.ts is stale — run 'make gen-types'" && exit 1)

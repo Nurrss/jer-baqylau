@@ -27,3 +27,34 @@ application-status-UNDER_REVIEW = ⏳ қаралуда
 application-status-INSPECTION_SCHEDULED = 🚗 инспектордың барып шығуы тағайындалды
 application-status-APPROVED = ✅ мақұлданды
 application-status-REJECTED = ❌ бас тартылды
+
+## Анықтамалықтар (акт, бот)
+
+purpose-IZHS = ЖТҚ
+purpose-AGRICULTURE = Ауыл шаруашылығы мақсаты
+purpose-COMMERCIAL = Коммерциялық қызмет
+purpose-INDUSTRIAL = Өнеркәсіп
+purpose-LPH = ЖҚШ
+owner-PRIVATE = Жеке меншік
+owner-LEASE = Жалға алу
+owner-STATE = Мемлекеттік меншік
+violation-UNUSED = Мақсаты бойынша пайдаланбау
+violation-SELF_SEIZURE = Өз бетінше басып алу
+violation-DUMP = Рұқсатсыз қоқыс үйіндісі
+violation-MISUSE = Мақсатсыз пайдалану
+category-DUMP = Қоқыс үйіндісі
+category-ABANDONED = Иесіз учаске
+category-SELF_SEIZURE = Өз бетінше басып алу
+category-OTHER = Басқа
+photo-source-INSPECTOR = Инспектор
+photo-source-CITIZEN = Тұрғын
+pstatus-OK = Бұзушылық жоқ
+pstatus-UNDER_CHECK = Тексерілуде
+pstatus-VIOLATION = Бұзушылық анықталды
+pstatus-IN_REMEDIATION = Бұзушылық жойылуда
+pstatus-RESOLVED = Бұзушылық жойылды
+pstatus-RETURNED_TO_STATE = Мемлекет меншігіне қайтарылды
+sstatus-NEW = жаңа
+sstatus-IN_REVIEW = жұмыста
+sstatus-CONFIRMED = расталды
+sstatus-REJECTED = қабылданбады

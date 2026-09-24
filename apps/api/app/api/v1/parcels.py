@@ -3,12 +3,13 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, File, Query, UploadFile, status
+from fastapi import APIRouter, File, Query, Response, UploadFile, status
 
 from app.api.deps import CurrentInspector, DbSession, Storage
 from app.core.errors import NotFoundError, ValidationFailedError
 from app.domain.enums import (
     EventType,
+    Lang,
     ParcelPurpose,
     ParcelStatus,
     PhotoOwnerType,
@@ -27,6 +28,7 @@ from app.schemas.parcels import (
 )
 from app.services import audit
 from app.services import parcels as service
+from app.services.act import build_act
 from app.services.photos import save_photo
 
 router = APIRouter(prefix="/parcels", tags=["parcels"], responses=ERROR_RESPONSES)
@@ -161,3 +163,24 @@ async def cadastre_record(parcel_id: uuid.UUID, session: DbSession, _: CurrentIn
     if record is None:
         raise NotFoundError("Registry record not found")
     return CadastreRecord.model_validate(record, from_attributes=True)
+
+
+@router.get(
+    "/{parcel_id}/act.pdf",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}}},
+    summary="Inspection act (PDF) in the interface language",
+)
+async def inspection_act(
+    parcel_id: uuid.UUID,
+    session: DbSession,
+    storage: Storage,
+    inspector: CurrentInspector,
+    lang: Lang = Lang.RU,
+) -> Response:
+    filename, pdf = await build_act(session, storage, parcel_id, lang, inspector.name)
+    return Response(
+        pdf,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
