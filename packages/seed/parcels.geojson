@@ -1,0 +1,2778 @@
+{
+ "type": "FeatureCollection",
+ "name": "jer-demo-parcels-taraz",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3285621,
+        42.9310533
+       ],
+       [
+        71.3289153,
+        42.931103
+       ],
+       [
+        71.3287939,
+        42.9314992
+       ],
+       [
+        71.3284461,
+        42.9314689
+       ],
+       [
+        71.3285621,
+        42.9310533
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:001",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Аль-Фараби, 1",
+    "address_kk": "Тараз қ., Самал ш/а, Әл-Фараби к-сі, 1",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": "2029-03-15",
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 0
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3290698,
+        42.931563
+       ],
+       [
+        71.3291898,
+        42.9311629
+       ],
+       [
+        71.3289153,
+        42.931103
+       ],
+       [
+        71.3287939,
+        42.9314992
+       ],
+       [
+        71.3290698,
+        42.931563
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:002",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Аль-Фараби, 3",
+    "address_kk": "Тараз қ., Самал ш/а, Әл-Фараби к-сі, 3",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": "2035-07-09",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3293968,
+        42.9316127
+       ],
+       [
+        71.3295139,
+        42.9312015
+       ],
+       [
+        71.3291898,
+        42.9311629
+       ],
+       [
+        71.3290698,
+        42.931563
+       ],
+       [
+        71.3293968,
+        42.9316127
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:003",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Аль-Фараби, 5",
+    "address_kk": "Тараз қ., Самал ш/а, Әл-Фараби к-сі, 5",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.329708,
+        42.9316537
+       ],
+       [
+        71.3298156,
+        42.9312647
+       ],
+       [
+        71.3295139,
+        42.9312015
+       ],
+       [
+        71.3293968,
+        42.9316127
+       ],
+       [
+        71.329708,
+        42.9316537
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:004",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Аль-Фараби, 7",
+    "address_kk": "Тараз қ., Самал ш/а, Әл-Фараби к-сі, 7",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": "2026-10-29",
+    "seed_status": "IN_REMEDIATION",
+    "seed_violation_type": "UNUSED",
+    "seed_deadline_days": 30,
+    "seed_index": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3300596,
+        42.9317041
+       ],
+       [
+        71.3301363,
+        42.9313145
+       ],
+       [
+        71.3298156,
+        42.9312647
+       ],
+       [
+        71.329708,
+        42.9316537
+       ],
+       [
+        71.3300596,
+        42.9317041
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:005",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Аль-Фараби, 9",
+    "address_kk": "Тараз қ., Самал ш/а, Әл-Фараби к-сі, 9",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 4
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3303783,
+        42.9317661
+       ],
+       [
+        71.3305021,
+        42.9313586
+       ],
+       [
+        71.3301363,
+        42.9313145
+       ],
+       [
+        71.3300596,
+        42.9317041
+       ],
+       [
+        71.3303783,
+        42.9317661
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:006",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Аль-Фараби, 11",
+    "address_kk": "Тараз қ., Самал ш/а, Әл-Фараби к-сі, 11",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": "2035-04-28",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 5
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3284461,
+        42.9314689
+       ],
+       [
+        71.3283694,
+        42.9317935
+       ],
+       [
+        71.3287037,
+        42.9318412
+       ],
+       [
+        71.3287939,
+        42.9314992
+       ],
+       [
+        71.3284461,
+        42.9314689
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:007",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Бектурова, 41",
+    "address_kk": "Тараз қ., Самал ш/а, Бектұров к-сі, 41",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": "2035-07-18",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 6
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3287939,
+        42.9314992
+       ],
+       [
+        71.3287037,
+        42.9318412
+       ],
+       [
+        71.3289785,
+        42.9318708
+       ],
+       [
+        71.3290698,
+        42.931563
+       ],
+       [
+        71.3287939,
+        42.9314992
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:008",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Бектурова, 43",
+    "address_kk": "Тараз қ., Самал ш/а, Бектұров к-сі, 43",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 7
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3290698,
+        42.931563
+       ],
+       [
+        71.3289785,
+        42.9318708
+       ],
+       [
+        71.3292968,
+        42.9319163
+       ],
+       [
+        71.3293968,
+        42.9316127
+       ],
+       [
+        71.3290698,
+        42.931563
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:009",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Бектурова, 45",
+    "address_kk": "Тараз қ., Самал ш/а, Бектұров к-сі, 45",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 8
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3293968,
+        42.9316127
+       ],
+       [
+        71.3292968,
+        42.9319163
+       ],
+       [
+        71.3295992,
+        42.9319639
+       ],
+       [
+        71.329708,
+        42.9316537
+       ],
+       [
+        71.3293968,
+        42.9316127
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:010",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Бектурова, 47",
+    "address_kk": "Тараз қ., Самал ш/а, Бектұров к-сі, 47",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 9
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.329708,
+        42.9316537
+       ],
+       [
+        71.3295992,
+        42.9319639
+       ],
+       [
+        71.3299384,
+        42.9320315
+       ],
+       [
+        71.3300596,
+        42.9317041
+       ],
+       [
+        71.329708,
+        42.9316537
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:011",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Бектурова, 49",
+    "address_kk": "Тараз қ., Самал ш/а, Бектұров к-сі, 49",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "RESOLVED",
+    "seed_violation_type": "DUMP",
+    "seed_deadline_days": null,
+    "seed_index": 10
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3300596,
+        42.9317041
+       ],
+       [
+        71.3299384,
+        42.9320315
+       ],
+       [
+        71.3302808,
+        42.9320774
+       ],
+       [
+        71.3303783,
+        42.9317661
+       ],
+       [
+        71.3300596,
+        42.9317041
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:012",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Бектурова, 51",
+    "address_kk": "Тараз қ., Самал ш/а, Бектұров к-сі, 51",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 11
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3283694,
+        42.9317935
+       ],
+       [
+        71.3282564,
+        42.9321295
+       ],
+       [
+        71.3286143,
+        42.9321957
+       ],
+       [
+        71.3287037,
+        42.9318412
+       ],
+       [
+        71.3283694,
+        42.9317935
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:013",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Жамбыла, 81",
+    "address_kk": "Тараз қ., Самал ш/а, Жамбыл к-сі, 81",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 12
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3287037,
+        42.9318412
+       ],
+       [
+        71.3286143,
+        42.9321957
+       ],
+       [
+        71.3288965,
+        42.9322265
+       ],
+       [
+        71.3289785,
+        42.9318708
+       ],
+       [
+        71.3287037,
+        42.9318412
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:014",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Жамбыла, 83",
+    "address_kk": "Тараз қ., Самал ш/а, Жамбыл к-сі, 83",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 13
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3289785,
+        42.9318708
+       ],
+       [
+        71.3288965,
+        42.9322265
+       ],
+       [
+        71.3292092,
+        42.9322749
+       ],
+       [
+        71.3292968,
+        42.9319163
+       ],
+       [
+        71.3289785,
+        42.9318708
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:015",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Жамбыла, 85",
+    "address_kk": "Тараз қ., Самал ш/а, Жамбыл к-сі, 85",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 14
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3292968,
+        42.9319163
+       ],
+       [
+        71.3292092,
+        42.9322749
+       ],
+       [
+        71.3294949,
+        42.9323422
+       ],
+       [
+        71.3295992,
+        42.9319639
+       ],
+       [
+        71.3292968,
+        42.9319163
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:016",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Жамбыла, 87",
+    "address_kk": "Тараз қ., Самал ш/а, Жамбыл к-сі, 87",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 15
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3295992,
+        42.9319639
+       ],
+       [
+        71.3294949,
+        42.9323422
+       ],
+       [
+        71.3298492,
+        42.9323854
+       ],
+       [
+        71.3299384,
+        42.9320315
+       ],
+       [
+        71.3295992,
+        42.9319639
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:017",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Жамбыла, 89",
+    "address_kk": "Тараз қ., Самал ш/а, Жамбыл к-сі, 89",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": "2030-06-21",
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 16
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3299384,
+        42.9320315
+       ],
+       [
+        71.3298492,
+        42.9323854
+       ],
+       [
+        71.330186,
+        42.9324457
+       ],
+       [
+        71.3302808,
+        42.9320774
+       ],
+       [
+        71.3299384,
+        42.9320315
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:901:018",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Самал, ул. Жамбыла, 91",
+    "address_kk": "Тараз қ., Самал ш/а, Жамбыл к-сі, 91",
+    "district": "Тараз, мкр. Самал",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 17
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4264367,
+        42.8737066
+       ],
+       [
+        71.4267705,
+        42.8736739
+       ],
+       [
+        71.4268492,
+        42.8741079
+       ],
+       [
+        71.4265013,
+        42.8741494
+       ],
+       [
+        71.4264367,
+        42.8737066
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:001",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 1",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 1",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 18
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4271066,
+        42.8740803
+       ],
+       [
+        71.42703,
+        42.8736414
+       ],
+       [
+        71.4267705,
+        42.8736739
+       ],
+       [
+        71.4268492,
+        42.8741079
+       ],
+       [
+        71.4271066,
+        42.8740803
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:002",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 3",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 3",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "IN_REMEDIATION",
+    "seed_violation_type": "UNUSED",
+    "seed_deadline_days": -5,
+    "seed_index": 19
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4274113,
+        42.874053
+       ],
+       [
+        71.4273107,
+        42.873613
+       ],
+       [
+        71.42703,
+        42.8736414
+       ],
+       [
+        71.4271066,
+        42.8740803
+       ],
+       [
+        71.4274113,
+        42.874053
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:003",
+    "purpose": "LPH",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 5",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 5",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "DUMP",
+    "seed_deadline_days": -3,
+    "seed_index": 20
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4277025,
+        42.874032
+       ],
+       [
+        71.4276053,
+        42.8735999
+       ],
+       [
+        71.4273107,
+        42.873613
+       ],
+       [
+        71.4274113,
+        42.874053
+       ],
+       [
+        71.4277025,
+        42.874032
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:004",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 7",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 7",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 21
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4279539,
+        42.8740023
+       ],
+       [
+        71.4278821,
+        42.8735529
+       ],
+       [
+        71.4276053,
+        42.8735999
+       ],
+       [
+        71.4277025,
+        42.874032
+       ],
+       [
+        71.4279539,
+        42.8740023
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:005",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 9",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 9",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "UNUSED",
+    "seed_deadline_days": -9,
+    "seed_index": 22
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4282603,
+        42.8739657
+       ],
+       [
+        71.4281883,
+        42.8735293
+       ],
+       [
+        71.4278821,
+        42.8735529
+       ],
+       [
+        71.4279539,
+        42.8740023
+       ],
+       [
+        71.4282603,
+        42.8739657
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:006",
+    "purpose": "LPH",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 11",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 11",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": "2035-03-22",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 23
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4285819,
+        42.8739354
+       ],
+       [
+        71.4284891,
+        42.8734857
+       ],
+       [
+        71.4281883,
+        42.8735293
+       ],
+       [
+        71.4282603,
+        42.8739657
+       ],
+       [
+        71.4285819,
+        42.8739354
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:007",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Бектурова, 13",
+    "address_kk": "Тараз қ., Қарасу ш/а, Бектұров к-сі, 13",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 24
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4265013,
+        42.8741494
+       ],
+       [
+        71.4265741,
+        42.8745287
+       ],
+       [
+        71.4269133,
+        42.8745079
+       ],
+       [
+        71.4268492,
+        42.8741079
+       ],
+       [
+        71.4265013,
+        42.8741494
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:008",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 41",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 41",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 25
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4268492,
+        42.8741079
+       ],
+       [
+        71.4269133,
+        42.8745079
+       ],
+       [
+        71.4272094,
+        42.8744586
+       ],
+       [
+        71.4271066,
+        42.8740803
+       ],
+       [
+        71.4268492,
+        42.8741079
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:009",
+    "purpose": "LPH",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 43",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 43",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 26
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4271066,
+        42.8740803
+       ],
+       [
+        71.4272094,
+        42.8744586
+       ],
+       [
+        71.4274651,
+        42.8744299
+       ],
+       [
+        71.4274113,
+        42.874053
+       ],
+       [
+        71.4271066,
+        42.8740803
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:010",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 45",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 45",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": "2032-07-24",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 27
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4274113,
+        42.874053
+       ],
+       [
+        71.4274651,
+        42.8744299
+       ],
+       [
+        71.4277742,
+        42.874417
+       ],
+       [
+        71.4277025,
+        42.874032
+       ],
+       [
+        71.4274113,
+        42.874053
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:011",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 47",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 47",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 28
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4277025,
+        42.874032
+       ],
+       [
+        71.4277742,
+        42.874417
+       ],
+       [
+        71.4280376,
+        42.8743835
+       ],
+       [
+        71.4279539,
+        42.8740023
+       ],
+       [
+        71.4277025,
+        42.874032
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:012",
+    "purpose": "LPH",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 49",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 49",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 29
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4279539,
+        42.8740023
+       ],
+       [
+        71.4280376,
+        42.8743835
+       ],
+       [
+        71.4283294,
+        42.8743402
+       ],
+       [
+        71.4282603,
+        42.8739657
+       ],
+       [
+        71.4279539,
+        42.8740023
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:013",
+    "purpose": "IZHS",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 51",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 51",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": "2029-06-23",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 30
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4282603,
+        42.8739657
+       ],
+       [
+        71.4283294,
+        42.8743402
+       ],
+       [
+        71.4286732,
+        42.8743153
+       ],
+       [
+        71.4285819,
+        42.8739354
+       ],
+       [
+        71.4282603,
+        42.8739657
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:902:014",
+    "purpose": "IZHS",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, мкр. Карасу, ул. Жамбыла, 53",
+    "address_kk": "Тараз қ., Қарасу ш/а, Жамбыл к-сі, 53",
+    "district": "Тараз, мкр. Карасу",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 31
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4491581,
+        42.9161491
+       ],
+       [
+        71.4506227,
+        42.9165657
+       ],
+       [
+        71.4503134,
+        42.9171042
+       ],
+       [
+        71.4488714,
+        42.9166008
+       ],
+       [
+        71.4491581,
+        42.9161491
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:001",
+    "purpose": "COMMERCIAL",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жамбыла, 1",
+    "address_kk": "Тараз қ., айналма жол, Жамбыл к-сі, 1",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": null,
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "DUMP",
+    "seed_deadline_days": 3,
+    "seed_index": 32
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4515436,
+        42.9175307
+       ],
+       [
+        71.4519004,
+        42.9170523
+       ],
+       [
+        71.4506227,
+        42.9165657
+       ],
+       [
+        71.4503134,
+        42.9171042
+       ],
+       [
+        71.4515436,
+        42.9175307
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:002",
+    "purpose": "INDUSTRIAL",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жамбыла, 3",
+    "address_kk": "Тараз қ., айналма жол, Жамбыл к-сі, 3",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": "2027-10-07",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 33
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4523704,
+        42.9177483
+       ],
+       [
+        71.4526339,
+        42.9172552
+       ],
+       [
+        71.4519004,
+        42.9170523
+       ],
+       [
+        71.4515436,
+        42.9175307
+       ],
+       [
+        71.4523704,
+        42.9177483
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:003",
+    "purpose": "COMMERCIAL",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жамбыла, 5",
+    "address_kk": "Тараз қ., айналма жол, Жамбыл к-сі, 5",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": "2030-06-04",
+    "seed_status": "IN_REMEDIATION",
+    "seed_violation_type": "MISUSE",
+    "seed_deadline_days": 16,
+    "seed_index": 34
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.453437,
+        42.9181368
+       ],
+       [
+        71.4536983,
+        42.9176239
+       ],
+       [
+        71.4526339,
+        42.9172552
+       ],
+       [
+        71.4523704,
+        42.9177483
+       ],
+       [
+        71.453437,
+        42.9181368
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:004",
+    "purpose": "COMMERCIAL",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жамбыла, 7",
+    "address_kk": "Тараз қ., айналма жол, Жамбыл к-сі, 7",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 35
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4488714,
+        42.9166008
+       ],
+       [
+        71.4482813,
+        42.9174714
+       ],
+       [
+        71.449824,
+        42.9180011
+       ],
+       [
+        71.4503134,
+        42.9171042
+       ],
+       [
+        71.4488714,
+        42.9166008
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:005",
+    "purpose": "INDUSTRIAL",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жибек жолы, 41",
+    "address_kk": "Тараз қ., айналма жол, Жібек жолы к-сі, 41",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": "2033-05-07",
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "UNUSED",
+    "seed_deadline_days": 21,
+    "seed_index": 36
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4503134,
+        42.9171042
+       ],
+       [
+        71.449824,
+        42.9180011
+       ],
+       [
+        71.4510413,
+        42.9183875
+       ],
+       [
+        71.4515436,
+        42.9175307
+       ],
+       [
+        71.4503134,
+        42.9171042
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:006",
+    "purpose": "COMMERCIAL",
+    "owner_type": "PRIVATE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жибек жолы, 43",
+    "address_kk": "Тараз қ., айналма жол, Жібек жолы к-сі, 43",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": null,
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "SELF_SEIZURE",
+    "seed_deadline_days": 12,
+    "seed_index": 37
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4515436,
+        42.9175307
+       ],
+       [
+        71.4510413,
+        42.9183875
+       ],
+       [
+        71.4518108,
+        42.9186154
+       ],
+       [
+        71.4523704,
+        42.9177483
+       ],
+       [
+        71.4515436,
+        42.9175307
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:007",
+    "purpose": "COMMERCIAL",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жибек жолы, 45",
+    "address_kk": "Тараз қ., айналма жол, Жібек жолы к-сі, 45",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": "2033-01-05",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 38
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.4523704,
+        42.9177483
+       ],
+       [
+        71.4518108,
+        42.9186154
+       ],
+       [
+        71.4528925,
+        42.9189967
+       ],
+       [
+        71.453437,
+        42.9181368
+       ],
+       [
+        71.4523704,
+        42.9177483
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:903:008",
+    "purpose": "INDUSTRIAL",
+    "owner_type": "LEASE",
+    "address_ru": "г. Тараз, Объездная трасса, ул. Жибек жолы, 47",
+    "address_kk": "Тараз қ., айналма жол, Жібек жолы к-сі, 47",
+    "district": "Тараз, Объездная трасса",
+    "lease_until": "2027-01-17",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 39
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2752843,
+        42.9769354
+       ],
+       [
+        71.2757673,
+        42.9741249
+       ],
+       [
+        71.2714811,
+        42.9738613
+       ],
+       [
+        71.2713201,
+        42.9756129
+       ],
+       [
+        71.2725948,
+        42.9756945
+       ],
+       [
+        71.2724801,
+        42.9766537
+       ],
+       [
+        71.2752843,
+        42.9769354
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:001",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 1",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 1 алқап",
+    "district": "Байзакский район",
+    "lease_until": "2026-07-26",
+    "seed_status": "IN_REMEDIATION",
+    "seed_violation_type": "DUMP",
+    "seed_deadline_days": 8,
+    "seed_index": 40
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2791769,
+        42.9773226
+       ],
+       [
+        71.2792868,
+        42.974676
+       ],
+       [
+        71.277049,
+        42.9743256
+       ],
+       [
+        71.2769497,
+        42.975156
+       ],
+       [
+        71.2756049,
+        42.9750699
+       ],
+       [
+        71.2752843,
+        42.9769354
+       ],
+       [
+        71.2791769,
+        42.9773226
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:002",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 2",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 2 алқап",
+    "district": "Байзакский район",
+    "lease_until": "2035-08-05",
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "MISUSE",
+    "seed_deadline_days": 5,
+    "seed_index": 41
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.282992,
+        42.9747041
+       ],
+       [
+        71.2792868,
+        42.974676
+       ],
+       [
+        71.2792022,
+        42.9767135
+       ],
+       [
+        71.2800777,
+        42.9767696
+       ],
+       [
+        71.280002,
+        42.9774024
+       ],
+       [
+        71.2827013,
+        42.9776634
+       ],
+       [
+        71.282992,
+        42.9747041
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:003",
+    "purpose": "AGRICULTURE",
+    "owner_type": "STATE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 3",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 3 алқап",
+    "district": "Байзакский район",
+    "lease_until": null,
+    "seed_status": "RETURNED_TO_STATE",
+    "seed_violation_type": "UNUSED",
+    "seed_deadline_days": null,
+    "seed_index": 42
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.287576,
+        42.9777128
+       ],
+       [
+        71.2883006,
+        42.9751951
+       ],
+       [
+        71.282992,
+        42.9747041
+       ],
+       [
+        71.2827013,
+        42.9776634
+       ],
+       [
+        71.287576,
+        42.9777128
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:004",
+    "purpose": "AGRICULTURE",
+    "owner_type": "STATE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 4",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 4 алқап",
+    "district": "Байзакский район",
+    "lease_until": null,
+    "seed_status": "RETURNED_TO_STATE",
+    "seed_violation_type": "SELF_SEIZURE",
+    "seed_deadline_days": null,
+    "seed_index": 43
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.271236,
+        42.9765288
+       ],
+       [
+        71.2707572,
+        42.9813013
+       ],
+       [
+        71.2746561,
+        42.9812476
+       ],
+       [
+        71.2752843,
+        42.9769354
+       ],
+       [
+        71.271236,
+        42.9765288
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:005",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 5",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 5 алқап",
+    "district": "Байзакский район",
+    "lease_until": "2034-08-13",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 44
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2752843,
+        42.9769354
+       ],
+       [
+        71.2746561,
+        42.9812476
+       ],
+       [
+        71.2786531,
+        42.9816081
+       ],
+       [
+        71.2791769,
+        42.9773226
+       ],
+       [
+        71.2752843,
+        42.9769354
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:006",
+    "purpose": "AGRICULTURE",
+    "owner_type": "PRIVATE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 6",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 6 алқап",
+    "district": "Байзакский район",
+    "lease_until": null,
+    "seed_status": "RESOLVED",
+    "seed_violation_type": "MISUSE",
+    "seed_deadline_days": null,
+    "seed_index": 45
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2791769,
+        42.9773226
+       ],
+       [
+        71.2786531,
+        42.9816081
+       ],
+       [
+        71.2819698,
+        42.9817427
+       ],
+       [
+        71.2827013,
+        42.9776634
+       ],
+       [
+        71.280002,
+        42.9774024
+       ],
+       [
+        71.28000200177972,
+        42.97740238512272
+       ],
+       [
+        71.2791769,
+        42.9773226
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:007",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 7",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 7 алқап",
+    "district": "Байзакский район",
+    "lease_until": "2028-10-04",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 46
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2827013,
+        42.9776634
+       ],
+       [
+        71.2819698,
+        42.9817427
+       ],
+       [
+        71.2875501,
+        42.9821872
+       ],
+       [
+        71.287576,
+        42.9777128
+       ],
+       [
+        71.2827013,
+        42.9776634
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:008",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 8",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 8 алқап",
+    "district": "Байзакский район",
+    "lease_until": "2027-05-02",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 47
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2705784,
+        42.9854912
+       ],
+       [
+        71.2739762,
+        42.9859115
+       ],
+       [
+        71.274512,
+        42.9822359
+       ],
+       [
+        71.2731847,
+        42.982151
+       ],
+       [
+        71.27329039880986,
+        42.98126640996023
+       ],
+       [
+        71.2707572,
+        42.9813013
+       ],
+       [
+        71.2705784,
+        42.9854912
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:009",
+    "purpose": "AGRICULTURE",
+    "owner_type": "PRIVATE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 9",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 9 алқап",
+    "district": "Байзакский район",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 48
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2746561,
+        42.9812476
+       ],
+       [
+        71.2739762,
+        42.9859115
+       ],
+       [
+        71.2783459,
+        42.9861775
+       ],
+       [
+        71.2786531,
+        42.9816081
+       ],
+       [
+        71.2746561,
+        42.9812476
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:010",
+    "purpose": "AGRICULTURE",
+    "owner_type": "PRIVATE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 10",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 10 алқап",
+    "district": "Байзакский район",
+    "lease_until": null,
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 49
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2786531,
+        42.9816081
+       ],
+       [
+        71.2783459,
+        42.9861775
+       ],
+       [
+        71.2818193,
+        42.9863455
+       ],
+       [
+        71.2819698,
+        42.9817427
+       ],
+       [
+        71.2786531,
+        42.9816081
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:011",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 11",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 11 алқап",
+    "district": "Байзакский район",
+    "lease_until": "2033-12-27",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 50
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.2819698,
+        42.9817427
+       ],
+       [
+        71.2818193,
+        42.9863455
+       ],
+       [
+        71.2865689,
+        42.9864856
+       ],
+       [
+        71.2875501,
+        42.9821872
+       ],
+       [
+        71.2819698,
+        42.9817427
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:904:012",
+    "purpose": "AGRICULTURE",
+    "owner_type": "STATE",
+    "address_ru": "Байзакский район, окрестности с. Сарыкемер, поле № 12",
+    "address_kk": "Байзақ ауданы, Сарыкемер а. маңы, № 12 алқап",
+    "district": "Байзакский район",
+    "lease_until": null,
+    "seed_status": "RETURNED_TO_STATE",
+    "seed_violation_type": "UNUSED",
+    "seed_deadline_days": null,
+    "seed_index": 51
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3006809,
+        42.8441324
+       ],
+       [
+        71.3049805,
+        42.8436187
+       ],
+       [
+        71.305906,
+        42.8465015
+       ],
+       [
+        71.3019249,
+        42.847034
+       ],
+       [
+        71.3006809,
+        42.8441324
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:001",
+    "purpose": "AGRICULTURE",
+    "owner_type": "PRIVATE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 1",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 1 алқап",
+    "district": "Жамбылский район",
+    "lease_until": null,
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 52
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3119942,
+        42.8452669
+       ],
+       [
+        71.3109793,
+        42.8422131
+       ],
+       [
+        71.3049805,
+        42.8436187
+       ],
+       [
+        71.305906,
+        42.8465015
+       ],
+       [
+        71.3119942,
+        42.8452669
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:002",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 2",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 2 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2029-12-01",
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 53
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3179291,
+        42.8440036
+       ],
+       [
+        71.3174372,
+        42.8411028
+       ],
+       [
+        71.3109793,
+        42.8422131
+       ],
+       [
+        71.3119942,
+        42.8452669
+       ],
+       [
+        71.3179291,
+        42.8440036
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:003",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 3",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 3 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2034-01-10",
+    "seed_status": "UNDER_CHECK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 54
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3174372,
+        42.8411028
+       ],
+       [
+        71.3179291,
+        42.8440036
+       ],
+       [
+        71.3247683,
+        42.8427073
+       ],
+       [
+        71.3244944,
+        42.8419018
+       ],
+       [
+        71.3255665,
+        42.8417058
+       ],
+       [
+        71.3249261,
+        42.8399413
+       ],
+       [
+        71.3174372,
+        42.8411028
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:004",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 4",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 4 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2031-01-23",
+    "seed_status": "VIOLATION",
+    "seed_violation_type": "SELF_SEIZURE",
+    "seed_deadline_days": 40,
+    "seed_index": 55
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3019249,
+        42.847034
+       ],
+       [
+        71.303623,
+        42.8522577
+       ],
+       [
+        71.3072412,
+        42.8514329
+       ],
+       [
+        71.305906,
+        42.8465015
+       ],
+       [
+        71.3019249,
+        42.847034
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:005",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 5",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 5 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2032-10-06",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 56
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.305906,
+        42.8465015
+       ],
+       [
+        71.3072412,
+        42.8514329
+       ],
+       [
+        71.3143532,
+        42.850432
+       ],
+       [
+        71.3119942,
+        42.8452669
+       ],
+       [
+        71.305906,
+        42.8465015
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:006",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 6",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 6 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2031-04-07",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 57
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3119942,
+        42.8452669
+       ],
+       [
+        71.3143532,
+        42.850432
+       ],
+       [
+        71.3175459,
+        42.8495791
+       ],
+       [
+        71.3169871,
+        42.8479358
+       ],
+       [
+        71.3190496,
+        42.8475587
+       ],
+       [
+        71.3179291,
+        42.8440036
+       ],
+       [
+        71.3119942,
+        42.8452669
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:007",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 7",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 7 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2030-10-19",
+    "seed_status": "IN_REMEDIATION",
+    "seed_violation_type": "SELF_SEIZURE",
+    "seed_deadline_days": -2,
+    "seed_index": 58
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "MultiPolygon",
+    "coordinates": [
+     [
+      [
+       [
+        71.3195201,
+        42.8490517
+       ],
+       [
+        71.3274193,
+        42.8480083
+       ],
+       [
+        71.3262073,
+        42.8437409
+       ],
+       [
+        71.3245984,
+        42.844035
+       ],
+       [
+        71.3241845,
+        42.842818
+       ],
+       [
+        71.3179291,
+        42.8440036
+       ],
+       [
+        71.3190496,
+        42.8475587
+       ],
+       [
+        71.31904955655548,
+        42.847558707943236
+       ],
+       [
+        71.3195201,
+        42.8490517
+       ]
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "cadastral_number": "06:097:905:008",
+    "purpose": "AGRICULTURE",
+    "owner_type": "LEASE",
+    "address_ru": "Жамбылский район, окрестности с. Аса, поле № 8",
+    "address_kk": "Жамбыл ауданы, Аса а. маңы, № 8 алқап",
+    "district": "Жамбылский район",
+    "lease_until": "2028-07-01",
+    "seed_status": "OK",
+    "seed_violation_type": null,
+    "seed_deadline_days": null,
+    "seed_index": 59
+   }
+  }
+ ]
+}

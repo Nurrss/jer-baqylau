@@ -1,0 +1,80 @@
+# Исторические сигналы «Народного контроля» (фото — сгенерированные плейсхолдеры).
+# parcel: кадастровый номер, внутри которого ставится точка (offset_m — сдвиг от центра, м).
+# location: явные координаты, если сигнал вне участков.
+signals:
+  - key: dump-samal
+    category: DUMP
+    parcel: "06:097:901:009"
+    offset_m: [3, -2]
+    hours_ago: 5
+    status: NEW
+    lang: ru
+    photos: 2
+    description: У забора свалили строительный мусор и старые покрышки, уже неделю лежит.
+  - key: dump-samal-dup
+    duplicate_of: dump-samal
+    category: DUMP
+    parcel: "06:097:901:009"
+    offset_m: [-6, 4]
+    hours_ago: 2
+    status: NEW
+    lang: kk
+    photos: 1
+    description: Қоршаудың жанына құрылыс қоқысы тасталған.
+  - key: abandoned-assa
+    category: ABANDONED
+    parcel: "06:097:905:002"
+    offset_m: [40, 25]
+    hours_ago: 26
+    status: NEW
+    lang: kk
+    photos: 1
+    description: Алқап үш жыл бойы егілмеген, арамшөп басып кеткен.
+  - key: seizure-samal
+    category: SELF_SEIZURE
+    parcel: "06:097:901:015"
+    offset_m: [0, 0]
+    hours_ago: 52
+    status: IN_REVIEW
+    lang: ru
+    photos: 2
+    comment: Взят в работу, выезд запланирован.
+    description: Соседи передвинули забор примерно на 3 метра на улицу.
+  - key: dump-karasu
+    category: DUMP
+    parcel: "06:097:902:003"
+    offset_m: [2, 2]
+    hours_ago: 430
+    status: CONFIRMED
+    lang: ru
+    photos: 1
+    comment: Нарушение подтверждено при выезде, собственнику выдано предписание.
+    description: На участке жгут мусор, дым идёт на дома.
+  - key: seizure-bypass
+    category: SELF_SEIZURE
+    parcel: "06:097:903:006"
+    offset_m: [-10, 5]
+    hours_ago: 330
+    status: CONFIRMED
+    lang: kk
+    photos: 1
+    comment: Самовольный захват подтверждён обмером.
+    description: Дүкен иесі учаскенің шекарасынан шығып, тұрақ салып алды.
+  - key: other-samal
+    category: OTHER
+    parcel: "06:097:901:002"
+    offset_m: [0, 0]
+    hours_ago: 240
+    status: REJECTED
+    lang: ru
+    photos: 1
+    comment: "Нарушение не подтвердилось: на участке ведётся согласованное строительство."
+    description: На участке что-то строят без таблички.
+  - key: dump-roadside
+    category: DUMP
+    location: [42.9225, 71.4655]
+    hours_ago: 70
+    status: NEW
+    lang: ru
+    photos: 1
+    description: Вдоль объездной дороги свалка бытового мусора.
