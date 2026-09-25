@@ -3,14 +3,17 @@ import {
   Building2,
   CalendarClock,
   Check,
+  CheckCircle2,
   CircleAlert,
   Database,
   FileDown,
+  Info,
+  Lightbulb,
   Loader2,
   Megaphone,
   X,
 } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { downloadFile } from '@/api/client'
@@ -23,12 +26,14 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/misc'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoryTimeline } from '@/features/common/History'
 import { PhotoGallery, PhotoUploader } from '@/features/common/PhotoGallery'
 import { daysUntil, fromDateInput, toDateInput, useDateFns } from '@/lib/dates'
 import { LIFECYCLE_STEPS, lifecycleIndex } from '@/lib/status'
 import { cn, formatArea } from '@/lib/utils'
+import { useGuideStore } from '@/store/guide'
 import { useUiStore } from '@/store/ui'
 import { ParcelTransitionDialog } from './ParcelTransitionDialog'
 
@@ -284,6 +289,74 @@ function PanelSkeleton() {
   )
 }
 
+function TabCount({ n }: { n: number }) {
+  return n > 0 ? <span className="text-xs text-muted-foreground tabular-nums">{n}</span> : null
+}
+
+type NextStepKind = 'info' | 'warning' | 'danger' | 'success' | 'muted'
+
+/** What the inspector should do next, derived from the parcel state (the state machine is the source of truth). */
+function nextStep(parcel: ParcelDetail): { key: string; kind: NextStepKind; action?: ParcelStatus } {
+  const overdue = parcel.is_overdue
+  switch (parcel.status) {
+    case 'OK':
+      return parcel.open_signals_count > 0
+        ? { key: 'okWithSignals', kind: 'warning', action: 'UNDER_CHECK' }
+        : { key: 'ok', kind: 'muted' }
+    case 'UNDER_CHECK':
+      return { key: 'underCheck', kind: 'warning', action: 'VIOLATION' }
+    case 'VIOLATION':
+      return { key: overdue ? 'violationOverdue' : 'violation', kind: 'danger', action: 'IN_REMEDIATION' }
+    case 'IN_REMEDIATION':
+      return overdue
+        ? { key: 'remediationOverdue', kind: 'danger', action: 'RETURNED_TO_STATE' }
+        : { key: 'remediation', kind: 'info', action: 'RESOLVED' }
+    case 'RESOLVED':
+      return { key: 'resolved', kind: 'success' }
+    default:
+      return { key: 'returned', kind: 'muted' }
+  }
+}
+
+function NextStep({ parcel, onAction }: { parcel: ParcelDetail; onAction: (to: ParcelStatus) => void }) {
+  const { t } = useTranslation()
+  const { date } = useDateFns()
+  const step = nextStep(parcel)
+  const styles: Record<NextStepKind, string> = {
+    info: 'border-primary/30 bg-primary/5',
+    warning: 'border-accent/50 bg-accent/10',
+    danger: 'border-destructive/30 bg-destructive/5',
+    success: 'border-success/30 bg-success/5',
+    muted: 'border-border bg-muted/40',
+  }
+  const Icon = step.kind === 'success' ? CheckCircle2 : step.kind === 'muted' ? Info : Lightbulb
+  return (
+    <div className={cn('mx-5 mb-2 rounded-xl border p-3', styles[step.kind])} data-tour="parcel-next">
+      <p className="flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
+        <Icon className="size-3.5" /> {t('nextStep.title')}
+      </p>
+      <p className="mt-1 text-sm">
+        {t(`nextStep.${step.key}`, {
+          count: parcel.open_signals_count,
+          date: date(parcel.deadline_at),
+        })}
+      </p>
+      {step.action && parcel.allowed_transitions.includes(step.action) && (
+        <Button
+          size="sm"
+          className="mt-2.5"
+          variant={
+            step.action === 'VIOLATION' || step.action === 'RETURNED_TO_STATE' ? 'destructive' : 'default'
+          }
+          onClick={() => onAction(step.action!)}
+        >
+          {t(`transition.action.PARCEL.${step.action}`)}
+        </Button>
+      )}
+    </div>
+  )
+}
+
 export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: () => void }) {
   const { t, i18n } = useTranslation()
   const errorMessage = useErrorMessage()
@@ -292,7 +365,15 @@ export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: 
   const selectSignal = useUiStore((s) => s.selectSignal)
   const [target, setTarget] = useState<ParcelStatus | null>(null)
   const [downloading, setDownloading] = useState(false)
+  const [tab, setTab] = useState('overview')
   const parcel = query.data
+  const startOnce = useGuideStore((s) => s.startOnce)
+
+  useEffect(() => {
+    if (!parcel) return
+    const timer = window.setTimeout(() => startOnce('parcel'), 700)
+    return () => window.clearTimeout(timer)
+  }, [parcel, startOnce])
 
   return (
     <aside
@@ -338,90 +419,117 @@ export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: 
         {query.isError && <ErrorState error={query.error} onRetry={() => void query.refetch()} />}
         {parcel && (
           <>
-            <Section title={t('lifecycle.title')}>
-              <LifecycleStepper status={parcel.status} />
-              {parcel.allowed_transitions.length > 0 ? (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {parcel.allowed_transitions.map((to) => (
-                    <Button
-                      key={to}
-                      size="sm"
-                      variant={
-                        to === 'VIOLATION' || to === 'RETURNED_TO_STATE'
-                          ? 'destructive'
-                          : to === 'RESOLVED' || to === 'OK'
-                            ? 'success'
-                            : 'default'
-                      }
-                      onClick={() => setTarget(to)}
-                    >
-                      {t(`transition.action.PARCEL.${to}`)}
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-xs text-muted-foreground">{t('lifecycle.terminal')}</p>
-              )}
-            </Section>
-
-            <DeadlineEditor key={parcel.deadline_at ?? 'none'} parcel={parcel} />
-
-            <Section title={t('parcel.characteristics')}>
-              <Characteristics parcel={parcel} />
-            </Section>
-
-            <Section
-              title={t('photos.title')}
-              aside={<span className="text-xs text-muted-foreground">{parcel.photos.length}</span>}
-            >
-              <div className="grid gap-3">
-                <PhotoGallery photos={parcel.photos} />
-                <PhotoUploader upload={(files, onProgress) => upload.mutateAsync({ files, onProgress })} />
+            <NextStep parcel={parcel} onAction={setTarget} />
+            <Tabs value={tab} onValueChange={setTab} className="mt-1">
+              <div className="sticky top-0 z-10 border-b bg-card px-5 pb-2" data-tour="parcel-tabs">
+                <TabsList className="w-full">
+                  <TabsTrigger value="overview" className="flex-1">
+                    {t('parcel.tabs.overview')}
+                  </TabsTrigger>
+                  <TabsTrigger value="photos" className="flex-1">
+                    {t('parcel.tabs.photos')} <TabCount n={parcel.photos.length} />
+                  </TabsTrigger>
+                  <TabsTrigger value="signals" className="flex-1">
+                    {t('parcel.tabs.signals')} <TabCount n={parcel.signals.length} />
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="flex-1">
+                    {t('parcel.tabs.history')}
+                  </TabsTrigger>
+                </TabsList>
               </div>
-            </Section>
 
-            <Section title={t('parcel.relatedSignals')} icon={<Megaphone className="size-3.5" />}>
-              {parcel.signals.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t('parcel.noSignals')}</p>
-              ) : (
-                <ul className="grid gap-2">
-                  {parcel.signals.map((signal) => (
-                    <li key={signal.id}>
-                      <button
-                        type="button"
-                        onClick={() => selectSignal(signal.id)}
-                        className="flex w-full items-center gap-3 rounded-lg border p-2 text-left hover:bg-muted"
-                      >
-                        {signal.thumb_url ? (
-                          <img src={signal.thumb_url} alt="" className="size-10 rounded object-cover" />
-                        ) : (
-                          <span className="grid size-10 place-items-center rounded bg-muted">
-                            <Megaphone className="size-4 text-muted-foreground" />
-                          </span>
-                        )}
-                        <span className="min-w-0 flex-1">
-                          <span className="block font-mono text-xs font-semibold">
-                            {signal.tracking_code}
-                          </span>
-                          <span className="block truncate text-xs text-muted-foreground">
-                            {t(`signalCategory.${signal.category}`)}
-                            {signal.reports_count > 1 &&
-                              ` · ${t('signals.reports', { count: signal.reports_count })}`}
-                          </span>
-                        </span>
-                        <StatusBadge kind="signal" status={signal.status} />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Section>
+              <TabsContent value="overview">
+                <Section title={t('lifecycle.title')}>
+                  <LifecycleStepper status={parcel.status} />
+                  {parcel.allowed_transitions.length > 0 ? (
+                    <div className="mt-4 grid gap-2" data-tour="parcel-actions">
+                      <p className="text-xs text-muted-foreground">{t('parcel.allActions')}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {parcel.allowed_transitions.map((to) => (
+                          <Button
+                            key={to}
+                            size="sm"
+                            variant={
+                              to === 'VIOLATION' || to === 'RETURNED_TO_STATE'
+                                ? 'destructive'
+                                : to === 'RESOLVED' || to === 'OK'
+                                  ? 'success'
+                                  : 'default'
+                            }
+                            onClick={() => setTarget(to)}
+                          >
+                            {t(`transition.action.PARCEL.${to}`)}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-xs text-muted-foreground">{t('lifecycle.terminal')}</p>
+                  )}
+                </Section>
+                <DeadlineEditor key={parcel.deadline_at ?? 'none'} parcel={parcel} />
+                <Section title={t('parcel.characteristics')}>
+                  <Characteristics parcel={parcel} />
+                </Section>
+                <CadastreCheck parcelId={parcel.id} />
+              </TabsContent>
 
-            <CadastreCheck parcelId={parcel.id} />
+              <TabsContent value="photos">
+                <Section title={t('photos.title')}>
+                  <div className="grid gap-3">
+                    <PhotoUploader
+                      upload={(files, onProgress) => upload.mutateAsync({ files, onProgress })}
+                    />
+                    <PhotoGallery photos={parcel.photos} />
+                  </div>
+                </Section>
+              </TabsContent>
 
-            <Section title={t('history.title')}>
-              <HistoryTimeline items={parcel.history} kind="parcel" />
-            </Section>
+              <TabsContent value="signals">
+                <Section title={t('parcel.relatedSignals')} icon={<Megaphone className="size-3.5" />}>
+                  {parcel.signals.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{t('parcel.noSignals')}</p>
+                  ) : (
+                    <ul className="grid gap-2">
+                      {parcel.signals.map((signal) => (
+                        <li key={signal.id}>
+                          <button
+                            type="button"
+                            onClick={() => selectSignal(signal.id)}
+                            className="flex w-full items-center gap-3 rounded-lg border p-2 text-left hover:bg-muted"
+                          >
+                            {signal.thumb_url ? (
+                              <img src={signal.thumb_url} alt="" className="size-10 rounded object-cover" />
+                            ) : (
+                              <span className="grid size-10 place-items-center rounded bg-muted">
+                                <Megaphone className="size-4 text-muted-foreground" />
+                              </span>
+                            )}
+                            <span className="min-w-0 flex-1">
+                              <span className="block font-mono text-xs font-semibold">
+                                {signal.tracking_code}
+                              </span>
+                              <span className="block truncate text-xs text-muted-foreground">
+                                {t(`signalCategory.${signal.category}`)}
+                                {signal.reports_count > 1 &&
+                                  ` · ${t('signals.reports', { count: signal.reports_count })}`}
+                              </span>
+                            </span>
+                            <StatusBadge kind="signal" status={signal.status} />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </Section>
+              </TabsContent>
+
+              <TabsContent value="history">
+                <Section title={t('history.title')}>
+                  <HistoryTimeline items={parcel.history} kind="parcel" />
+                </Section>
+              </TabsContent>
+            </Tabs>
           </>
         )}
       </div>

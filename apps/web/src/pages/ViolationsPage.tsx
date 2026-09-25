@@ -170,7 +170,7 @@ export function ViolationsPage() {
                   <tr
                     key={p.id}
                     className="cursor-pointer border-b last:border-0 hover:bg-muted/50"
-                    onClick={() => navigate(`/?parcel=${p.id}`)}
+                    onClick={() => navigate(`/map?parcel=${p.id}`)}
                   >
                     <td className="px-4 py-3 font-mono font-medium">{p.cadastral_number}</td>
                     <td className="px-4 py-3">

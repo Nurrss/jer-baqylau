@@ -141,7 +141,7 @@ export function SignalsPage() {
                     // Narrow screens have no detail pane: open the signal on the map instead.
                     window.matchMedia('(min-width: 768px)').matches
                       ? setSelected(signal.id)
-                      : navigate(`/?signal=${signal.id}`)
+                      : navigate(`/map?signal=${signal.id}`)
                   }
                 />
               ))}
@@ -181,14 +181,14 @@ export function SignalsPage() {
                 variant="outline"
                 size="sm"
                 className="ml-auto"
-                onClick={() => navigate(`/?signal=${detail.data.id}`)}
+                onClick={() => navigate(`/map?signal=${detail.data.id}`)}
               >
                 <MapIcon /> {t('realtime.showOnMap')}
               </Button>
             </header>
             <SignalDetailView
               signal={detail.data}
-              onOpenParcel={(parcelId) => navigate(`/?parcel=${parcelId}`)}
+              onOpenParcel={(parcelId) => navigate(`/map?parcel=${parcelId}`)}
             />
           </div>
         ) : null}

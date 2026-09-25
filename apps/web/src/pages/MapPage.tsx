@@ -9,6 +9,7 @@ import { ParcelMap } from '@/features/map/ParcelMap'
 import { ParcelPanel } from '@/features/parcel/ParcelPanel'
 import { SignalPanel } from '@/features/signals/SignalPanel'
 import { cn } from '@/lib/utils'
+import { useGuideStore } from '@/store/guide'
 import { useUiStore } from '@/store/ui'
 
 export function MapPage() {
@@ -17,6 +18,14 @@ export function MapPage() {
   const signals = useSignals()
   const { selectedParcelId, selectedSignalId, selectParcel, selectSignal, flyTo } = useUiStore()
   const [params, setParams] = useSearchParams()
+  const startOnce = useGuideStore((s) => s.startOnce)
+
+  // First visit to the map: a short guided tour once the parcels are on screen.
+  useEffect(() => {
+    if (!parcels.data || selectedParcelId || selectedSignalId) return
+    const timer = window.setTimeout(() => startOnce('map'), 800)
+    return () => window.clearTimeout(timer)
+  }, [parcels.data, selectedParcelId, selectedSignalId, startOnce])
 
   // Deep links: /?parcel=<id> or /?signal=<id> (from tables and the signal queue).
   useEffect(() => {
@@ -75,7 +84,7 @@ export function MapPage() {
       )}
 
       <div className="pointer-events-none absolute top-3 right-3 left-3 z-10 flex items-start justify-between gap-3">
-        <div className="pointer-events-auto w-full max-w-md">
+        <div className="pointer-events-auto w-full max-w-md" data-tour="map-search">
           <MapSearch
             onPick={(result) => {
               selectParcel(result.id)
@@ -89,11 +98,13 @@ export function MapPage() {
             (selectedParcelId || selectedSignalId) && 'hidden md:mr-[440px] md:block',
           )}
         >
-          <LayerControls />
+          <div data-tour="map-layers">
+            <LayerControls />
+          </div>
         </div>
       </div>
 
-      <div className="absolute bottom-6 left-3 z-10">
+      <div className="absolute bottom-6 left-3 z-10" data-tour="map-legend">
         <Legend parcels={parcels.data} />
       </div>
 

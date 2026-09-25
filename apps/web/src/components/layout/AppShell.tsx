@@ -1,11 +1,14 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import {
   BarChart3,
+  CircleHelp,
   FileText,
+  Home,
   LogOut,
   Map as MapIcon,
   Megaphone,
   Moon,
+  Search,
   ShieldAlert,
   Sun,
   UserRound,
@@ -19,11 +22,16 @@ import { Logo } from '@/components/common/Logo'
 import { Tooltip } from '@/components/ui/misc'
 import { playChime, useRealtimeEvents, useRealtimeStatus, type SignalCreatedPayload } from '@/lib/realtime'
 import { cn } from '@/lib/utils'
+import { CommandPalette } from '@/features/guide/CommandPalette'
+import { HelpDialog } from '@/features/guide/HelpDialog'
+import { Tour } from '@/features/guide/Tour'
 import { useAuthStore } from '@/store/auth'
+import { useGuideStore } from '@/store/guide'
 import { useUiStore } from '@/store/ui'
 
 const NAV = [
-  { to: '/', icon: MapIcon, key: 'map', end: true },
+  { to: '/', icon: Home, key: 'home', end: true },
+  { to: '/map', icon: MapIcon, key: 'map' },
   { to: '/signals', icon: Megaphone, key: 'signals' },
   { to: '/violations', icon: ShieldAlert, key: 'violations' },
   { to: '/applications', icon: FileText, key: 'applications' },
@@ -35,6 +43,7 @@ function LanguageSwitch() {
   return (
     <div
       className="flex rounded-lg border bg-muted p-0.5 text-xs font-semibold"
+      data-tour="lang"
       role="group"
       aria-label="Language"
     >
@@ -69,7 +78,10 @@ function RealtimeIndicator() {
   }[mode]
   return (
     <Tooltip content={t(`realtime.hint.${mode}`)}>
-      <span className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
+      <span
+        className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex"
+        data-tour="realtime"
+      >
         <span className={cn('relative flex size-2 rounded-full', color)}>
           {mode === 'realtime' && (
             <span className={cn('absolute inset-0 animate-ping rounded-full opacity-60', color)} />
@@ -125,6 +137,25 @@ export function AppShell() {
   const theme = useUiStore((s) => s.theme)
   const setTheme = useUiStore((s) => s.setTheme)
   const newSignals = useSignals(['NEW']).data?.total ?? 0
+  const setPaletteOpen = useGuideStore((s) => s.setPaletteOpen)
+  const setHelpOpen = useGuideStore((s) => s.setHelpOpen)
+
+  // Global shortcuts: Ctrl/⌘+K — search, "?" — help (ignored while typing).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      const typing =
+        target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen(true)
+      } else if (e.key === '?' && !typing) {
+        setHelpOpen(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [setPaletteOpen, setHelpOpen])
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -141,7 +172,7 @@ export function AppShell() {
         action: {
           label: t('realtime.showOnMap'),
           onClick: () => {
-            navigate('/')
+            navigate('/map')
             useUiStore.getState().selectSignal(payload.signal_id)
             useUiStore.getState().flyTo({ center: [payload.lon, payload.lat], zoom: 17 })
           },
@@ -157,6 +188,7 @@ export function AppShell() {
       <nav
         className="z-20 flex w-16 shrink-0 flex-col items-center gap-1 bg-sidebar py-3 text-sidebar-foreground lg:w-56 lg:items-stretch lg:px-3"
         aria-label={t('nav.label')}
+        data-tour="nav"
       >
         <div className="mb-4 flex items-center gap-2.5 px-1 lg:px-2">
           <Logo className="size-9 shrink-0" />
@@ -170,6 +202,8 @@ export function AppShell() {
             key={to}
             to={to}
             end={'end' in rest}
+            data-tour={`nav-${key}`}
+            title={t(`nav.hint.${key}`)}
             className={({ isActive }) =>
               cn(
                 'group relative flex items-center gap-3 rounded-lg p-2.5 text-sm font-medium transition-colors lg:px-3',
@@ -198,7 +232,19 @@ export function AppShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="z-10 flex h-14 shrink-0 items-center gap-3 border-b bg-card px-4">
-          <h1 className="truncate text-sm font-semibold text-muted-foreground">{t('app.subtitle')}</h1>
+          <h1 className="hidden truncate text-sm font-semibold text-muted-foreground xl:block">
+            {t('app.subtitle')}
+          </h1>
+          <button
+            type="button"
+            data-tour="palette"
+            onClick={() => setPaletteOpen(true)}
+            className="flex h-9 w-full max-w-xs items-center gap-2 rounded-lg border bg-muted/60 px-3 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted xl:ml-4"
+          >
+            <Search className="size-4" />
+            <span className="truncate">{t('palette.trigger')}</span>
+            <kbd className="ml-auto hidden rounded border bg-card px-1.5 text-[10px] whitespace-nowrap sm:block">Ctrl K</kbd>
+          </button>
           <div className="ml-auto flex items-center gap-3">
             <RealtimeIndicator />
             <LanguageSwitch />
@@ -212,6 +258,17 @@ export function AppShell() {
                 {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
               </button>
             </Tooltip>
+            <Tooltip content={t('help.button')}>
+              <button
+                type="button"
+                data-tour="help"
+                className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+                onClick={() => setHelpOpen(true)}
+                aria-label={t('help.button')}
+              >
+                <CircleHelp className="size-4" />
+              </button>
+            </Tooltip>
             <UserMenu />
           </div>
         </header>
@@ -219,6 +276,9 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      <Tour />
+      <HelpDialog />
+      <CommandPalette />
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { AppShell } from '@/components/layout/AppShell'
 import { TooltipProvider } from '@/components/ui/misc'
 import { ApplicationsPage } from '@/pages/ApplicationsPage'
 import { DashboardPage } from '@/pages/DashboardPage'
+import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { MapPage } from '@/pages/MapPage'
 import { SignalsPage } from '@/pages/SignalsPage'
@@ -65,7 +66,8 @@ export default function App() {
                 </RequireAuth>
               }
             >
-              <Route index element={<MapPage />} />
+              <Route index element={<HomePage />} />
+              <Route path="map" element={<MapPage />} />
               <Route path="signals" element={<SignalsPage />} />
               <Route path="violations" element={<ViolationsPage />} />
               <Route path="applications" element={<ApplicationsPage />} />

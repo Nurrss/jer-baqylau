@@ -1,7 +1,7 @@
 import { BellRing, FileText, Loader2, Search, X } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useApplications, useApplicationTransition } from '@/api/queries'
 import { APPLICATION_STATUSES, type Application, type ApplicationStatus } from '@/api/types'
@@ -188,7 +188,7 @@ function ApplicationPanel({ application, onClose }: { application: Application; 
                 <button
                   type="button"
                   className="font-mono text-primary hover:underline"
-                  onClick={() => navigate(`/?parcel=${application.parcel_id}`)}
+                  onClick={() => navigate(`/map?parcel=${application.parcel_id}`)}
                 >
                   {application.parcel_cadastral_number}
                 </button>
@@ -227,7 +227,9 @@ export function ApplicationsPage() {
   const [status, setStatus] = useState<ApplicationStatus | 'all'>('all')
   const [search, setSearch] = useState('')
   const [q, setQ] = useState('')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [params] = useSearchParams()
+  // Deep link from «Сегодня» / search: /applications?id=<uuid>
+  const [selectedId, setSelectedId] = useState<string | null>(params.get('id'))
   const query = useApplications(status === 'all' ? [] : [status], q)
   const selected = query.data?.items.find((a) => a.id === selectedId) ?? null
 
