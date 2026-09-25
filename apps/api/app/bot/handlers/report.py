@@ -9,6 +9,7 @@ from __future__ import annotations
 import asyncio
 import html
 import io
+import re
 import time
 import uuid
 from collections import defaultdict
@@ -44,6 +45,7 @@ log = get_logger(__name__)
 router = Router(name="report")
 
 MAX_PHOTOS = 5
+COORDS_RE = re.compile(r"^\s*(-?\d{1,2}\.\d+)\s*[,; ]\s*(-?\d{1,3}\.\d+)\s*$")
 MAX_DESCRIPTION = 500
 PHOTO_ACK_DELAY = 1.2  # seconds: one reply per album instead of one per photo
 
@@ -140,11 +142,30 @@ async def category_expected(message: Message, tr: Tr) -> None:
 # ── Location ────────────────────────────────────────────────────────────────
 
 
+def parse_coordinates(text: str) -> tuple[float, float] | None:
+    """Coordinates pasted from a map app: "42.9283, 71.3466" (also with ';' or spaces)."""
+    match = COORDS_RE.match(text.strip())
+    if not match:
+        return None
+    lat, lon = float(match.group(1)), float(match.group(2))
+    return (lat, lon) if -90 <= lat <= 90 and -180 <= lon <= 180 else None
+
+
 @router.message(ReportFlow.location, F.location | F.venue)
 async def receive_location(message: Message, state: FSMContext, tr: Tr) -> None:
     location = message.venue.location if message.venue else message.location
     assert location is not None
-    lat, lon = location.latitude, location.longitude
+    await _accept_location(message, state, tr, location.latitude, location.longitude)
+
+
+@router.message(ReportFlow.location, F.text.func(lambda text: parse_coordinates(text) is not None))
+async def receive_coordinates(message: Message, state: FSMContext, tr: Tr) -> None:
+    coords = parse_coordinates(message.text or "")
+    assert coords is not None
+    await _accept_location(message, state, tr, *coords)
+
+
+async def _accept_location(message: Message, state: FSMContext, tr: Tr, lat: float, lon: float) -> None:
     if not signal_service.in_region(lat, lon):
         await message.answer(tr("report-out-of-region"), reply_markup=location_keyboard(tr))
         return

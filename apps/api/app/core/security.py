@@ -101,7 +101,10 @@ async def verify_token(token: str, settings: Settings | None = None) -> Inspecto
         raise AuthError("Token expired", code="TOKEN_EXPIRED") from exc
     except (jwt.PyJWTError, KeyError) as exc:
         raise AuthError("Invalid token") from exc
-    return _claims_to_inspector(claims)
+    inspector = _claims_to_inspector(claims)
+    if settings.inspector_emails and (inspector.email or "").lower() not in settings.inspector_emails:
+        raise ForbiddenError("This account is not registered as an inspector", code="NOT_AN_INSPECTOR")
+    return inspector
 
 
 def verify_service_key(provided: str | None, settings: Settings | None = None) -> None:

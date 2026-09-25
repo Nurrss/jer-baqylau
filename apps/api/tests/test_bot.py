@@ -290,3 +290,11 @@ async def test_duplicate_update_is_processed_once(bot_env: tuple[Bot, Dispatcher
     for _ in range(2):
         await process_update(bot, dp, Update.model_validate(payload, context={"bot": bot}))
     assert len(session.texts()) == 1
+
+
+def test_parse_coordinates() -> None:
+    assert report.parse_coordinates("42.9283, 71.3466") == (42.9283, 71.3466)
+    assert report.parse_coordinates(" 42.9283;71.3466 ") == (42.9283, 71.3466)
+    assert report.parse_coordinates("42.9 71.3") == (42.9, 71.3)
+    assert report.parse_coordinates("привет") is None
+    assert report.parse_coordinates("99.1, 71.3") is None

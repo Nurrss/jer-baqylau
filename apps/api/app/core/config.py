@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
@@ -39,7 +40,8 @@ class BotMode(StrEnum):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(REPO_ROOT / ".env", API_ROOT / ".env"),
+        # JER_ENV_FILE=.env.production lets scripts target another environment.
+        env_file=(REPO_ROOT / os.environ.get("JER_ENV_FILE", ".env"), API_ROOT / ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
@@ -71,6 +73,8 @@ class Settings(BaseSettings):
     demo_inspector_password: SecretStr = SecretStr("demo12345")
     demo_inspector_name: str = "Инспектор Демо"
     service_api_key: SecretStr = SecretStr("local-service-key")
+    # Optional allowlist of inspector emails (defence in depth on top of Supabase sign-up settings).
+    inspector_emails: Annotated[list[str], NoDecode] = Field(default_factory=list)
 
     # --- Storage ---
     storage_backend: StorageBackend = StorageBackend.LOCAL
@@ -104,6 +108,13 @@ class Settings(BaseSettings):
     def _split_origins(cls, value: Any) -> Any:
         if isinstance(value, str):
             return [item.strip() for item in value.split(",") if item.strip()]
+        return value
+
+    @field_validator("inspector_emails", mode="before")
+    @classmethod
+    def _split_emails(cls, value: Any) -> Any:
+        if isinstance(value, str):
+            return [item.strip().lower() for item in value.split(",") if item.strip()]
         return value
 
     @field_validator("region_bbox", mode="before")

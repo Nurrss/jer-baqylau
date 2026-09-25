@@ -97,3 +97,16 @@ def test_mask_person_name() -> None:
     assert mask_person_name("Ерлан Серкулов") == "Ерлан С."
     assert mask_person_name("Айгерим") == "Айгерим"
     assert mask_person_name("") == ""
+
+
+async def test_inspector_allowlist() -> None:
+    from app.core.config import get_settings
+    from app.core.errors import ForbiddenError
+    from app.core.security import issue_local_token, verify_token
+
+    settings = get_settings().model_copy(update={"inspector_emails": ["boss@jer.kz"]})
+    token, _ = issue_local_token(settings, "someone@jer.kz", "Someone")
+    with pytest.raises(ForbiddenError):
+        await verify_token(token, settings)
+    ok_token, _ = issue_local_token(settings, "boss@jer.kz", "Boss")
+    assert (await verify_token(ok_token, settings)).email == "boss@jer.kz"

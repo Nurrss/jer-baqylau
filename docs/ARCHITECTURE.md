@@ -1,0 +1,118 @@
+# Архитектура «ЖерБақылау»
+
+## Обзор
+
+```mermaid
+flowchart LR
+    subgraph Citizens["Граждане"]
+        TG["Telegram-бот<br/>RU / KZ, только кнопки"]
+    end
+    subgraph Inspectors["Инспекторы"]
+        WEB["Веб-панель<br/>React + MapLibre<br/>(Vercel)"]
+    end
+
+    TG -- webhook + secret --> API
+    WEB -- REST + JWT --> API
+
+    subgraph Railway["Railway: один контейнер"]
+        API["FastAPI<br/>REST /api/v1"]
+        BOT["aiogram 3<br/>FSM"]
+        SCH["APScheduler<br/>спутниковый скан"]
+        SVC["Сервисный слой<br/>машина состояний · аудит · события"]
+        API --> SVC
+        BOT --> SVC
+        SCH --> SVC
+    end
+
+    subgraph Supabase
+        PG[("Postgres + PostGIS<br/>RLS")]
+        ST[("Storage<br/>приватный бакет")]
+        AU["Auth<br/>JWT/JWKS"]
+        RT["Realtime<br/>postgres_changes"]
+    end
+
+    SVC --> PG
+    SVC --> ST
+    SVC -. уведомления после коммита .-> TG
+    BOT <--> R[("Upstash Redis<br/>FSM")]
+    PG --> RT -- events INSERT --> WEB
+    WEB -- вход --> AU
+
+    subgraph Adapters["Адаптеры (Protocol)"]
+        CAD["CadastreProvider<br/>LocalDb · MockGbdZks → ГБД ЗКС"]
+        SAT["SatelliteProvider<br/>MockSentinel → Sentinel-2 NDVI"]
+        NOT["NotificationProvider<br/>Telegram · SMS/eGov mobile"]
+        STO["StorageProvider<br/>Supabase · локальный диск"]
+    end
+    SVC --- Adapters
+```
+
+## Сквозной цикл
+
+```mermaid
+sequenceDiagram
+    participant C as Житель (Telegram)
+    participant B as Бот (FSM)
+    participant S as Сервисы + PostGIS
+    participant R as Supabase Realtime
+    participant I as Инспектор (веб)
+    C->>B: категория → геолокация → фото → описание → «Отправить»
+    B->>S: create_signal: ST_Contains / ST_DWithin 100 м, дедуп 30 м / 7 дн
+    S->>S: участок OK → UNDER_CHECK, аудит, events
+    B-->>C: «Сигнал SIG-2026-00XX принят»
+    B->>S: фото из Telegram → Storage (в фоне)
+    S-->>R: INSERT events
+    R-->>I: toast, точка на карте, участок жёлтый
+    I->>S: подтвердить → VIOLATION + дедлайн → IN_REMEDIATION → RESOLVED
+    S-->>C: уведомление на языке жителя на каждом этапе (после коммита)
+```
+
+## Слои кода
+
+| Слой | Где | Ответственность |
+|---|---|---|
+| Домен | `app/domain` | enum'ы, **машина состояний** (единственный источник допустимых переходов), трек-номера |
+| Сервисы | `app/services` | бизнес-логика, транзакции, аудит, события, уведомления; общие для API, бота и планировщика |
+| Адаптеры | `app/providers` | внешние системы за `Protocol`-интерфейсами |
+| Транспорт | `app/api`, `app/bot` | тонкие HTTP-роуты и хендлеры бота |
+| Данные | `app/db`, `migrations` | SQLAlchemy 2 + GeoAlchemy2, Alembic |
+
+Ключевые свойства:
+- **Геоданные только в PostGIS** (SRID 4326, GiST-индексы); площади и расстояния — через `::geography`.
+- **Аудит**: каждая смена статуса пишет `status_transitions` и `events` в той же транзакции.
+- **Уведомления после коммита** (`outbox.after_commit`): откат транзакции — сообщение не уходит.
+- **Идемпотентность**: обработанные `update_id` Telegram хранятся в БД; сид и сброс демо — под advisory lock.
+
+## Подключение реальных государственных систем
+
+| Интеграция | Сейчас | Путь к продакшену |
+|---|---|---|
+| **ГБД ЗКС** (земельный кадастр) | `MockGbdZksProvider` — детерминированный ответ реестра, расхождения площади | Реализовать `CadastreProvider` поверх API ГБД ЗКС через **ШЭП** (шлюз электронного правительства); синхронизация участков по кадастровым номерам, ночная сверка геометрий, таблица расхождений для инспектора |
+| **egov.kz / ЕСЭДО** (заявления) | Заявления в собственной таблице, статусы меняет инспектор | Подписка на статусы услуг через ШЭП; трек-номер = номер заявки egov; бот остаётся каналом уведомлений |
+| **Спутниковый мониторинг** | `MockSentinelProvider` (демо, явно подписан в UI) | Sentinel-2 L2A через **Copernicus Data Space** (Statistical API / openEO): медианный NDVI по полигону за сезон, порог по назначению земли; флаг «кандидат на проверку» уже пишется в `parcels.ndvi_flagged` |
+| **Уведомления** | Telegram | `SmsNotificationProvider` / **eGov mobile push** — тот же `NotificationProvider`, выбор канала по профилю жителя |
+| **Вход инспектора** | Supabase Auth (email + пароль) | **ЭЦП НУЦ РК через NCALayer**: подпись challenge на клиенте → проверка сертификата и роли на бэкенде → выпуск сессии; allowlist `INSPECTOR_EMAILS` заменяется реестром должностных лиц |
+
+## Безопасность
+
+- **RLS**: включён на всех таблицах; роль `authenticated` имеет только SELECT на `events`, `signals`, `parcels`
+  (нужно Realtime). Пишет в БД только бэкенд. PostgREST для `anon` закрыт.
+- **Секреты** только в переменных окружения; `service_role` и токен бота не попадают во фронтенд;
+  вебхук проверяет `X-Telegram-Bot-Api-Secret-Token`; служебные эндпоинты — `X-Service-Key`.
+- **Фото** в приватном бакете, выдаются подписанными ссылками с ограниченным сроком; EXIF удаляется при
+  перекодировании (координаты сохраняются отдельно в PostGIS).
+- **ПДн граждан минимальны**: `chat_id`, язык, точка и фото. Имена заявителей хранятся маскированными («Ерлан С.»).
+  Для прод-эксплуатации — размещение БД и хранилища **на территории РК** (закон о персональных данных):
+  стек переносится на казахстанское облако/ЦОД без изменений кода (Postgres + PostGIS + S3-совместимое хранилище).
+- **Журнал аудита** неизменяем на уровне API (только INSERT), содержит автора, комментарий и метаданные.
+- Rate limit на сигналы (N в час на жителя), валидация региона, лимиты размера фото.
+
+## Масштабирование
+
+- **Горизонтально**: API без состояния в памяти (FSM — Redis, сессии — JWT); несколько реплик за балансировщиком.
+  Вебхук идемпотентен; планировщик берёт `pg_try_advisory_xact_lock`, поэтому скан выполняет одна реплика.
+- **Нагрузка на карту**: `GET /parcels?bbox=` уже фильтрует по экрану; для десятков тысяч участков —
+  векторные тайлы (`ST_AsMVT`) или pg_tileserv, кластеризация на сервере.
+- **Фоновые задачи**: при росте — вынести загрузку фото и спутниковые сканы в очередь (arq/Celery на том же Redis).
+- **Мультирегиональность**: `REGION_BBOX` и сид — параметры; районы/области — отдельное поле и RLS по району для
+  разграничения доступа инспекторов.
