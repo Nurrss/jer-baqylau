@@ -8,7 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Any
 
-from pydantic import Field, SecretStr, field_validator, model_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 API_ROOT = Path(__file__).resolve().parents[2]
@@ -45,6 +45,7 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
+        env_ignore_empty=True,  # `KEY=` in .env means "not set", so aliases and defaults apply
     )
 
     env: Environment = Environment.LOCAL
@@ -65,8 +66,14 @@ class Settings(BaseSettings):
     # --- Auth ---
     auth_mode: AuthMode = AuthMode.LOCAL
     supabase_url: str = ""
-    supabase_anon_key: SecretStr = SecretStr("")
-    supabase_service_role_key: SecretStr = SecretStr("")
+    # New-style keys (sb_publishable_… / sb_secret_…) are accepted under their dashboard names too.
+    supabase_anon_key: SecretStr = Field(
+        default=SecretStr(""), validation_alias=AliasChoices("SUPABASE_ANON_KEY", "SUPABASE_PUBLISHABLE_KEY")
+    )
+    supabase_service_role_key: SecretStr = Field(
+        default=SecretStr(""),
+        validation_alias=AliasChoices("SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SECRET_KEY"),
+    )
     supabase_jwt_secret: SecretStr = SecretStr("")
     local_jwt_secret: SecretStr = SecretStr("local-dev-secret-change-me-please-32b")
     demo_inspector_email: str = "inspector@jer.kz"
