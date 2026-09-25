@@ -14,6 +14,8 @@ COPY apps/api/pyproject.toml apps/api/uv.lock apps/api/.python-version ./
 RUN uv sync --frozen --no-dev --no-install-project && rm -rf /root/.cache/uv
 
 FROM base AS runtime
+# libexpat: required by the GDAL bundled in rasterio wheels (Sentinel-2 COG reads).
+RUN apt-get update && apt-get install -y --no-install-recommends libexpat1 && rm -rf /var/lib/apt/lists/*
 RUN useradd --create-home --uid 10001 app && mkdir -p /data/storage && chown app /data/storage
 COPY --from=deps /opt/venv /opt/venv
 COPY packages/seed /app/packages/seed
