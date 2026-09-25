@@ -17,6 +17,9 @@ from pathlib import Path
 _BASE_URL = os.environ.get("TEST_DATABASE_URL") or os.environ.get(
     "DATABASE_URL", "postgresql://jer:jer@localhost:54322/jer"
 )
+if not os.environ.get("TEST_DATABASE_URL") and not any(h in _BASE_URL for h in ("@localhost", "@127.0.0.1", "@db:")):
+    # Tests drop and recreate a database: never do that against a remote server by accident.
+    raise RuntimeError("Tests run only against a local PostGIS; set TEST_DATABASE_URL to override explicitly.")
 _base, _, _dbname = _BASE_URL.rpartition("/")
 _dbname = _dbname.split("?")[0]
 TEST_DB = _dbname if _dbname.endswith("_test") else f"{_dbname}_test"
