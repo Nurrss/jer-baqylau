@@ -27,15 +27,31 @@ async def dashboard(session: AsyncSession) -> DashboardStats:
     now = datetime.now(UTC)
     week_ago = now - timedelta(days=7)
 
-    parcels_total, area_total = (
-        await session.execute(select(func.count(Parcel.id), func.coalesce(func.sum(Parcel.area_ha), 0)))
-    ).one()
-    status_counts: dict[ParcelStatus, int] = dict(
-        (await session.execute(select(Parcel.status, func.count()).group_by(Parcel.status))).tuples().all()
+    by_status = (
+        select(Parcel.status.label("status"), func.count().label("n"))
+        .group_by(Parcel.status)
+        .subquery("by_status")
     )
-    overdue = await session.scalar(select(func.count(Parcel.id)).where(overdue_clause(now)))
-    signals_7d = await session.scalar(select(func.count(Signal.id)).where(Signal.created_at >= week_ago))
-    signals_new = await session.scalar(select(func.count(Signal.id)).where(Signal.status == SignalStatus.NEW))
+    # One round trip for all parcel aggregates and one for signal counters (the DB may be far away).
+    parcels_total, area_total, overdue, status_json = (
+        await session.execute(
+            select(
+                func.count(Parcel.id),
+                func.coalesce(func.sum(Parcel.area_ha), 0),
+                func.count(Parcel.id).filter(overdue_clause(now)),
+                select(func.json_object_agg(by_status.c.status, by_status.c.n)).scalar_subquery(),
+            )
+        )
+    ).one()
+    status_counts: dict[ParcelStatus, int] = {ParcelStatus(k): int(v) for k, v in (status_json or {}).items()}
+    signals_7d, signals_new = (
+        await session.execute(
+            select(
+                func.count(Signal.id).filter(Signal.created_at >= week_ago),
+                func.count(Signal.id).filter(Signal.status == SignalStatus.NEW),
+            )
+        )
+    ).one()
 
     # Reaction time: signal creation → first inspector action on it.
     first_action = (

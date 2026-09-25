@@ -27,8 +27,10 @@ def build_engine(settings: Settings) -> AsyncEngine:
         settings.async_database_url,
         pool_size=settings.db_pool_size,
         max_overflow=settings.db_pool_size,
-        pool_pre_ping=True,
-        pool_recycle=1800,
+        # No pre-ping: it costs a network round trip per request, and the DB can be far away.
+        # Connections are recycled before poolers/proxies would drop them as idle.
+        pool_pre_ping=False,
+        pool_recycle=300,
         connect_args=connect_args,
     )
 

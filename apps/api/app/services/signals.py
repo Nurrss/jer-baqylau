@@ -252,32 +252,22 @@ async def attach_photos(
 async def summaries(
     session: AsyncSession, storage: StorageProvider, query: Select[tuple[Signal]]
 ) -> list[SignalSummary]:
-    signals = list(await session.scalars(query))
-    if not signals:
+    # Coordinates and the parcel's cadastral number come with the main query (fewer round trips).
+    rows = (
+        await session.execute(
+            query.add_columns(
+                func.ST_Y(Signal.location), func.ST_X(Signal.location), Parcel.cadastral_number
+            ).outerjoin(Parcel, Parcel.id == Signal.parcel_id)
+        )
+    ).all()
+    if not rows:
         return []
+    signals = [row[0] for row in rows]
     ids = [s.id for s in signals]
-    coords = {
-        sid: (lat, lon)
-        for sid, lat, lon in await session.execute(
-            select(Signal.id, func.ST_Y(Signal.location), func.ST_X(Signal.location)).where(
-                Signal.id.in_(ids)
-            )
-        )
+    coords = {row[0].id: (row[1], row[2]) for row in rows}
+    cadastral: dict[uuid.UUID, str] = {
+        row[0].parcel_id: row[3] for row in rows if row[0].parcel_id and row[3]
     }
-    parcel_ids = {s.parcel_id for s in signals if s.parcel_id}
-    cadastral: dict[uuid.UUID, str] = (
-        dict(
-            (
-                await session.execute(
-                    select(Parcel.id, Parcel.cadastral_number).where(Parcel.id.in_(parcel_ids))
-                )
-            )
-            .tuples()
-            .all()
-        )
-        if parcel_ids
-        else {}
-    )
     roots = {s.duplicate_of or s.id for s in signals}
     dup_counts: dict[uuid.UUID | None, int] = dict(
         (

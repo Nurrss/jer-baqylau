@@ -33,35 +33,65 @@ async def get_by_number(session: AsyncSession, tracking_number: str) -> Applicat
     return await session.scalar(select(Application).where(Application.tracking_number == tracking_number))
 
 
-async def to_out(session: AsyncSession, application: Application) -> ApplicationOut:
-    cadastral = (
-        await session.scalar(select(Parcel.cadastral_number).where(Parcel.id == application.parcel_id))
-        if application.parcel_id
-        else None
-    )
-    subscribers = await session.scalar(
-        select(func.count(Subscription.id)).where(
-            Subscription.target_type == SubscriptionTarget.APPLICATION,
-            Subscription.target_id == application.id,
+async def to_out_many(session: AsyncSession, applications: list[Application]) -> list[ApplicationOut]:
+    """Serialize applications with a constant number of queries (no N+1: the DB may be far away)."""
+    if not applications:
+        return []
+    ids = [a.id for a in applications]
+    parcel_ids = {a.parcel_id for a in applications if a.parcel_id}
+    cadastral: dict[uuid.UUID, str] = (
+        dict(
+            (
+                await session.execute(
+                    select(Parcel.id, Parcel.cadastral_number).where(Parcel.id.in_(parcel_ids))
+                )
+            )
+            .tuples()
+            .all()
         )
+        if parcel_ids
+        else {}
     )
-    return ApplicationOut(
-        id=str(application.id),
-        tracking_number=application.tracking_number,
-        applicant_name=application.applicant_name,
-        type=application.type,
-        status=application.status,
-        status_comment_ru=application.status_comment_ru,
-        status_comment_kk=application.status_comment_kk,
-        inspection_date=application.inspection_date,
-        parcel_id=str(application.parcel_id) if application.parcel_id else None,
-        parcel_cadastral_number=cadastral,
-        submitted_at=application.submitted_at,
-        updated_at=application.updated_at,
-        subscribers_count=int(subscribers or 0),
-        allowed_transitions=allowed_transitions(EntityType.APPLICATION, application.status),
-        history=await audit.history(session, EntityType.APPLICATION, application.id),
+    subscribers: dict[uuid.UUID, int] = dict(
+        (
+            await session.execute(
+                select(Subscription.target_id, func.count(Subscription.id))
+                .where(
+                    Subscription.target_type == SubscriptionTarget.APPLICATION,
+                    Subscription.target_id.in_(ids),
+                )
+                .group_by(Subscription.target_id)
+            )
+        )
+        .tuples()
+        .all()
     )
+    history = await audit.histories(session, EntityType.APPLICATION, ids)
+    return [
+        ApplicationOut(
+            id=str(a.id),
+            tracking_number=a.tracking_number,
+            applicant_name=a.applicant_name,
+            type=a.type,
+            status=a.status,
+            status_comment_ru=a.status_comment_ru,
+            status_comment_kk=a.status_comment_kk,
+            inspection_date=a.inspection_date,
+            parcel_id=str(a.parcel_id) if a.parcel_id else None,
+            parcel_cadastral_number=cadastral.get(a.parcel_id) if a.parcel_id else None,
+            submitted_at=a.submitted_at,
+            updated_at=a.updated_at,
+            subscribers_count=int(subscribers.get(a.id, 0)),
+            allowed_transitions=allowed_transitions(EntityType.APPLICATION, a.status),
+            history=history[a.id],
+        )
+        for a in applications
+    ]
+
+
+async def to_out(session: AsyncSession, application: Application) -> ApplicationOut:
+    [out] = await to_out_many(session, [application])
+    return out
 
 
 async def list_applications(
@@ -74,7 +104,7 @@ async def list_applications(
         like = f"%{q.strip()}%"
         query = query.where(Application.tracking_number.ilike(like) | Application.applicant_name.ilike(like))
     rows = list(await session.scalars(query.order_by(Application.submitted_at.desc())))
-    return ApplicationList(items=[await to_out(session, a) for a in rows], total=len(rows))
+    return ApplicationList(items=await to_out_many(session, rows), total=len(rows))
 
 
 async def transition(

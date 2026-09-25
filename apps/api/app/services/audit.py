@@ -53,3 +53,20 @@ async def history(
         .order_by(StatusTransition.created_at.desc(), StatusTransition.id.desc())
     )
     return [TransitionOut.model_validate(row) for row in rows]
+
+
+async def histories(
+    session: AsyncSession, entity_type: EntityType, entity_ids: list[uuid.UUID]
+) -> dict[uuid.UUID, list[TransitionOut]]:
+    """Histories of many entities in one query (newest first)."""
+    result: dict[uuid.UUID, list[TransitionOut]] = {entity_id: [] for entity_id in entity_ids}
+    if not entity_ids:
+        return result
+    rows = await session.scalars(
+        select(StatusTransition)
+        .where(StatusTransition.entity_type == entity_type, StatusTransition.entity_id.in_(entity_ids))
+        .order_by(StatusTransition.created_at.desc(), StatusTransition.id.desc())
+    )
+    for row in rows:
+        result[row.entity_id].append(TransitionOut.model_validate(row))
+    return result
