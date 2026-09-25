@@ -51,7 +51,8 @@ class Smoke:
         self.base = args.base_url.rstrip("/")
         self.api = f"{self.base}/api/v1"
         self.args = args
-        self.http = httpx.Client(timeout=60)
+        # Short keep-alive: edge proxies drop idle connections, reusing one fails with "Server disconnected".
+        self.http = httpx.Client(timeout=120, limits=httpx.Limits(keepalive_expiry=5))
         self.service_key = args.service_key or self.settings.service_api_key.get_secret_value()
         self.auth: dict[str, str] = {}
 

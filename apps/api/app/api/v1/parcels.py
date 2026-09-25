@@ -29,7 +29,7 @@ from app.schemas.parcels import (
 from app.services import audit
 from app.services import parcels as service
 from app.services.act import build_act
-from app.services.photos import save_photo
+from app.services.photos import PhotoSpec, save_photos
 
 router = APIRouter(prefix="/parcels", tags=["parcels"], responses=ERROR_RESPONSES)
 
@@ -133,16 +133,13 @@ async def upload_parcel_photos(
         raise ValidationFailedError("At least one file is required")
     if len(files) > MAX_PHOTOS_PER_UPLOAD:
         raise ValidationFailedError(f"At most {MAX_PHOTOS_PER_UPLOAD} files per upload")
-    for upload in files:
-        await save_photo(
-            session,
-            storage,
-            owner_type=PhotoOwnerType.PARCEL,
-            owner_id=parcel.id,
-            data=await upload.read(),
-            source=PhotoSource.INSPECTOR,
-            uploaded_by=inspector.actor,
+    specs = [
+        PhotoSpec(
+            PhotoOwnerType.PARCEL, parcel.id, await upload.read(), PhotoSource.INSPECTOR, inspector.actor
         )
+        for upload in files
+    ]
+    await save_photos(session, storage, specs)
     await audit.emit_event(
         session,
         EventType.PHOTO_ADDED,

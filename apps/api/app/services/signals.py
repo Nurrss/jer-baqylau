@@ -35,7 +35,7 @@ from app.providers.storage import StorageProvider
 from app.schemas.signals import SignalDetail, SignalList, SignalSummary, SignalTransitionRequest
 from app.services import audit, notifier
 from app.services.parcels import apply_transition, get_parcel
-from app.services.photos import photos_for, save_photo
+from app.services.photos import PhotoSpec, photos_for, save_photos
 
 PARCEL_SEARCH_RADIUS_M = 100
 DUPLICATE_RADIUS_M = 30
@@ -228,18 +228,13 @@ async def attach_photos(
     uploaded_by: str,
     source: PhotoSource = PhotoSource.CITIZEN,
 ) -> int:
-    saved = 0
-    for data in photos:
-        await save_photo(
+    saved = len(
+        await save_photos(
             session,
             storage,
-            owner_type=PhotoOwnerType.SIGNAL,
-            owner_id=signal_id,
-            data=data,
-            source=source,
-            uploaded_by=uploaded_by,
+            [PhotoSpec(PhotoOwnerType.SIGNAL, signal_id, data, source, uploaded_by) for data in photos],
         )
-        saved += 1
+    )
     if saved:
         await audit.emit_event(
             session,

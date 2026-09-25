@@ -48,7 +48,7 @@ from app.schemas.misc import DemoResetResponse
 from app.seed.organizers import load_features
 from app.services import audit, satellite
 from app.services.outbox import after_commit
-from app.services.photos import save_photo
+from app.services.photos import PhotoSpec, save_photos
 from app.services.placeholders import placeholder_photo
 
 log = get_logger(__name__)
@@ -263,6 +263,8 @@ async def _seed_signals(
 ) -> int:
     items = sorted(_read_yaml("signals.yaml")["signals"], key=lambda s: -s["hours_ago"])
     ids: dict[str, uuid.UUID] = {}
+    specs: list[PhotoSpec] = []
+    created_by_signal: dict[uuid.UUID, datetime] = {}
     centroids = {
         c: (lon, lat)
         for c, lon, lat in await session.execute(
@@ -321,17 +323,19 @@ async def _seed_signals(
                 item.get("comment"),
             )
         await session.flush()
-        for n in range(int(item.get("photos", 0))):
-            photo = await save_photo(
-                session,
-                storage,
-                owner_type=PhotoOwnerType.SIGNAL,
-                owner_id=signal.id,
-                data=placeholder_photo(f"{item['key']}:{n}", signal.category),
-                source=PhotoSource.CITIZEN,
-                uploaded_by="citizen",
+        created_by_signal[signal.id] = created
+        specs += [
+            PhotoSpec(
+                PhotoOwnerType.SIGNAL,
+                signal.id,
+                placeholder_photo(f"{item['key']}:{n}", signal.category),
+                PhotoSource.CITIZEN,
+                "citizen",
             )
-            photo.created_at = created
+            for n in range(int(item.get("photos", 0)))
+        ]
+    for photo in await save_photos(session, storage, specs):
+        photo.created_at = created_by_signal[photo.owner_id]
     await session.execute(text("SELECT setval('signal_tracking_seq', :v, true)"), {"v": max(len(items), 1)})
     return len(ids)
 
@@ -345,19 +349,18 @@ async def _seed_inspector_photos(
         ViolationType.SELF_SEIZURE: SignalCategory.SELF_SEIZURE,
         ViolationType.MISUSE: SignalCategory.OTHER,
     }
-    for parcel in parcels.values():
-        if parcel.status in (ParcelStatus.VIOLATION, ParcelStatus.IN_REMEDIATION) and parcel.violation_type:
-            await save_photo(
-                session,
-                storage,
-                owner_type=PhotoOwnerType.PARCEL,
-                owner_id=parcel.id,
-                data=placeholder_photo(
-                    f"inspector:{parcel.cadastral_number}", category[parcel.violation_type]
-                ),
-                source=PhotoSource.INSPECTOR,
-                uploaded_by=INSPECTOR_ACTOR,
-            )
+    specs = [
+        PhotoSpec(
+            PhotoOwnerType.PARCEL,
+            parcel.id,
+            placeholder_photo(f"inspector:{parcel.cadastral_number}", category[parcel.violation_type]),
+            PhotoSource.INSPECTOR,
+            INSPECTOR_ACTOR,
+        )
+        for parcel in parcels.values()
+        if parcel.status in (ParcelStatus.VIOLATION, ParcelStatus.IN_REMEDIATION) and parcel.violation_type
+    ]
+    await save_photos(session, storage, specs)
 
 
 async def seed(session: AsyncSession, storage: StorageProvider) -> DemoResetResponse:

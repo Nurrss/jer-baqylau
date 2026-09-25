@@ -117,6 +117,62 @@ def process_image(data: bytes) -> ProcessedImage:
     )
 
 
+UPLOAD_CONCURRENCY = 8
+
+
+@dataclass(slots=True)
+class PhotoSpec:
+    owner_type: PhotoOwnerType
+    owner_id: uuid.UUID
+    data: bytes
+    source: PhotoSource
+    uploaded_by: str
+
+
+def _build(spec: PhotoSpec, processed: ProcessedImage) -> tuple[Photo, list[tuple[str, bytes]]]:
+    photo_id = uuid.uuid4()
+    base = f"{spec.owner_type.value.lower()}/{spec.owner_id}/{photo_id}"
+    full_path, thumb_path = f"{base}.jpg", f"{base}_thumb.jpg"
+    photo = Photo(
+        id=photo_id,
+        owner_type=spec.owner_type,
+        owner_id=spec.owner_id,
+        storage_path=full_path,
+        thumb_path=thumb_path,
+        content_type="image/jpeg",
+        width=processed.width,
+        height=processed.height,
+        source=spec.source,
+        taken_at=processed.taken_at,
+        location=(
+            from_shape(Point(processed.lon, processed.lat), srid=4326)
+            if processed.lat is not None and processed.lon is not None
+            else None
+        ),
+        uploaded_by=spec.uploaded_by,
+    )
+    return photo, [(full_path, processed.full), (thumb_path, processed.thumb)]
+
+
+async def save_photos(session: AsyncSession, storage: StorageProvider, specs: list[PhotoSpec]) -> list[Photo]:
+    """Process images, upload all files concurrently (storage may be far away), then insert rows."""
+    if not specs:
+        return []
+    processed = await asyncio.gather(*(asyncio.to_thread(process_image, spec.data) for spec in specs))
+    built = [_build(spec, image) for spec, image in zip(specs, processed, strict=True)]
+    semaphore = asyncio.Semaphore(UPLOAD_CONCURRENCY)
+
+    async def upload(path: str, data: bytes) -> None:
+        async with semaphore:
+            await storage.upload(path, data, "image/jpeg")
+
+    await asyncio.gather(*(upload(path, data) for _, files in built for path, data in files))
+    photos = [photo for photo, _ in built]
+    session.add_all(photos)
+    await session.flush()
+    return photos
+
+
 async def save_photo(
     session: AsyncSession,
     storage: StorageProvider,
@@ -127,32 +183,9 @@ async def save_photo(
     source: PhotoSource,
     uploaded_by: str,
 ) -> Photo:
-    processed = await asyncio.to_thread(process_image, data)
-    photo_id = uuid.uuid4()
-    base = f"{owner_type.value.lower()}/{owner_id}/{photo_id}"
-    full_path, thumb_path = f"{base}.jpg", f"{base}_thumb.jpg"
-    await storage.upload(full_path, processed.full, "image/jpeg")
-    await storage.upload(thumb_path, processed.thumb, "image/jpeg")
-    photo = Photo(
-        id=photo_id,
-        owner_type=owner_type,
-        owner_id=owner_id,
-        storage_path=full_path,
-        thumb_path=thumb_path,
-        content_type="image/jpeg",
-        width=processed.width,
-        height=processed.height,
-        source=source,
-        taken_at=processed.taken_at,
-        location=(
-            from_shape(Point(processed.lon, processed.lat), srid=4326)
-            if processed.lat is not None and processed.lon is not None
-            else None
-        ),
-        uploaded_by=uploaded_by,
+    [photo] = await save_photos(
+        session, storage, [PhotoSpec(owner_type, owner_id, data, source, uploaded_by)]
     )
-    session.add(photo)
-    await session.flush()
     return photo
 
 

@@ -37,7 +37,7 @@ def reset_remote(base_url: str, service_key: str) -> None:
     import httpx
 
     resp = httpx.post(
-        f"{base_url.rstrip('/')}/api/v1/dev/demo-reset", headers={"X-Service-Key": service_key}, timeout=120
+        f"{base_url.rstrip('/')}/api/v1/dev/demo-reset", headers={"X-Service-Key": service_key}, timeout=300
     )
     resp.raise_for_status()
     print(f"Demo reset done on {base_url}: {resp.json()}")
