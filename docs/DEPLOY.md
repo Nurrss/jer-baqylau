@@ -127,6 +127,18 @@ Environment Variables — три `VITE_*` выше. `vercel.json` уже сод�
 
 Вернись в Railway и впиши `CORS_ORIGINS=https://<vercel-домен>` (можно несколько через запятую).
 
+### Панель ходит к API через свой домен
+
+`apps/web/vercel.json` проксирует `/api/*` и `/health` на Railway, а `VITE_API_URL` = домен Vercel.
+Некоторые сети (DNS-фильтры, мобильные операторы) не резолвят `*.up.railway.app`; так панель
+работает везде, где открывается Vercel. Скрипты тоже удобнее запускать через него:
+`--base-url https://<vercel-домен>`.
+
+### Спутник
+
+`SATELLITE_PROVIDER=sentinel` — реальные снимки Sentinel-2 L2A (без ключей), `SATELLITE_SCAN_INTERVAL_MINUTES=360`.
+Образ API содержит `libexpat1` для GDAL из колёс rasterio.
+
 ## 6. Чек-лист после деплоя
 
 | Проверка | Как |

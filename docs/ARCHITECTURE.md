@@ -12,7 +12,7 @@ flowchart LR
     end
 
     TG -- webhook + secret --> API
-    WEB -- REST + JWT --> API
+    WEB -- "REST + JWT (same-origin /api → Vercel rewrite)" --> API
 
     subgraph Railway["Railway: один контейнер"]
         API["FastAPI<br/>REST /api/v1"]
@@ -89,7 +89,7 @@ sequenceDiagram
 |---|---|---|
 | **ГБД ЗКС** (земельный кадастр) | `MockGbdZksProvider` — детерминированный ответ реестра, расхождения площади | Реализовать `CadastreProvider` поверх API ГБД ЗКС через **ШЭП** (шлюз электронного правительства); синхронизация участков по кадастровым номерам, ночная сверка геометрий, таблица расхождений для инспектора |
 | **egov.kz / ЕСЭДО** (заявления) | Заявления в собственной таблице, статусы меняет инспектор | Подписка на статусы услуг через ШЭП; трек-номер = номер заявки egov; бот остаётся каналом уведомлений |
-| **Спутниковый мониторинг** | `MockSentinelProvider` (демо, явно подписан в UI) | Sentinel-2 L2A через **Copernicus Data Space** (Statistical API / openEO): медианный NDVI по полигону за сезон, порог по назначению земли; флаг «кандидат на проверку» уже пишется в `parcels.ndvi_flagged` |
+| **Спутниковый мониторинг** | **Работает на реальных данных**: `EarthSearchSentinelProvider` — Sentinel-2 L2A из открытого каталога Earth Search (AWS), NDVI по пикселям внутри полигона, облака/тени исключаются по SCL, скан каждые 6 ч; `MockSentinelProvider` — офлайн-демо | NDVI-история за сезоны, RGB «до/после», детекция изменений застройки; при необходимости — Copernicus Data Space или казахстанские ДЗЗ-данные (тот же `SatelliteProvider`) |
 | **Уведомления** | Telegram | `SmsNotificationProvider` / **eGov mobile push** — тот же `NotificationProvider`, выбор канала по профилю жителя |
 | **Вход инспектора** | Supabase Auth (email + пароль) | **ЭЦП НУЦ РК через NCALayer**: подпись challenge на клиенте → проверка сертификата и роли на бэкенде → выпуск сессии; allowlist `INSPECTOR_EMAILS` заменяется реестром должностных лиц |
 
