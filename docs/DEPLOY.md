@@ -90,6 +90,12 @@ railway domain                  # сгенерировать публичный 
 Либо через сайт: **New Project → Deploy from GitHub repo** → репозиторий `jer-baqylau`; `railway.json` в корне
 сам укажет Dockerfile и healthcheck `/health`.
 
+> ⚠️ Новый сборщик Railway (Railpack) игнорирует `railway.json` для выбора Dockerfile — задай переменную сервиса
+> `RAILWAY_DOCKERFILE_PATH=apps/api/Dockerfile`. Регион ставь рядом с БД:
+> `railway scale --service <service> southeast-asia=1 us-west=0 us-east=0 eu-west=0`
+> (для Supabase во Франкфурте — `eu-west=1`). Каждый запрос к далёкой БД стоит ~150–200 мс сети.
+> На бесплатном плане Railway один проект: сервис можно добавить в существующий (`railway add --service jer-api`).
+
 **Variables** (Service → Variables → *Raw Editor*) — вставь из `.env.production` всё, **кроме** строк `VITE_*`, плюс:
 ```
 PUBLIC_API_URL=https://<railway-домен>
