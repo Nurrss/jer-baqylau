@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 import uuid
 
 from sqlalchemy import select
@@ -67,7 +68,7 @@ async def signal_status_changed(
             status=t(lang, f"signal-status-{new_status.value}"),
         )
         if new_status is SignalStatus.REJECTED and comment:
-            text += "\n\n" + t(lang, "notify-reason", reason=comment)
+            text += "\n\n" + t(lang, "notify-reason", reason=html.escape(comment))
         elif new_status is SignalStatus.CONFIRMED:
             text += "\n\n" + t(lang, "notify-signal-confirmed-hint")
         notifications.append(Notification(chat_id=chat_id, text=text))
@@ -116,7 +117,7 @@ async def application_status_changed(session: AsyncSession, application: Applica
             status=t(lang, f"application-status-{application.status.value}"),
         )
         if comment:
-            text += "\n\n" + comment
+            text += "\n\n" + html.escape(comment)
         if application.inspection_date:
             text += "\n" + t(lang, "application-inspection-date", date=application.inspection_date)
         notifications.append(

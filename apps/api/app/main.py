@@ -119,6 +119,9 @@ def create_app() -> FastAPI:
     register_error_handlers(app)
     app.include_router(system_router)
     app.include_router(api_router)
+    from app.bot.runtime import webhook_router
+
+    app.include_router(webhook_router)
     return app
 
 
