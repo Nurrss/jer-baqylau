@@ -11,7 +11,7 @@ WORKDIR /app/apps/api
 
 FROM base AS deps
 COPY apps/api/pyproject.toml apps/api/uv.lock apps/api/.python-version ./
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-install-project
+RUN uv sync --frozen --no-dev --no-install-project && rm -rf /root/.cache/uv
 
 FROM base AS runtime
 RUN useradd --create-home --uid 10001 app && mkdir -p /data/storage && chown app /data/storage
