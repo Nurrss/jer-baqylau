@@ -205,3 +205,9 @@ export function useNdvi(enabled: boolean) {
     staleTime: 5 * 60_000,
   })
 }
+
+export function useSatelliteScan() {
+  return useMutation({
+    mutationFn: async () => unwrap(await api.POST('/api/v1/satellite/scan')),
+  })
+}

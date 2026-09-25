@@ -101,14 +101,25 @@ class NdviReadingOut(ApiModel):
     ndvi: float
     flagged: bool
     scanned_at: datetime
+    observed_at: datetime | None = Field(default=None, description="Acquisition time of the satellite scene")
+    scene_id: str | None = None
 
 
 class NdviLayer(ApiModel):
     provider: str
     is_demo: bool
     scanned_at: datetime | None
+    observed_from: datetime | None = None
+    observed_to: datetime | None = None
+    scenes: list[str] = Field(default_factory=list)
     threshold: float
     readings: list[NdviReadingOut]
+
+
+class SatelliteScanStarted(ApiModel):
+    started: bool = Field(description="False if a scan is already running")
+    provider: str
+    is_demo: bool
 
 
 class SatelliteScanResult(ApiModel):

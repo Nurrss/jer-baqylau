@@ -7,25 +7,30 @@ import {
   Layers,
   Loader2,
   Megaphone,
+  RefreshCw,
   Satellite,
   Search,
   X,
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNdvi, useParcelSearch } from '@/api/queries'
+import { useNdvi, useParcelSearch, useSatelliteScan } from '@/api/queries'
 import {
   PARCEL_STATUSES,
   PURPOSES,
   VIOLATION_TYPES,
+  type NdviLayer,
   type ParcelFeatureCollection,
   type ParcelSearchResult,
 } from '@/api/types'
 import { StatusBadge } from '@/components/common/StatusBadge'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Checkbox, Switch } from '@/components/ui/misc'
 import { useDateFns } from '@/lib/dates'
 import { NDVI_STOPS, PARCEL_STATUS_COLORS } from '@/lib/status'
+import { useErrorMessage } from '@/lib/useErrorMessage'
 import { cn } from '@/lib/utils'
 import { useUiStore } from '@/store/ui'
 
@@ -137,6 +142,48 @@ export function MapSearch({ onPick }: { onPick: (result: ParcelSearchResult) => 
 
 // ── Layers / basemap ────────────────────────────────────────────────────────
 
+function NdviInfo({ layer }: { layer: NdviLayer }) {
+  const { t } = useTranslation()
+  const { date, dateTime } = useDateFns()
+  const errorMessage = useErrorMessage()
+  const scan = useSatelliteScan()
+  const period =
+    layer.observed_from && layer.observed_to
+      ? date(layer.observed_from) === date(layer.observed_to)
+        ? date(layer.observed_to)
+        : `${date(layer.observed_from)} – ${date(layer.observed_to)}`
+      : null
+  return (
+    <div className="grid gap-1.5 px-2 pt-1 text-[11px] text-muted-foreground">
+      {layer.is_demo ? (
+        <p>{t('map.ndviDemoNote')}</p>
+      ) : (
+        <>
+          <p>{t('map.ndviSource')}</p>
+          {period && <p>{t('map.ndviScenes', { period, count: layer.scenes?.length ?? 0 })}</p>}
+        </>
+      )}
+      <p>{t('map.ndviScanned', { date: dateTime(layer.scanned_at) })}</p>
+      <Button
+        size="sm"
+        variant="outline"
+        className="mt-1 h-7 text-xs"
+        disabled={scan.isPending}
+        onClick={async () => {
+          try {
+            const result = await scan.mutateAsync()
+            toast.info(result.started ? t('map.scanStarted') : t('map.scanRunning'))
+          } catch (err) {
+            toast.error(errorMessage(err))
+          }
+        }}
+      >
+        <RefreshCw className={cn(scan.isPending && 'animate-spin')} /> {t('map.scanNow')}
+      </Button>
+    </div>
+  )
+}
+
 export function LayerControls() {
   const { t } = useTranslation()
   const {
@@ -149,8 +196,7 @@ export function LayerControls() {
     soundEnabled,
     toggleSound,
   } = useUiStore()
-  const { dateTime } = useDateFns()
-  const ndvi = useNdvi(ndviLayer)
+  const ndvi = useNdvi(true)
 
   return (
     <div className="flex flex-col items-end gap-2">
@@ -196,18 +242,19 @@ export function LayerControls() {
                 <span className="flex items-center gap-2">
                   <Satellite className="size-4 text-success" /> {t('map.layerNdvi')}
                 </span>
-                <Badge variant="warning" className="mt-1.5">
-                  {t('map.demoBadge')}
-                </Badge>
+                {ndvi.data && !ndvi.data.is_demo ? (
+                  <Badge variant="success" className="mt-1.5">
+                    {t('map.realBadge')}
+                  </Badge>
+                ) : (
+                  <Badge variant="warning" className="mt-1.5">
+                    {t('map.demoBadge')}
+                  </Badge>
+                )}
               </span>
               <Switch checked={ndviLayer} onCheckedChange={toggleNdvi} />
             </label>
-            {ndviLayer && ndvi.data && (
-              <p className="px-2 pt-1 text-[11px] text-muted-foreground">
-                {t('map.ndviProvider', { provider: ndvi.data.provider })} ·{' '}
-                {t('map.ndviScanned', { date: dateTime(ndvi.data.scanned_at) })}
-              </p>
-            )}
+            {ndviLayer && ndvi.data && <NdviInfo layer={ndvi.data} />}
             <div className="my-2 h-px bg-border" />
             <label className="flex cursor-pointer items-center justify-between gap-3 rounded-lg p-2 hover:bg-muted">
               <span className="flex items-center gap-2 text-sm">

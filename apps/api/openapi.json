@@ -1425,7 +1425,7 @@
         "tags": [
           "satellite"
         ],
-        "summary": "NDVI layer (demo provider)",
+        "summary": "NDVI layer (Sentinel-2 L2A or demo provider)",
         "operationId": "ndvi_layer_api_v1_satellite_ndvi_get",
         "responses": {
           "200": {
@@ -1481,15 +1481,15 @@
         "tags": [
           "satellite"
         ],
-        "summary": "Run a scan now",
+        "summary": "Start a satellite scan in the background (result arrives as a satellite.scan_completed event)",
         "operationId": "satellite_scan_api_v1_satellite_scan_post",
         "responses": {
-          "200": {
+          "202": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SatelliteScanResult"
+                  "$ref": "#/components/schemas/SatelliteScanStarted"
                 }
               }
             }
@@ -2567,6 +2567,37 @@
             ],
             "title": "Scanned At"
           },
+          "observed_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed From"
+          },
+          "observed_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed To"
+          },
+          "scenes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Scenes"
+          },
           "threshold": {
             "type": "number",
             "title": "Threshold"
@@ -2607,6 +2638,30 @@
             "type": "string",
             "format": "date-time",
             "title": "Scanned At"
+          },
+          "observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed At",
+            "description": "Acquisition time of the satellite scene"
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Id"
           }
         },
         "type": "object",
@@ -2760,6 +2815,29 @@
             ],
             "title": "Ndvi Scanned At"
           },
+          "ndvi_observed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ndvi Observed At"
+          },
+          "ndvi_scene_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ndvi Scene Id"
+          },
           "updated_at": {
             "type": "string",
             "format": "date-time",
@@ -2817,6 +2895,8 @@
           "lease_until",
           "inspector_id",
           "ndvi_scanned_at",
+          "ndvi_observed_at",
+          "ndvi_scene_id",
           "updated_at",
           "allowed_transitions",
           "photos",
@@ -3199,28 +3279,29 @@
         ],
         "title": "PhotoOut"
       },
-      "SatelliteScanResult": {
+      "SatelliteScanStarted": {
         "properties": {
-          "scanned": {
-            "type": "integer",
-            "title": "Scanned"
-          },
-          "flagged": {
-            "type": "integer",
-            "title": "Flagged"
+          "started": {
+            "type": "boolean",
+            "title": "Started",
+            "description": "False if a scan is already running"
           },
           "provider": {
             "type": "string",
             "title": "Provider"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
           }
         },
         "type": "object",
         "required": [
-          "scanned",
-          "flagged",
-          "provider"
+          "started",
+          "provider",
+          "is_demo"
         ],
-        "title": "SatelliteScanResult"
+        "title": "SatelliteScanStarted"
       },
       "SignalCategory": {
         "type": "string",

@@ -57,6 +57,8 @@ class ParcelDetail(ParcelProperties):
     lease_until: date | None
     inspector_id: str | None
     ndvi_scanned_at: datetime | None
+    ndvi_observed_at: datetime | None
+    ndvi_scene_id: str | None
     updated_at: datetime
     allowed_transitions: list[ParcelStatus]
     photos: list[PhotoOut]

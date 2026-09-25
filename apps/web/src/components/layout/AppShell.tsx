@@ -243,7 +243,9 @@ export function AppShell() {
           >
             <Search className="size-4" />
             <span className="truncate">{t('palette.trigger')}</span>
-            <kbd className="ml-auto hidden rounded border bg-card px-1.5 text-[10px] whitespace-nowrap sm:block">Ctrl K</kbd>
+            <kbd className="ml-auto hidden rounded border bg-card px-1.5 text-[10px] whitespace-nowrap sm:block">
+              Ctrl K
+            </kbd>
           </button>
           <div className="ml-auto flex items-center gap-3">
             <RealtimeIndicator />

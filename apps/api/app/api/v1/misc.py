@@ -16,9 +16,10 @@ from app.api.deps import CurrentInspector, DbSession
 from app.db.models import Event, Parcel
 from app.providers.satellite import get_satellite_provider
 from app.schemas.common import ERROR_RESPONSES
-from app.schemas.misc import DashboardStats, EventList, EventOut, NdviLayer, SatelliteScanResult
+from app.schemas.misc import DashboardStats, EventList, EventOut, NdviLayer, SatelliteScanStarted
 from app.services import satellite, stats
 from app.services.parcels import overdue_clause
+from app.workers.scheduler import start_scan_in_background
 
 router = APIRouter(responses=ERROR_RESPONSES)
 
@@ -35,17 +36,26 @@ async def dashboard(session: DbSession, _: CurrentInspector) -> DashboardStats:
 
 
 @router.get(
-    "/satellite/ndvi", response_model=NdviLayer, tags=["satellite"], summary="NDVI layer (demo provider)"
+    "/satellite/ndvi",
+    response_model=NdviLayer,
+    tags=["satellite"],
+    summary="NDVI layer (Sentinel-2 L2A or demo provider)",
 )
 async def ndvi_layer(session: DbSession, _: CurrentInspector) -> NdviLayer:
     return await satellite.layer(session, get_satellite_provider())
 
 
 @router.post(
-    "/satellite/scan", response_model=SatelliteScanResult, tags=["satellite"], summary="Run a scan now"
+    "/satellite/scan",
+    response_model=SatelliteScanStarted,
+    status_code=202,
+    tags=["satellite"],
+    summary="Start a satellite scan in the background (result arrives as a satellite.scan_completed event)",
 )
-async def satellite_scan(session: DbSession, _: CurrentInspector) -> SatelliteScanResult:
-    return await satellite.run_scan(session, get_satellite_provider())
+async def satellite_scan(_: CurrentInspector) -> SatelliteScanStarted:
+    provider = get_satellite_provider()
+    started = start_scan_in_background()
+    return SatelliteScanStarted(started=started, provider=provider.name, is_demo=provider.is_demo)
 
 
 @router.get("/events", response_model=EventList, tags=["events"], summary="Event feed (realtime fallback)")

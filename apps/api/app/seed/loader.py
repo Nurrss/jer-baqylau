@@ -369,7 +369,17 @@ async def seed(session: AsyncSession, storage: StorageProvider) -> DemoResetResp
     applications = await _seed_applications(session, parcels, clock)
     signals = await _seed_signals(session, storage, parcels, clock)
     await _seed_inspector_photos(session, storage, parcels)
-    await satellite.run_scan(session, get_satellite_provider())
+    provider = get_satellite_provider()
+    if provider.is_demo:
+        await satellite.run_scan(session, provider)
+    else:
+        # A real Sentinel-2 scan takes tens of seconds: run it after the reset is committed.
+        from app.workers.scheduler import start_scan_in_background
+
+        async def scan_later() -> None:
+            start_scan_in_background()
+
+        after_commit(session, scan_later)
     log.info("seed_completed", parcels=len(parcels), applications=applications, signals=signals)
     return DemoResetResponse(parcels=len(parcels), applications=applications, signals=signals)
 

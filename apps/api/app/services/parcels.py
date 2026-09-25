@@ -215,6 +215,8 @@ async def get_detail(session: AsyncSession, storage: StorageProvider, parcel_id:
         lease_until=parcel.lease_until,
         inspector_id=parcel.inspector_id,
         ndvi_scanned_at=parcel.ndvi_scanned_at,
+        ndvi_observed_at=parcel.ndvi_observed_at,
+        ndvi_scene_id=parcel.ndvi_scene_id,
         updated_at=parcel.updated_at,
         allowed_transitions=allowed_transitions(EntityType.PARCEL, parcel.status),
         photos=photos.get(parcel.id, []),

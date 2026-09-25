@@ -160,6 +160,11 @@ function Characteristics({ parcel }: { parcel: ParcelDetail }) {
       'NDVI',
       <span key="ndvi" className="flex items-center gap-2">
         {parcel.ndvi.toFixed(2)}
+        {parcel.ndvi_observed_at && (
+          <span className="text-xs font-normal text-muted-foreground">
+            {t('parcel.ndviObserved', { date: date(parcel.ndvi_observed_at) })}
+          </span>
+        )}
         {parcel.ndvi_flagged && <Badge variant="warning">{t('parcel.ndviFlagged')}</Badge>}
       </span>,
     ])

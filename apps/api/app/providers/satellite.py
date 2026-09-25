@@ -11,7 +11,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Protocol
+from typing import Any, Protocol
 
 from app.domain.enums import ParcelPurpose, ParcelStatus, ViolationType
 
@@ -26,6 +26,7 @@ class ParcelSnapshot:
     purpose: ParcelPurpose
     status: ParcelStatus
     violation_type: ViolationType | None
+    geometry: dict[str, Any] | None = None  # GeoJSON, EPSG:4326
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +34,9 @@ class NdviReading:
     parcel_id: str
     ndvi: float
     flagged: bool
+    observed_at: datetime | None = None  # acquisition time of the scene
+    scene_id: str | None = None
+    valid_fraction: float | None = None  # share of cloud-free pixels inside the parcel
 
 
 class SatelliteProvider(Protocol):
@@ -78,9 +82,21 @@ class MockSentinelProvider:
                 value < UNUSED_NDVI_THRESHOLD
             )
             flagged = flagged or parcel.violation_type is ViolationType.UNUSED
-            readings.append(NdviReading(parcel_id=parcel.id, ndvi=value, flagged=flagged))
+            readings.append(
+                NdviReading(
+                    parcel_id=parcel.id, ndvi=value, flagged=flagged, observed_at=moment, valid_fraction=1.0
+                )
+            )
         return readings
 
 
 def get_satellite_provider() -> SatelliteProvider:
+    """SATELLITE_PROVIDER=sentinel → real Sentinel-2 L2A (Earth Search); anything else → demo mock."""
+    from app.core.config import get_settings
+
+    settings = get_settings()
+    if settings.satellite_provider == "sentinel":
+        from app.providers.sentinel import EarthSearchSentinelProvider
+
+        return EarthSearchSentinelProvider(stac_url=settings.sentinel_stac_url)
     return MockSentinelProvider()

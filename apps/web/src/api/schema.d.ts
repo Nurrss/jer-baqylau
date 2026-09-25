@@ -318,7 +318,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** NDVI layer (demo provider) */
+        /** NDVI layer (Sentinel-2 L2A or demo provider) */
         get: operations["ndvi_layer_api_v1_satellite_ndvi_get"];
         put?: never;
         post?: never;
@@ -337,7 +337,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Run a scan now */
+        /** Start a satellite scan in the background (result arrives as a satellite.scan_completed event) */
         post: operations["satellite_scan_api_v1_satellite_scan_post"];
         delete?: never;
         options?: never;
@@ -690,6 +690,12 @@ export interface components {
             is_demo: boolean;
             /** Scanned At */
             scanned_at: string | null;
+            /** Observed From */
+            observed_from?: string | null;
+            /** Observed To */
+            observed_to?: string | null;
+            /** Scenes */
+            scenes?: string[];
             /** Threshold */
             threshold: number;
             /** Readings */
@@ -708,6 +714,13 @@ export interface components {
              * Format: date-time
              */
             scanned_at: string;
+            /**
+             * Observed At
+             * @description Acquisition time of the satellite scene
+             */
+            observed_at?: string | null;
+            /** Scene Id */
+            scene_id?: string | null;
         };
         /**
          * OwnerType
@@ -758,6 +771,10 @@ export interface components {
             inspector_id: string | null;
             /** Ndvi Scanned At */
             ndvi_scanned_at: string | null;
+            /** Ndvi Observed At */
+            ndvi_observed_at: string | null;
+            /** Ndvi Scene Id */
+            ndvi_scene_id: string | null;
             /**
              * Updated At
              * Format: date-time
@@ -901,14 +918,17 @@ export interface components {
              */
             created_at: string;
         };
-        /** SatelliteScanResult */
-        SatelliteScanResult: {
-            /** Scanned */
-            scanned: number;
-            /** Flagged */
-            flagged: number;
+        /** SatelliteScanStarted */
+        SatelliteScanStarted: {
+            /**
+             * Started
+             * @description False if a scan is already running
+             */
+            started: boolean;
             /** Provider */
             provider: string;
+            /** Is Demo */
+            is_demo: boolean;
         };
         /**
          * SignalCategory
@@ -2152,12 +2172,12 @@ export interface operations {
         requestBody?: never;
         responses: {
             /** @description Successful Response */
-            200: {
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SatelliteScanResult"];
+                    "application/json": components["schemas"]["SatelliteScanStarted"];
                 };
             };
             /** @description Not authenticated */

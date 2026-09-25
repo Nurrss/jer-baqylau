@@ -161,10 +161,17 @@
     "legendNdvi": "NDVI өсімдік индексі",
     "ndviLow": "жалаңаш топырақ",
     "ndviHigh": "қалың өсімдік",
-    "ndviFlagged": "пайдаланылмауы мүмкін",
+    "ndviFlagged": "үміткер: а/ш жерінде NDVI 0,2-ден төмен",
     "filters": "Сүзгілер",
     "resetFilters": "Тастау",
-    "overdueOnly": "Тек мерзімі өткендер"
+    "overdueOnly": "Тек мерзімі өткендер",
+    "realBadge": "Sentinel-2 · нақты суреттер",
+    "ndviDemoNote": "Демо деректер: нақты суреттер үшін SATELLITE_PROVIDER=sentinel қосыңыз.",
+    "ndviSource": "Sentinel-2 L2A (ESA Copernicus), 10 м, бұлттар мен көлеңкелер алынып тасталған.",
+    "ndviScenes": "Суреттер: {{period}} · сахна: {{count}}",
+    "scanNow": "Жаңа суреттер бойынша жаңарту",
+    "scanStarted": "Скан басталды — қабат ~1 минуттан кейін автоматты түрде жаңарады",
+    "scanRunning": "Скан орындалып жатыр"
   },
   "parcel": {
     "card": "Учаске карточкасы",
@@ -192,7 +199,8 @@
       "signals": "Сигналдар",
       "history": "Тарих"
     },
-    "allActions": "Учаске бойынша барлық әрекеттер:"
+    "allActions": "Учаске бойынша барлық әрекеттер:",
+    "ndviObserved": "сурет {{date}}"
   },
   "deadline": {
     "left_one": "{{count}} күн қалды",

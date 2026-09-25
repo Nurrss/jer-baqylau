@@ -161,10 +161,17 @@
     "legendNdvi": "Индекс растительности NDVI",
     "ndviLow": "голая почва",
     "ndviHigh": "густая растительность",
-    "ndviFlagged": "вероятно не используется",
+    "ndviFlagged": "кандидат: NDVI ниже 0,2 на с/х земле",
     "filters": "Фильтры",
     "resetFilters": "Сбросить",
-    "overdueOnly": "Только просроченные"
+    "overdueOnly": "Только просроченные",
+    "realBadge": "Sentinel-2 · реальные снимки",
+    "ndviDemoNote": "Демо-данные: включите SATELLITE_PROVIDER=sentinel для реальных снимков.",
+    "ndviSource": "Sentinel-2 L2A (ESA Copernicus), 10 м, облака и тени исключены.",
+    "ndviScenes": "Снимки: {{period}} · сцен: {{count}}",
+    "scanNow": "Обновить по свежим снимкам",
+    "scanStarted": "Скан запущен — слой обновится автоматически через ~1 минуту",
+    "scanRunning": "Скан уже выполняется"
   },
   "parcel": {
     "card": "Карточка участка",
@@ -194,7 +201,8 @@
       "signals": "Сигналы",
       "history": "История"
     },
-    "allActions": "Все действия по участку:"
+    "allActions": "Все действия по участку:",
+    "ndviObserved": "снимок {{date}}"
   },
   "deadline": {
     "left_one": "осталось {{count}} дн.",

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime, timedelta
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -27,7 +28,28 @@ async def satellite_scan_job() -> None:
         if not locked:
             log.info("satellite_scan_skipped_locked")
             return
-        await satellite.run_scan(session, get_satellite_provider())
+        try:
+            await satellite.run_scan(session, get_satellite_provider())
+        except Exception:
+            # Network/catalogue problems must not kill the scheduler; previous values stay.
+            log.exception("satellite_scan_failed")
+
+
+_background: set[asyncio.Task[None]] = set()
+
+
+def start_scan_in_background() -> bool:
+    """Kick off a scan without blocking the caller (a real Sentinel-2 scan takes tens of seconds).
+
+    Completion is announced by the ``satellite.scan_completed`` event (realtime → the panel refreshes).
+    Returns False if a scan started from this process is still running.
+    """
+    if _background:
+        return False
+    task = asyncio.create_task(satellite_scan_job())
+    _background.add(task)
+    task.add_done_callback(_background.discard)
+    return True
 
 
 def build_scheduler(settings: Settings) -> AsyncIOScheduler:

@@ -116,6 +116,8 @@ class Parcel(Base):
     ndvi: Mapped[float | None] = mapped_column(Float)
     ndvi_flagged: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
     ndvi_scanned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ndvi_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ndvi_scene_id: Mapped[str | None] = mapped_column(String(64))
     source: Mapped[str] = mapped_column(String(32), nullable=False, server_default="seed")
     created_at: Mapped[datetime] = created_at_col()
     updated_at: Mapped[datetime] = updated_at_col()
@@ -282,6 +284,9 @@ class NdviScan(Base):
     ndvi: Mapped[float] = mapped_column(Float, nullable=False)
     flagged: Mapped[bool] = mapped_column(Boolean, nullable=False)
     provider: Mapped[str] = mapped_column(String(32), nullable=False)
+    observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    scene_id: Mapped[str | None] = mapped_column(String(64))
+    valid_fraction: Mapped[float | None] = mapped_column(Float)
     scanned_at: Mapped[datetime] = created_at_col()
 
     __table_args__ = (Index("ix_ndvi_scans_parcel", "parcel_id", "scanned_at"),)

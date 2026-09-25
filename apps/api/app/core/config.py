@@ -6,7 +6,7 @@ import os
 from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -104,6 +104,9 @@ class Settings(BaseSettings):
 
     # --- Background jobs ---
     satellite_scan_interval_minutes: int = 30
+    # mock (offline demo) | sentinel (real Sentinel-2 L2A from the Earth Search open catalogue)
+    satellite_provider: Literal["mock", "sentinel"] = "mock"
+    sentinel_stac_url: str = "https://earth-search.aws.element84.com/v1"
     scheduler_enabled: bool = True
 
     # --- Startup ---
