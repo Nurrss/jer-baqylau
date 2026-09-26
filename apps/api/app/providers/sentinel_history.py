@@ -37,7 +37,7 @@ log = get_logger(__name__)
 MIN_VALID_FRACTION = 0.6
 CANDIDATES_PER_MONTH = 3
 MAX_PAGES = 6
-HISTORY_WORKERS = 6
+HISTORY_WORKERS = 3  # same as the periodic scan: fits a 512 MB container
 CHIP_SIZE_PX = 320
 CHIP_MIN_EXTENT_M = 300  # small house plots still get visible context
 
@@ -145,8 +145,15 @@ def _best_for_month(candidates: list[dict[str, Any]], geometry: dict[str, Any]) 
             log.warning("sentinel_history_scene_failed", scene=item["id"], error=str(exc))
             continue
         if point is not None:
+            log.info("sentinel_history_month", scene=item["id"], rss_mb=_rss_mb())
             return point
     return None
+
+
+def _rss_mb() -> int:
+    import resource
+
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // 1024  # Linux: KiB
 
 
 async def ndvi_history(
@@ -165,7 +172,13 @@ async def ndvi_history(
             return sorted((p for p in results if p is not None), key=lambda p: p.observed_at)
 
     points = await asyncio.to_thread(run)
-    log.info("sentinel_history_built", scenes=len(items), months=len(by_month), points=len(points))
+    log.info(
+        "sentinel_history_built",
+        scenes=len(items),
+        months=len(by_month),
+        points=len(points),
+        peak_rss_mb=_rss_mb(),
+    )
     return points
 
 
