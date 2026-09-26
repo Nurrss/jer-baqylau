@@ -37,7 +37,7 @@ log = get_logger(__name__)
 MIN_VALID_FRACTION = 0.6
 CANDIDATES_PER_MONTH = 3
 MAX_PAGES = 6
-HISTORY_WORKERS = 12
+HISTORY_WORKERS = 6
 CHIP_SIZE_PX = 320
 CHIP_MIN_EXTENT_M = 300  # small house plots still get visible context
 

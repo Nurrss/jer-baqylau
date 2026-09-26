@@ -38,6 +38,11 @@ GROWING_MONTHS = range(5, 9)  # May–August: differences between used and unuse
 
 _in_progress: set[uuid.UUID] = set()
 _tasks: set[asyncio.Task[None]] = set()
+# One heavy raster job at a time; a finished (or failed) attempt is not repeated for a while,
+# so a panel polling a parcel without usable scenes does not restart the download every 5 s.
+_job_slot = asyncio.Semaphore(1)
+_last_attempt: dict[uuid.UUID, datetime] = {}
+RETRY_AFTER = timedelta(minutes=30)
 
 
 def _yearly_peaks(points: list[NdviPoint]) -> list[YearPeak]:
@@ -132,7 +137,7 @@ async def get_satellite(
     images = [
         SatelliteImage(date=at, scene_id=scene, url=urls[path]) for at, path, scene in chips if path in urls
     ]
-    status = "ready" if has_history and parcel_id not in _in_progress else "loading"
+    status = "loading" if parcel_id in _in_progress else "ready"
     return ParcelSatellite(
         status=status,
         provider=provider.name,
@@ -147,6 +152,10 @@ async def get_satellite(
 def start_history_job(parcel_id: uuid.UUID) -> bool:
     if parcel_id in _in_progress:
         return False
+    last = _last_attempt.get(parcel_id)
+    if last is not None and datetime.now(UTC) - last < RETRY_AFTER:
+        return False
+    _last_attempt[parcel_id] = datetime.now(UTC)
     _in_progress.add(parcel_id)
     task = asyncio.create_task(_build_history(parcel_id))
     _tasks.add(task)
@@ -161,6 +170,11 @@ async def _fetch_item(client: httpx.AsyncClient, stac_url: str, scene_id: str) -
 
 
 async def _build_history(parcel_id: uuid.UUID) -> None:
+    async with _job_slot:
+        await _build_history_now(parcel_id)
+
+
+async def _build_history_now(parcel_id: uuid.UUID) -> None:
     from app.providers.sentinel_history import ndvi_history, render_chip
 
     settings = get_settings()
