@@ -98,3 +98,33 @@ class CadastreRecord(ApiModel):
     encumbrances: list[str]
     matches_local: bool
     discrepancies: list[str]
+
+
+class NdviPoint(ApiModel):
+    date: datetime
+    ndvi: float
+    valid_fraction: float | None
+    scene_id: str | None
+
+
+class YearPeak(ApiModel):
+    year: int
+    peak: float
+
+
+class SatelliteImage(ApiModel):
+    date: datetime
+    scene_id: str
+    url: str
+
+
+class ParcelSatellite(ApiModel):
+    """NDVI history and true-colour chips of one parcel (evidence of use / non-use)."""
+
+    status: Literal["ready", "loading", "demo"]
+    provider: str
+    is_demo: bool
+    threshold: float
+    points: list[NdviPoint]
+    yearly_peaks: list[YearPeak]
+    images: list[SatelliteImage]

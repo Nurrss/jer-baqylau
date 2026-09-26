@@ -22,6 +22,7 @@ from app.schemas.parcels import (
     CadastreRecord,
     ParcelDetail,
     ParcelFeatureCollection,
+    ParcelSatellite,
     ParcelSearchResult,
     ParcelTransitionRequest,
     ParcelUpdateRequest,
@@ -30,6 +31,7 @@ from app.services import audit
 from app.services import parcels as service
 from app.services.act import build_act
 from app.services.photos import PhotoSpec, save_photos
+from app.services.satellite_history import get_satellite
 
 router = APIRouter(prefix="/parcels", tags=["parcels"], responses=ERROR_RESPONSES)
 
@@ -181,3 +183,14 @@ async def inspection_act(
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.get(
+    "/{parcel_id}/satellite",
+    response_model=ParcelSatellite,
+    summary="NDVI history (up to 3 years) and before/after satellite images; built in the background on first request",
+)
+async def parcel_satellite(
+    parcel_id: uuid.UUID, session: DbSession, storage: Storage, _: CurrentInspector
+) -> ParcelSatellite:
+    return await get_satellite(session, storage, parcel_id)

@@ -860,6 +860,74 @@
         }
       }
     },
+    "/api/v1/parcels/{parcel_id}/satellite": {
+      "get": {
+        "tags": [
+          "parcels"
+        ],
+        "summary": "NDVI history (up to 3 years) and before/after satellite images; built in the background on first request",
+        "operationId": "parcel_satellite_api_v1_parcels__parcel_id__satellite_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParcelSatellite"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/signals": {
       "get": {
         "tags": [
@@ -2620,6 +2688,49 @@
         ],
         "title": "NdviLayer"
       },
+      "NdviPoint": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "ndvi": {
+            "type": "number",
+            "title": "Ndvi"
+          },
+          "valid_fraction": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid Fraction"
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "ndvi",
+          "valid_fraction",
+          "scene_id"
+        ],
+        "title": "NdviPoint"
+      },
       "NdviReadingOut": {
         "properties": {
           "parcel_id": {
@@ -3068,6 +3179,64 @@
         ],
         "title": "ParcelPurpose"
       },
+      "ParcelSatellite": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "loading",
+              "demo"
+            ],
+            "title": "Status"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "threshold": {
+            "type": "number",
+            "title": "Threshold"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/NdviPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          },
+          "yearly_peaks": {
+            "items": {
+              "$ref": "#/components/schemas/YearPeak"
+            },
+            "type": "array",
+            "title": "Yearly Peaks"
+          },
+          "images": {
+            "items": {
+              "$ref": "#/components/schemas/SatelliteImage"
+            },
+            "type": "array",
+            "title": "Images"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "provider",
+          "is_demo",
+          "threshold",
+          "points",
+          "yearly_peaks",
+          "images"
+        ],
+        "title": "ParcelSatellite",
+        "description": "NDVI history and true-colour chips of one parcel (evidence of use / non-use)."
+      },
       "ParcelSearchResult": {
         "properties": {
           "id": {
@@ -3278,6 +3447,30 @@
           "created_at"
         ],
         "title": "PhotoOut"
+      },
+      "SatelliteImage": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Date"
+          },
+          "scene_id": {
+            "type": "string",
+            "title": "Scene Id"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "scene_id",
+          "url"
+        ],
+        "title": "SatelliteImage"
       },
       "SatelliteScanStarted": {
         "properties": {
@@ -3959,6 +4152,24 @@
           "count"
         ],
         "title": "ViolationTypeCount"
+      },
+      "YearPeak": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "peak": {
+            "type": "number",
+            "title": "Peak"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "peak"
+        ],
+        "title": "YearPeak"
       }
     },
     "securitySchemes": {

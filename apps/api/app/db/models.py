@@ -287,6 +287,7 @@ class NdviScan(Base):
     observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     scene_id: Mapped[str | None] = mapped_column(String(64))
     valid_fraction: Mapped[float | None] = mapped_column(Float)
+    chip_path: Mapped[str | None] = mapped_column(String(255))  # true-colour image of the parcel (storage)
     scanned_at: Mapped[datetime] = created_at_col()
 
     __table_args__ = (Index("ix_ndvi_scans_parcel", "parcel_id", "scanned_at"),)

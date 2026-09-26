@@ -192,6 +192,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/parcels/{parcel_id}/satellite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** NDVI history (up to 3 years) and before/after satellite images; built in the background on first request */
+        get: operations["parcel_satellite_api_v1_parcels__parcel_id__satellite_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/signals": {
         parameters: {
             query?: never;
@@ -701,6 +718,20 @@ export interface components {
             /** Readings */
             readings: components["schemas"]["NdviReadingOut"][];
         };
+        /** NdviPoint */
+        NdviPoint: {
+            /**
+             * Date
+             * Format: date-time
+             */
+            date: string;
+            /** Ndvi */
+            ndvi: number;
+            /** Valid Fraction */
+            valid_fraction: number | null;
+            /** Scene Id */
+            scene_id: string | null;
+        };
         /** NdviReadingOut */
         NdviReadingOut: {
             /** Parcel Id */
@@ -850,6 +881,29 @@ export interface components {
          * @enum {string}
          */
         ParcelPurpose: "IZHS" | "AGRICULTURE" | "COMMERCIAL" | "INDUSTRIAL" | "LPH";
+        /**
+         * ParcelSatellite
+         * @description NDVI history and true-colour chips of one parcel (evidence of use / non-use).
+         */
+        ParcelSatellite: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ready" | "loading" | "demo";
+            /** Provider */
+            provider: string;
+            /** Is Demo */
+            is_demo: boolean;
+            /** Threshold */
+            threshold: number;
+            /** Points */
+            points: components["schemas"]["NdviPoint"][];
+            /** Yearly Peaks */
+            yearly_peaks: components["schemas"]["YearPeak"][];
+            /** Images */
+            images: components["schemas"]["SatelliteImage"][];
+        };
         /** ParcelSearchResult */
         ParcelSearchResult: {
             /** Id */
@@ -917,6 +971,18 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** SatelliteImage */
+        SatelliteImage: {
+            /**
+             * Date
+             * Format: date-time
+             */
+            date: string;
+            /** Scene Id */
+            scene_id: string;
+            /** Url */
+            url: string;
         };
         /** SatelliteScanStarted */
         SatelliteScanStarted: {
@@ -1140,6 +1206,13 @@ export interface components {
             violation_type: components["schemas"]["ViolationType"];
             /** Count */
             count: number;
+        };
+        /** YearPeak */
+        YearPeak: {
+            /** Year */
+            year: number;
+            /** Peak */
+            peak: number;
         };
     };
     responses: never;
@@ -1713,6 +1786,55 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": unknown;
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    parcel_satellite_api_v1_parcels__parcel_id__satellite_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ParcelSatellite"];
                 };
             };
             /** @description Not authenticated */

@@ -96,6 +96,7 @@ class EventType(StrEnum):
     PHOTO_ADDED = "photo.added"
     APPLICATION_STATUS_CHANGED = "application.status_changed"
     SATELLITE_SCAN_COMPLETED = "satellite.scan_completed"
+    SATELLITE_HISTORY_READY = "satellite.history_ready"
     DEMO_RESET = "demo.reset"
 
 
