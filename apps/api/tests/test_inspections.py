@@ -98,6 +98,12 @@ async def test_honest_report_passes_and_becomes_evidence(
     # The link is single-use.
     again = await _submit(client, token, lat=0, lon=0, photos=[placeholder_photo("x")])
     assert again.status_code == 409, again.text
+    # Until the report is reviewed, the owner is not asked again.
+    duplicate = await client.post(
+        f"{API}/parcels/{parcel['id']}/inspection-requests", json={"due_hours": 24}, headers=auth_headers
+    )
+    assert duplicate.status_code == 409
+    assert duplicate.json()["error"]["code"] == "INSPECTION_ALREADY_OPEN"
 
     await client.post(
         f"{API}/parcels/{parcel['id']}/transitions",

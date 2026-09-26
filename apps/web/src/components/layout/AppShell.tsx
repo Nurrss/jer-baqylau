@@ -2,6 +2,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import {
   BarChart3,
   CircleHelp,
+  ClipboardCheck,
   FileText,
   Home,
   LogOut,
@@ -35,10 +36,11 @@ const NAV = [
   { to: '/signals', icon: Megaphone, key: 'signals' },
   { to: '/violations', icon: ShieldAlert, key: 'violations' },
   { to: '/applications', icon: FileText, key: 'applications' },
+  { to: '/inspections', icon: ClipboardCheck, key: 'inspections' },
   { to: '/dashboard', icon: BarChart3, key: 'dashboard' },
 ] as const
 
-function LanguageSwitch() {
+export function LanguageSwitch() {
   const { i18n } = useTranslation()
   return (
     <div

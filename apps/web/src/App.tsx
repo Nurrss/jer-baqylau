@@ -9,9 +9,12 @@ import { TooltipProvider } from '@/components/ui/misc'
 import { ApplicationsPage } from '@/pages/ApplicationsPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { HomePage } from '@/pages/HomePage'
+import { InspectionsPage } from '@/pages/InspectionsPage'
+import { InspectPage } from '@/pages/InspectPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { MapPage } from '@/pages/MapPage'
 import { SignalsPage } from '@/pages/SignalsPage'
+import { VerifyPage } from '@/pages/VerifyPage'
 import { ViolationsPage } from '@/pages/ViolationsPage'
 import { useAuthStore } from '@/store/auth'
 import { useUiStore } from '@/store/ui'
@@ -59,6 +62,8 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/inspect/:token" element={<InspectPage />} />
+            <Route path="/verify/:id" element={<VerifyPage />} />
             <Route
               element={
                 <RequireAuth>
@@ -71,6 +76,7 @@ export default function App() {
               <Route path="signals" element={<SignalsPage />} />
               <Route path="violations" element={<ViolationsPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
+              <Route path="inspections" element={<InspectionsPage />} />
               <Route path="dashboard" element={<DashboardPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

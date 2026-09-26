@@ -1,9 +1,9 @@
-import { AlarmClock, AreaChart, Clock3, Hourglass, Megaphone, ShieldAlert, Wrench } from 'lucide-react'
+import { AlarmClock, AreaChart, Clock3, Hourglass, Megaphone, ShieldAlert, ShieldCheck, Wrench } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { useDashboard } from '@/api/queries'
+import { useAuditVerify, useDashboard } from '@/api/queries'
 import { ErrorState } from '@/components/common/States'
 import { StatusBadge } from '@/components/common/StatusBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { DeadlineChip } from '@/features/parcel/ParcelPanel'
 import { useDateFns } from '@/lib/dates'
 import { PARCEL_STATUS_COLORS } from '@/lib/status'
-import { formatArea } from '@/lib/utils'
+import { cn, formatArea } from '@/lib/utils'
 
 const BAR_COLOR = '#0b6aa8'
 
@@ -61,6 +61,27 @@ function ChartTooltip({
   )
 }
 
+/** Recomputes the whole status-history hash chain: any silent edit or deletion shows up here. */
+function AuditIntegrity() {
+  const { t } = useTranslation()
+  const query = useAuditVerify()
+  if (!query.data) return <Skeleton className="h-9 w-64 rounded-lg" />
+  const { intact, length } = query.data
+  return (
+    <div
+      title={query.data.head}
+      className={cn(
+        'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm',
+        intact ? 'border-success/40 bg-success/5 text-success' : 'border-destructive/50 bg-destructive/10 text-destructive',
+      )}
+    >
+      {intact ? <ShieldCheck className="size-4" /> : <ShieldAlert className="size-4" />}
+      <span className="font-medium">{t(intact ? 'audit.intact' : 'audit.broken')}</span>
+      <span className="text-xs opacity-80">{t('audit.records', { count: length })}</span>
+    </div>
+  )
+}
+
 export function DashboardPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -86,9 +107,12 @@ export function DashboardPage() {
   return (
     <div className="absolute inset-0 overflow-y-auto">
       <div className="mx-auto grid max-w-7xl gap-4 p-4 md:p-6">
-        <div>
-          <h2 className="text-xl font-semibold">{t('dashboard.title')}</h2>
-          <p className="text-sm text-muted-foreground">{t('dashboard.subtitle')}</p>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold">{t('dashboard.title')}</h2>
+            <p className="text-sm text-muted-foreground">{t('dashboard.subtitle')}</p>
+          </div>
+          <AuditIntegrity />
         </div>
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">

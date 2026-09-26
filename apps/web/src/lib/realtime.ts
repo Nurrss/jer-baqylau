@@ -63,6 +63,18 @@ function invalidate(qc: QueryClient, event: Pick<EventOut, 'type' | 'payload'>) 
       inv(qk.ndvi)
       inv(qk.parcels)
       break
+    case 'satellite.history_ready':
+      if (p.parcel_id) inv(['parcel-satellite', p.parcel_id])
+      break
+    case 'inspection.requested':
+    case 'inspection.submitted':
+    case 'inspection.reviewed':
+    case 'inspection.plan_created':
+      inv(['inspections'])
+      inv(['inspection'])
+      inv(['risk'])
+      inv(['evidence'])
+      break
     case 'demo.reset':
       void qc.invalidateQueries()
       break

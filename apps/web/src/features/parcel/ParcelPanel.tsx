@@ -29,6 +29,9 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/misc'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoryTimeline } from '@/features/common/History'
+import { Section } from '@/features/common/Section'
+import { CrossCheckSection, ParcelInspections } from '@/features/integrity/ParcelIntegrity'
+import { SatelliteTab } from '@/features/satellite/SatelliteTab'
 import { PhotoGallery, PhotoUploader } from '@/features/common/PhotoGallery'
 import { daysUntil, fromDateInput, toDateInput, useDateFns } from '@/lib/dates'
 import { LIFECYCLE_STEPS, lifecycleIndex } from '@/lib/status'
@@ -36,31 +39,6 @@ import { cn, formatArea } from '@/lib/utils'
 import { useGuideStore } from '@/store/guide'
 import { useUiStore } from '@/store/ui'
 import { ParcelTransitionDialog } from './ParcelTransitionDialog'
-
-export function Section({
-  title,
-  icon,
-  children,
-  aside,
-}: {
-  title: string
-  icon?: ReactNode
-  children: ReactNode
-  aside?: ReactNode
-}) {
-  return (
-    <section className="border-t px-5 py-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="flex items-center gap-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          {icon}
-          {title}
-        </h3>
-        {aside}
-      </div>
-      {children}
-    </section>
-  )
-}
 
 export function DeadlineChip({ deadline, active }: { deadline: string; active: boolean }) {
   const { t } = useTranslation()
@@ -428,16 +406,19 @@ export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: 
             <Tabs value={tab} onValueChange={setTab} className="mt-1">
               <div className="sticky top-0 z-10 border-b bg-card px-5 pb-2" data-tour="parcel-tabs">
                 <TabsList className="w-full">
-                  <TabsTrigger value="overview" className="flex-1">
+                  <TabsTrigger value="overview" className="flex-1 px-1.5 text-[13px]">
                     {t('parcel.tabs.overview')}
                   </TabsTrigger>
-                  <TabsTrigger value="photos" className="flex-1">
+                  <TabsTrigger value="photos" className="flex-1 px-1.5 text-[13px]">
                     {t('parcel.tabs.photos')} <TabCount n={parcel.photos.length} />
                   </TabsTrigger>
-                  <TabsTrigger value="signals" className="flex-1">
+                  <TabsTrigger value="signals" className="flex-1 px-1.5 text-[13px]">
                     {t('parcel.tabs.signals')} <TabCount n={parcel.signals.length} />
                   </TabsTrigger>
-                  <TabsTrigger value="history" className="flex-1">
+                  <TabsTrigger value="satellite" className="flex-1 px-1.5 text-[13px]">
+                    {t('parcel.tabs.satellite')}
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="flex-1 px-1.5 text-[13px]">
                     {t('parcel.tabs.history')}
                   </TabsTrigger>
                 </TabsList>
@@ -476,7 +457,13 @@ export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: 
                 <Section title={t('parcel.characteristics')}>
                   <Characteristics parcel={parcel} />
                 </Section>
+                <ParcelInspections parcel={parcel} />
+                <CrossCheckSection parcelId={parcel.id} />
                 <CadastreCheck parcelId={parcel.id} />
+              </TabsContent>
+
+              <TabsContent value="satellite">
+                <SatelliteTab parcelId={parcel.id} />
               </TabsContent>
 
               <TabsContent value="photos">

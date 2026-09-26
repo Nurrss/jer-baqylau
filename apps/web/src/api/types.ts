@@ -56,3 +56,16 @@ export const APPLICATION_STATUSES: ApplicationStatus[] = [
   'APPROVED',
   'REJECTED',
 ]
+
+export type InspectionStatus = S['InspectionStatus']
+export type InspectionVerdict = S['InspectionVerdict']
+export type DeclaredUse = S['DeclaredUse']
+export type Inspection = S['InspectionOut']
+export type InspectionCheck = S['CheckOut']
+export type RiskItem = S['RiskItem']
+export type ResolutionEvidence = S['ResolutionEvidence']
+export type CrossCheck = S['CrossCheck']
+export type ParcelSatellite = S['ParcelSatellite']
+export type InspectionPublic = S['InspectionPublic']
+export type ActPublic = S['ActPublic']
+export const DECLARED_USES: DeclaredUse[] = ['CULTIVATED', 'BUILDING', 'CLEANED', 'FALLOW', 'OTHER']

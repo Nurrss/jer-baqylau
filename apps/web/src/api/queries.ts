@@ -9,6 +9,7 @@ import type {
   ParcelUpdateRequest,
   SignalStatus,
   SignalTransitionRequest,
+  InspectionStatus,
 } from './types'
 
 export const qk = {
@@ -209,5 +210,150 @@ export function useNdvi(enabled: boolean) {
 export function useSatelliteScan() {
   return useMutation({
     mutationFn: async () => unwrap(await api.POST('/api/v1/satellite/scan')),
+  })
+}
+
+// ── Integrity: inspections, risk, evidence, cross-checks, audit ─────────────
+
+export const qkx = {
+  inspections: (statuses: string[], parcelId?: string) => ['inspections', statuses, parcelId ?? ''] as const,
+  inspection: (id: string) => ['inspection', id] as const,
+  risk: ['risk'] as const,
+  evidence: (parcelId: string) => ['evidence', parcelId] as const,
+  crosscheck: (parcelId: string) => ['crosscheck', parcelId] as const,
+  satellite: (parcelId: string) => ['parcel-satellite', parcelId] as const,
+  audit: ['audit-verify'] as const,
+}
+
+export function useInspections(statuses: InspectionStatus[] = [], parcelId?: string) {
+  return useQuery({
+    queryKey: qkx.inspections(statuses, parcelId),
+    queryFn: async () =>
+      unwrap(
+        await api.GET('/api/v1/inspection-requests', {
+          params: { query: { status: statuses, parcel_id: parcelId ?? null, limit: 200 } },
+        }),
+      ),
+  })
+}
+
+export function useInspection(id: string | null) {
+  return useQuery({
+    queryKey: qkx.inspection(id ?? ''),
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v1/inspection-requests/{request_id}', { params: { path: { request_id: id! } } })),
+    enabled: Boolean(id),
+  })
+}
+
+function useInvalidateInspections() {
+  const qc = useQueryClient()
+  return () => {
+    void qc.invalidateQueries({ queryKey: ['inspections'] })
+    void qc.invalidateQueries({ queryKey: ['inspection'] })
+    void qc.invalidateQueries({ queryKey: qkx.risk })
+    void qc.invalidateQueries({ queryKey: ['evidence'] })
+  }
+}
+
+export function useRequestInspection(parcelId: string) {
+  const invalidate = useInvalidateInspections()
+  return useMutation({
+    mutationFn: async (body: { due_hours: number; note: string | null }) =>
+      unwrap(
+        await api.POST('/api/v1/parcels/{parcel_id}/inspection-requests', {
+          params: { path: { parcel_id: parcelId } },
+          body,
+        }),
+      ),
+    onSuccess: invalidate,
+  })
+}
+
+export function useReviewInspection(id: string) {
+  const invalidate = useInvalidateInspections()
+  return useMutation({
+    mutationFn: async (body: { decision: 'ACCEPTED' | 'REJECTED'; comment: string }) =>
+      unwrap(
+        await api.POST('/api/v1/inspection-requests/{request_id}/review', {
+          params: { path: { request_id: id } },
+          body,
+        }),
+      ),
+    onSuccess: invalidate,
+  })
+}
+
+export function useRisk(limit = 30) {
+  return useQuery({
+    queryKey: [...qkx.risk, limit],
+    queryFn: async () => unwrap(await api.GET('/api/v1/risk', { params: { query: { limit } } })),
+    staleTime: 30_000,
+  })
+}
+
+export function useCreatePlan() {
+  const invalidate = useInvalidateInspections()
+  return useMutation({
+    mutationFn: async (body: { size: number; random_share: number }) =>
+      unwrap(await api.POST('/api/v1/inspection-plan', { body })),
+    onSuccess: invalidate,
+  })
+}
+
+export function useEvidence(parcelId: string, enabled = true) {
+  return useQuery({
+    queryKey: qkx.evidence(parcelId),
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v1/parcels/{parcel_id}/evidence', { params: { path: { parcel_id: parcelId } } })),
+    enabled,
+  })
+}
+
+export function useCrosscheck(parcelId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: qkx.crosscheck(parcelId),
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v1/parcels/{parcel_id}/crosscheck', { params: { path: { parcel_id: parcelId } } })),
+    enabled,
+    staleTime: 5 * 60_000,
+  })
+}
+
+export function useParcelSatellite(parcelId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: qkx.satellite(parcelId),
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v1/parcels/{parcel_id}/satellite', { params: { path: { parcel_id: parcelId } } })),
+    enabled,
+    // While the history is being built in the background, poll (realtime also notifies).
+    refetchInterval: (query) => (query.state.data?.status === 'loading' ? 5000 : false),
+  })
+}
+
+export function useAuditVerify() {
+  return useQuery({
+    queryKey: qkx.audit,
+    queryFn: async () => unwrap(await api.GET('/api/v1/audit/verify')),
+    staleTime: 60_000,
+  })
+}
+
+// ── Public (no login) ───────────────────────────────────────────────────────
+
+export function usePublicInspection(token: string) {
+  return useQuery({
+    queryKey: ['public-inspection', token],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v1/public/inspections/{token}', { params: { path: { token } } })),
+    retry: false,
+  })
+}
+
+export function usePublicAct(actId: string) {
+  return useQuery({
+    queryKey: ['public-act', actId],
+    queryFn: async () => unwrap(await api.GET('/api/v1/public/acts/{act_id}', { params: { path: { act_id: actId } } })),
+    retry: false,
   })
 }

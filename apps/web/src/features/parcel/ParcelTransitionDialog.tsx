@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { useParcelTransition } from '@/api/queries'
+import { useEvidence, useParcelTransition } from '@/api/queries'
 import { VIOLATION_TYPES, type ParcelDetail, type ParcelStatus, type ViolationType } from '@/api/types'
 import { useErrorMessage } from '@/lib/useErrorMessage'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -18,6 +18,7 @@ import {
 import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { EvidenceList } from '@/features/integrity/EvidenceList'
 import { fromDateInput, toDateInput } from '@/lib/dates'
 
 const DEFAULT_DEADLINE_DAYS = 30
@@ -53,7 +54,11 @@ export function ParcelTransitionDialog({
   const needsType = target === 'VIOLATION'
   const showDeadline = target === 'VIOLATION' || target === 'IN_REMEDIATION'
   const today = toDateInput(new Date().toISOString())
-  const valid = comment.trim().length >= 3 && (!needsType || violationType !== '') && (!needsType || deadline)
+  const needsEvidence = target === 'RESOLVED'
+  const evidence = useEvidence(parcel.id, needsEvidence)
+  const evidenceOk = !needsEvidence || evidence.data?.sufficient === true
+  const valid =
+    comment.trim().length >= 3 && (!needsType || violationType !== '') && (!needsType || deadline) && evidenceOk
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -122,6 +127,8 @@ export function ParcelTransitionDialog({
                 />
               </div>
             )}
+
+            {needsEvidence && <EvidenceList evidence={evidence.data} loading={evidence.isLoading} />}
 
             <div className="grid gap-2">
               <Label htmlFor="comment">{t('transition.comment')} *</Label>

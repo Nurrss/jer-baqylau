@@ -154,7 +154,9 @@ async def create_plan(session: AsyncSession, *, size: int, random_share: float, 
     now = datetime.now(UTC)
     busy = set(
         await session.scalars(
-            select(InspectionRequest.parcel_id).where(InspectionRequest.status == InspectionStatus.REQUESTED)
+            select(InspectionRequest.parcel_id).where(
+                InspectionRequest.status.in_([InspectionStatus.REQUESTED, InspectionStatus.SUBMITTED])
+            )
         )
     )
     risks = [r for r in await compute_risks(session, now) if r.parcel_id not in busy]

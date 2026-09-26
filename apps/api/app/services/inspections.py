@@ -27,7 +27,7 @@ from typing import Any, Literal
 from geoalchemy2 import Geography
 from geoalchemy2.shape import from_shape
 from shapely.geometry import Point
-from sqlalchemy import cast, func, select
+from sqlalchemy import and_, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -123,8 +123,14 @@ async def create_request(
     open_request = await session.scalar(
         select(InspectionRequest.code).where(
             InspectionRequest.parcel_id == parcel_id,
-            InspectionRequest.status == InspectionStatus.REQUESTED,
-            InspectionRequest.due_at > datetime.now(UTC),
+            or_(
+                and_(
+                    InspectionRequest.status == InspectionStatus.REQUESTED,
+                    InspectionRequest.due_at > datetime.now(UTC),
+                ),
+                # A submitted report must be reviewed before the owner is asked again.
+                InspectionRequest.status == InspectionStatus.SUBMITTED,
+            ),
         )
     )
     if open_request:

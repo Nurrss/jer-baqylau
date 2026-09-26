@@ -1,6 +1,7 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {
   BarChart3,
+  ClipboardCheck,
   CornerDownLeft,
   FileText,
   Home,
@@ -73,6 +74,7 @@ function PaletteBody({ setOpen }: { setOpen: (open: boolean) => void }) {
       { id: 'p-signals', to: '/signals', icon: <Megaphone />, key: 'signals' },
       { id: 'p-violations', to: '/violations', icon: <ShieldAlert />, key: 'violations' },
       { id: 'p-applications', to: '/applications', icon: <FileText />, key: 'applications' },
+      { id: 'p-inspections', to: '/inspections', icon: <ClipboardCheck />, key: 'inspections' },
       { id: 'p-dashboard', to: '/dashboard', icon: <BarChart3 />, key: 'dashboard' },
     ]
       .filter((p) => !q || t(`nav.${p.key}`).toLowerCase().includes(q))

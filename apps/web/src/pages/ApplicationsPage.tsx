@@ -24,7 +24,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/misc'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoryTimeline } from '@/features/common/History'
-import { Section } from '@/features/parcel/ParcelPanel'
+import { Section } from '@/features/common/Section'
 import { toDateInput, useDateFns } from '@/lib/dates'
 
 function TransitionDialog({
