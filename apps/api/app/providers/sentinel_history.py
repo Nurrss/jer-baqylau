@@ -37,7 +37,7 @@ log = get_logger(__name__)
 MIN_VALID_FRACTION = 0.6
 CANDIDATES_PER_MONTH = 3
 MAX_PAGES = 6
-HISTORY_WORKERS = 3  # same as the periodic scan: fits a 512 MB container
+HISTORY_WORKERS = 1  # the API idles at ~400 MB; each extra reader adds ~45 MB (512 MB limit)
 CHIP_SIZE_PX = 320
 CHIP_MIN_EXTENT_M = 300  # small house plots still get visible context
 

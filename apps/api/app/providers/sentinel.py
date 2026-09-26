@@ -46,7 +46,7 @@ GDAL_ENV = {
     "VSI_CACHE": "TRUE",
     # Containers see the host's RAM, so GDAL's default block cache (5 % of it) overshoots the
     # service memory limit when several worker threads read at once (OOM restarts).
-    "GDAL_CACHEMAX": 64,  # MB, shared by all threads
+    "GDAL_CACHEMAX": 32,  # MB, shared by all threads
     "VSI_CACHE_SIZE": 10_000_000,  # bytes per open file (default 25 MB x 3 bands x threads)
 }
 

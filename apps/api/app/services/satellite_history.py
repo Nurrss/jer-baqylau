@@ -118,7 +118,7 @@ async def get_satellite(
     )
     has_history = any(r.provider == HISTORY_PROVIDER for r in rows)
     if not has_history:
-        start_history_job(parcel_id)
+        await start_history_job(parcel_id)
 
     by_scene: dict[str, NdviScan] = {}
     for row in rows:
@@ -149,11 +149,13 @@ async def get_satellite(
     )
 
 
-def start_history_job(parcel_id: uuid.UUID) -> bool:
+async def start_history_job(parcel_id: uuid.UUID) -> bool:
     if parcel_id in _in_progress:
         return False
     last = _last_attempt.get(parcel_id)
     if last is not None and datetime.now(UTC) - last < RETRY_AFTER:
+        return False
+    if not await _claim_attempt(parcel_id):
         return False
     _last_attempt[parcel_id] = datetime.now(UTC)
     _in_progress.add(parcel_id)
@@ -161,6 +163,25 @@ def start_history_job(parcel_id: uuid.UUID) -> bool:
     _tasks.add(task)
     task.add_done_callback(_tasks.discard)
     return True
+
+
+async def _claim_attempt(parcel_id: uuid.UUID) -> bool:
+    """Remember the attempt in Redis, so it survives a process restart (e.g. an OOM kill mid-job)
+    and a polling panel cannot turn one failing job into a restart loop."""
+    from redis.asyncio import Redis
+
+    client = Redis.from_url(get_settings().redis_url, socket_connect_timeout=2, socket_timeout=2)
+    try:
+        return bool(
+            await client.set(
+                f"satellite:history:{parcel_id}", "1", nx=True, ex=int(RETRY_AFTER.total_seconds())
+            )
+        )
+    except Exception as exc:  # Redis down: the in-memory guard still applies
+        log.warning("satellite_history_claim_failed", error=str(exc))
+        return True
+    finally:
+        await client.aclose()
 
 
 async def _fetch_item(client: httpx.AsyncClient, stac_url: str, scene_id: str) -> dict[str, Any]:
