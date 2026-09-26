@@ -185,3 +185,27 @@ class DemoResetResponse(ApiModel):
     parcels: int
     applications: int
     signals: int
+
+
+# ── Integrity ───────────────────────────────────────────────────────────────
+
+
+class ChainCheck(ApiModel):
+    intact: bool
+    length: int
+    head: str
+    broken_at_id: int | None = None
+
+
+class ActPublic(ApiModel):
+    """What anyone scanning the QR code on a printed act can see (no personal data)."""
+
+    number: str
+    issued_at: datetime
+    cadastral_number: str
+    parcel_status: str
+    lang: str
+    issued_by: str
+    pdf_sha256: str
+    photo_count: int
+    chain_at_issue: ChainCheck = Field(description="Audit log unchanged since the act was issued")

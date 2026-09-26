@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import hashlib
 import io
 import uuid
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
 from geoalchemy2.shape import from_shape
@@ -34,10 +35,28 @@ _DATETIME_ORIGINAL = next(k for k, v in ExifTags.TAGS.items() if v == "DateTimeO
 _EXIF_IFD = 0x8769
 
 
+def perceptual_hash(image: Image.Image) -> str:
+    """64-bit difference hash: survives re-compression and resizing, so a re-sent photo is recognized."""
+    small = image.convert("L").resize((9, 8), Image.Resampling.LANCZOS)
+    pixels = list(small.getdata())
+    bits = 0
+    for row in range(8):
+        for col in range(8):
+            left, right = pixels[row * 9 + col], pixels[row * 9 + col + 1]
+            bits = (bits << 1) | int(left > right)
+    return f"{bits:016x}"
+
+
+def hamming(a: str, b: str) -> int:
+    return (int(a, 16) ^ int(b, 16)).bit_count()
+
+
 @dataclass(slots=True)
 class ProcessedImage:
     full: bytes
     thumb: bytes
+    sha256: str
+    phash: str
     width: int
     height: int
     taken_at: datetime | None
@@ -109,6 +128,8 @@ def process_image(data: bytes) -> ProcessedImage:
     return ProcessedImage(
         full=full,
         thumb=thumb,
+        sha256=hashlib.sha256(full).hexdigest(),
+        phash=perceptual_hash(image),
         width=width,
         height=height,
         taken_at=taken_at,
@@ -150,6 +171,10 @@ def _build(spec: PhotoSpec, processed: ProcessedImage) -> tuple[Photo, list[tupl
             else None
         ),
         uploaded_by=spec.uploaded_by,
+        sha256=processed.sha256,
+        phash=processed.phash,
+        # Upload moment (not the transaction start that the DB default would give): evidence timing matters.
+        created_at=datetime.now(UTC),
     )
     return photo, [(full_path, processed.full), (thumb_path, processed.thumb)]
 

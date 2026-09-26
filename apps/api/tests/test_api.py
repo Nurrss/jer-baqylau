@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import uuid
+from typing import Any
 
 from httpx import AsyncClient
 from PIL import Image
@@ -132,14 +133,37 @@ async def test_full_signal_to_resolution_cycle(
     assert skip.status_code == 409
     assert skip.json()["error"]["details"]["allowed"] == ["IN_REMEDIATION"]
 
-    for target in ("IN_REMEDIATION", "RESOLVED"):
-        step = await client.post(
+    async def transition(target: str) -> Any:
+        return await client.post(
             f"{API}/parcels/{hit['id']}/transitions",
             json={"to": target, "comment": f"Шаг {target}"},
             headers=auth_headers,
         )
-        assert step.status_code == 200, step.text
-        assert step.json()["status"] == target
+
+    step = await transition("IN_REMEDIATION")
+    assert step.status_code == 200, step.text
+
+    # «Устранено» on the inspector's word alone is refused…
+    refused = await transition("RESOLVED")
+    assert refused.status_code == 422
+    assert refused.json()["error"]["code"] == "EVIDENCE_REQUIRED"
+    # …a photo taken on the parcel (GPS inside the boundary) after the precept is the evidence.
+    photo = await client.post(
+        f"{API}/parcels/{hit['id']}/photos",
+        files=[
+            (
+                "files",
+                ("fixed.jpg", _jpeg_with_gps(hit["centroid"]["lat"], hit["centroid"]["lon"]), "image/jpeg"),
+            )
+        ],
+        headers=auth_headers,
+    )
+    assert photo.status_code == 201
+    evidence = (await client.get(f"{API}/parcels/{hit['id']}/evidence", headers=auth_headers)).json()
+    assert evidence["sufficient"] is True
+    step = await transition("RESOLVED")
+    assert step.status_code == 200, step.text
+    assert step.json()["status"] == "RESOLVED"
 
     await outbox.drain()
     texts = [n.text for n in notifications.sent if n.chat_id == 777001]

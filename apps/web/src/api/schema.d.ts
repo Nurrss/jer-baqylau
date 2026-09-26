@@ -311,6 +311,159 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/parcels/{parcel_id}/inspection-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask the owner for a photo report (returns the one-time link) */
+        post: operations["request_inspection_api_v1_parcels__parcel_id__inspection_requests_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Inspections */
+        get: operations["list_inspections_api_v1_inspection_requests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Inspection */
+        get: operations["get_inspection_api_v1_inspection_requests__request_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-requests/{request_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept or reject an owner photo report (a FAILED report cannot be accepted) */
+        post: operations["review_inspection_api_v1_inspection_requests__request_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Parcels ranked by risk, with reasons */
+        get: operations["risk_ranking_api_v1_risk_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/inspection-plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create owner photo-report requests: top risk + reproducible random control sample */
+        post: operations["inspection_plan_api_v1_inspection_plan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parcels/{parcel_id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What evidence exists to close the violation as resolved */
+        get: operations["parcel_evidence_api_v1_parcels__parcel_id__evidence_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parcels/{parcel_id}/crosscheck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cross-check with state data: cadastre registry, declared sowing (subsidies) vs satellite */
+        get: operations["parcel_crosscheck_api_v1_parcels__parcel_id__crosscheck_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verify the audit hash chain */
+        get: operations["verify_audit_api_v1_audit_verify_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/stats/dashboard": {
         parameters: {
             query?: never;
@@ -413,6 +566,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/acts/{act_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verify a printed act by its QR code */
+        get: operations["verify_act_api_v1_public_acts__act_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/inspections/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Owner: open a photo-report request */
+        get: operations["open_inspection_api_v1_public_inspections__token__get"];
+        put?: never;
+        /** Owner: submit live camera photos with the device position (anti-fraud checks run server-side) */
+        post: operations["submit_inspection_api_v1_public_inspections__token__post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dev/simulate-signal": {
         parameters: {
             query?: never;
@@ -451,6 +639,33 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ActPublic
+         * @description What anyone scanning the QR code on a printed act can see (no personal data).
+         */
+        ActPublic: {
+            /** Number */
+            number: string;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Cadastral Number */
+            cadastral_number: string;
+            /** Parcel Status */
+            parcel_status: string;
+            /** Lang */
+            lang: string;
+            /** Issued By */
+            issued_by: string;
+            /** Pdf Sha256 */
+            pdf_sha256: string;
+            /** Photo Count */
+            photo_count: number;
+            /** @description Audit log unchanged since the act was issued */
+            chain_at_issue: components["schemas"]["ChainCheck"];
+        };
         /** ApplicationList */
         ApplicationList: {
             /** Items */
@@ -523,6 +738,31 @@ export interface components {
              */
             mode: "supabase" | "local";
         };
+        /** Body_submit_inspection_api_v1_public_inspections__token__post */
+        Body_submit_inspection_api_v1_public_inspections__token__post: {
+            /**
+             * Files
+             * @description 1–5 JPEG photos captured by the camera
+             */
+            files: string[];
+            /**
+             * Captured At
+             * @description ISO time of each capture, same order as files
+             */
+            captured_at: string[];
+            /** Lat */
+            lat: number;
+            /** Lon */
+            lon: number;
+            /**
+             * Accuracy
+             * @description GPS accuracy, metres
+             */
+            accuracy: number;
+            declared_use: components["schemas"]["DeclaredUse"];
+            /** Comment */
+            comment?: string | null;
+        };
         /** Body_upload_parcel_photos_api_v1_parcels__parcel_id__photos_post */
         Body_upload_parcel_photos_api_v1_parcels__parcel_id__photos_post: {
             /**
@@ -557,6 +797,59 @@ export interface components {
             /** Discrepancies */
             discrepancies: string[];
         };
+        /** ChainCheck */
+        ChainCheck: {
+            /** Intact */
+            intact: boolean;
+            /** Length */
+            length: number;
+            /** Head */
+            head: string;
+            /** Broken At Id */
+            broken_at_id?: number | null;
+        };
+        /** CheckOut */
+        CheckOut: {
+            /** Code */
+            code: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pass" | "warn" | "fail" | "skip";
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /** CrossCheck */
+        CrossCheck: {
+            /** Items */
+            items: components["schemas"]["CrossCheckItem"][];
+            /** Mismatches */
+            mismatches: number;
+        };
+        /** CrossCheckItem */
+        CrossCheckItem: {
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "GBD_ZKS" | "SUBSIDIES";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "mismatch" | "info";
+            /** Code */
+            code: string;
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+            /** Is Demo */
+            is_demo: boolean;
+        };
         /** DashboardStats */
         DashboardStats: {
             kpi: components["schemas"]["Kpi"];
@@ -579,6 +872,11 @@ export interface components {
             /** Count */
             count: number;
         };
+        /**
+         * DeclaredUse
+         * @enum {string}
+         */
+        DeclaredUse: "CULTIVATED" | "BUILDING" | "FALLOW" | "CLEANED" | "OTHER";
         /** DemoResetResponse */
         DemoResetResponse: {
             /** Parcels */
@@ -629,6 +927,20 @@ export interface components {
              */
             created_at: string;
         };
+        /** EvidenceItem */
+        EvidenceItem: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "INSPECTOR_PHOTO" | "OWNER_REPORT" | "SATELLITE";
+            /** Ok */
+            ok: boolean;
+            /** At */
+            at: string | null;
+            /** Detail */
+            detail: string | null;
+        };
         /** HealthOut */
         HealthOut: {
             /**
@@ -652,6 +964,138 @@ export interface components {
             /** Storage */
             storage: string;
         };
+        /** InspectionCreate */
+        InspectionCreate: {
+            /**
+             * Due Hours
+             * @default 48
+             */
+            due_hours?: number;
+            /** Note */
+            note?: string | null;
+        };
+        /** InspectionList */
+        InspectionList: {
+            /** Items */
+            items: components["schemas"]["InspectionOut"][];
+            /** Total */
+            total: number;
+        };
+        /** InspectionOut */
+        InspectionOut: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Parcel Id */
+            parcel_id: string;
+            /** Cadastral Number */
+            cadastral_number: string;
+            status: components["schemas"]["InspectionStatus"];
+            reason: components["schemas"]["InspectionReason"];
+            verdict: components["schemas"]["InspectionVerdict"] | null;
+            /** Note */
+            note: string | null;
+            /** Requested By */
+            requested_by: string;
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Submitted At */
+            submitted_at: string | null;
+            declared_use: components["schemas"]["DeclaredUse"] | null;
+            /** Owner Comment */
+            owner_comment: string | null;
+            device: components["schemas"]["LngLat"] | null;
+            /** Accuracy M */
+            accuracy_m: number | null;
+            /** Checks */
+            checks: components["schemas"]["CheckOut"][];
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Review Comment */
+            review_comment: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /**
+             * Link
+             * @description Owner link; only while the request is open
+             */
+            link: string | null;
+            /** Photos */
+            photos: components["schemas"]["PhotoOut"][];
+        };
+        /**
+         * InspectionPublic
+         * @description What the owner sees on the one-time link (no personal data of anyone).
+         */
+        InspectionPublic: {
+            /** Code */
+            code: string;
+            status: components["schemas"]["InspectionStatus"];
+            /** Cadastral Number */
+            cadastral_number: string;
+            /** Address Ru */
+            address_ru: string;
+            /** Address Kk */
+            address_kk: string;
+            purpose: components["schemas"]["ParcelPurpose"];
+            /**
+             * Due At
+             * Format: date-time
+             */
+            due_at: string;
+            /** Note */
+            note: string | null;
+            centroid: components["schemas"]["LngLat"];
+            /**
+             * Parcel
+             * @description Parcel boundary (GeoJSON) to show where to stand
+             */
+            parcel: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * InspectionReason
+         * @enum {string}
+         */
+        InspectionReason: "MANUAL" | "RISK" | "RANDOM" | "SIGNAL";
+        /** InspectionReview */
+        InspectionReview: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "ACCEPTED" | "REJECTED";
+            /** Comment */
+            comment: string;
+        };
+        /**
+         * InspectionStatus
+         * @enum {string}
+         */
+        InspectionStatus: "REQUESTED" | "SUBMITTED" | "ACCEPTED" | "REJECTED" | "EXPIRED";
+        /** InspectionSubmitted */
+        InspectionSubmitted: {
+            /** Code */
+            code: string;
+            status: components["schemas"]["InspectionStatus"];
+            /** Photos */
+            photos: number;
+        };
+        /**
+         * InspectionVerdict
+         * @enum {string}
+         */
+        InspectionVerdict: "PASS" | "SUSPICIOUS" | "FAIL";
         /** InspectorOut */
         InspectorOut: {
             /** Id */
@@ -971,6 +1415,62 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** PlanOut */
+        PlanOut: {
+            /**
+             * Seed
+             * @description Reproducible seed of the random control sample
+             */
+            seed: string;
+            /** Created */
+            created: components["schemas"]["InspectionOut"][];
+        };
+        /** PlanRequest */
+        PlanRequest: {
+            /**
+             * Size
+             * @default 5
+             */
+            size?: number;
+            /**
+             * Random Share
+             * @default 0.2
+             */
+            random_share?: number;
+        };
+        /** ResolutionEvidence */
+        ResolutionEvidence: {
+            /** Since */
+            since: string | null;
+            /** Sufficient */
+            sufficient: boolean;
+            /** Items */
+            items: components["schemas"]["EvidenceItem"][];
+        };
+        /** RiskFactorOut */
+        RiskFactorOut: {
+            /** Code */
+            code: string;
+            /** Points */
+            points: number;
+            /** Params */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /** RiskItem */
+        RiskItem: {
+            /** Parcel Id */
+            parcel_id: string;
+            /** Cadastral Number */
+            cadastral_number: string;
+            status: components["schemas"]["ParcelStatus"];
+            /** Score */
+            score: number;
+            /** Factors */
+            factors: components["schemas"]["RiskFactorOut"][];
+            centroid: components["schemas"]["LngLat"];
         };
         /** SatelliteImage */
         SatelliteImage: {
@@ -2190,6 +2690,466 @@ export interface operations {
             };
         };
     };
+    request_inspection_api_v1_parcels__parcel_id__inspection_requests_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_inspections_api_v1_inspection_requests_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["InspectionStatus"][];
+                parcel_id?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionList"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_inspection_api_v1_inspection_requests__request_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    review_inspection_api_v1_inspection_requests__request_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectionReview"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionOut"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Transition not allowed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    risk_ranking_api_v1_risk_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RiskItem"][];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    inspection_plan_api_v1_inspection_plan_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    parcel_evidence_api_v1_parcels__parcel_id__evidence_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResolutionEvidence"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    parcel_crosscheck_api_v1_parcels__parcel_id__crosscheck_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CrossCheck"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    verify_audit_api_v1_audit_verify_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChainCheck"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     dashboard_api_v1_stats_dashboard_get: {
         parameters: {
             query?: never;
@@ -2445,6 +3405,157 @@ export interface operations {
                 };
                 content: {
                     "text/csv": unknown;
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    verify_act_api_v1_public_acts__act_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                act_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActPublic"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    open_inspection_api_v1_public_inspections__token__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionPublic"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    submit_inspection_api_v1_public_inspections__token__post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_submit_inspection_api_v1_public_inspections__token__post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionSubmitted"];
                 };
             };
             /** @description Not authenticated */

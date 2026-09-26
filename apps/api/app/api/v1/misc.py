@@ -16,8 +16,8 @@ from app.api.deps import CurrentInspector, DbSession
 from app.db.models import Event, Parcel
 from app.providers.satellite import get_satellite_provider
 from app.schemas.common import ERROR_RESPONSES
-from app.schemas.misc import DashboardStats, EventList, EventOut, NdviLayer, SatelliteScanStarted
-from app.services import satellite, stats
+from app.schemas.misc import ChainCheck, DashboardStats, EventList, EventOut, NdviLayer, SatelliteScanStarted
+from app.services import audit, satellite, stats
 from app.services.parcels import overdue_clause
 from app.workers.scheduler import start_scan_in_background
 
@@ -28,6 +28,14 @@ EXPORT_COLUMNS = [
     "address_ru", "address_kk", "lease_until", "deadline_at", "is_overdue", "ndvi", "ndvi_flagged",
     "centroid_lon", "centroid_lat",
 ]  # fmt: skip
+
+
+@router.get("/audit/verify", response_model=ChainCheck, tags=["audit"], summary="Verify the audit hash chain")
+async def verify_audit(session: DbSession, _: CurrentInspector) -> ChainCheck:
+    status = await audit.verify_chain(session)
+    return ChainCheck(
+        intact=status.intact, length=status.length, head=status.head, broken_at_id=status.broken_at_id
+    )
 
 
 @router.get("/stats/dashboard", response_model=DashboardStats, tags=["stats"])

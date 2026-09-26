@@ -1432,6 +1432,672 @@
         }
       }
     },
+    "/api/v1/parcels/{parcel_id}/inspection-requests": {
+      "post": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "Ask the owner for a photo report (returns the one-time link)",
+        "operationId": "request_inspection_api_v1_parcels__parcel_id__inspection_requests_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inspection-requests": {
+      "get": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "List Inspections",
+        "operationId": "list_inspections_api_v1_inspection_requests_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/InspectionStatus"
+              },
+              "default": [],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "parcel_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parcel Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inspection-requests/{request_id}": {
+      "get": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "Get Inspection",
+        "operationId": "get_inspection_api_v1_inspection_requests__request_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inspection-requests/{request_id}/review": {
+      "post": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "Accept or reject an owner photo report (a FAILED report cannot be accepted)",
+        "operationId": "review_inspection_api_v1_inspection_requests__request_id__review_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectionReview"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Transition not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/risk": {
+      "get": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "Parcels ranked by risk, with reasons",
+        "operationId": "risk_ranking_api_v1_risk_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RiskItem"
+                  },
+                  "title": "Response Risk Ranking Api V1 Risk Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inspection-plan": {
+      "post": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "Create owner photo-report requests: top risk + reproducible random control sample",
+        "operationId": "inspection_plan_api_v1_inspection_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/parcels/{parcel_id}/evidence": {
+      "get": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "What evidence exists to close the violation as resolved",
+        "operationId": "parcel_evidence_api_v1_parcels__parcel_id__evidence_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolutionEvidence"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/parcels/{parcel_id}/crosscheck": {
+      "get": {
+        "tags": [
+          "inspections"
+        ],
+        "summary": "Cross-check with state data: cadastre registry, declared sowing (subsidies) vs satellite",
+        "operationId": "parcel_crosscheck_api_v1_parcels__parcel_id__crosscheck_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CrossCheck"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/audit/verify": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "Verify the audit hash chain",
+        "operationId": "verify_audit_api_v1_audit_verify_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChainCheck"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/stats/dashboard": {
       "get": {
         "tags": [
@@ -1793,6 +2459,201 @@
         ]
       }
     },
+    "/api/v1/public/acts/{act_id}": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Verify a printed act by its QR code",
+        "operationId": "verify_act_api_v1_public_acts__act_id__get",
+        "parameters": [
+          {
+            "name": "act_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Act Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActPublic"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/public/inspections/{token}": {
+      "get": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Owner: open a photo-report request",
+        "operationId": "open_inspection_api_v1_public_inspections__token__get",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionPublic"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Owner: submit live camera photos with the device position (anti-fraud checks run server-side)",
+        "operationId": "submit_inspection_api_v1_public_inspections__token__post",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_submit_inspection_api_v1_public_inspections__token__post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionSubmitted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/dev/simulate-signal": {
       "post": {
         "tags": [
@@ -1944,6 +2805,61 @@
   },
   "components": {
     "schemas": {
+      "ActPublic": {
+        "properties": {
+          "number": {
+            "type": "string",
+            "title": "Number"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "cadastral_number": {
+            "type": "string",
+            "title": "Cadastral Number"
+          },
+          "parcel_status": {
+            "type": "string",
+            "title": "Parcel Status"
+          },
+          "lang": {
+            "type": "string",
+            "title": "Lang"
+          },
+          "issued_by": {
+            "type": "string",
+            "title": "Issued By"
+          },
+          "pdf_sha256": {
+            "type": "string",
+            "title": "Pdf Sha256"
+          },
+          "photo_count": {
+            "type": "integer",
+            "title": "Photo Count"
+          },
+          "chain_at_issue": {
+            "$ref": "#/components/schemas/ChainCheck",
+            "description": "Audit log unchanged since the act was issued"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "issued_at",
+          "cadastral_number",
+          "parcel_status",
+          "lang",
+          "issued_by",
+          "pdf_sha256",
+          "photo_count",
+          "chain_at_issue"
+        ],
+        "title": "ActPublic",
+        "description": "What anyone scanning the QR code on a printed act can see (no personal data)."
+      },
       "ApplicationList": {
         "properties": {
           "items": {
@@ -2164,6 +3080,65 @@
         ],
         "title": "AuthConfig"
       },
+      "Body_submit_inspection_api_v1_public_inspections__token__post": {
+        "properties": {
+          "files": {
+            "items": {
+              "type": "string",
+              "contentMediaType": "application/octet-stream"
+            },
+            "type": "array",
+            "title": "Files",
+            "description": "1–5 JPEG photos captured by the camera"
+          },
+          "captured_at": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Captured At",
+            "description": "ISO time of each capture, same order as files"
+          },
+          "lat": {
+            "type": "number",
+            "title": "Lat"
+          },
+          "lon": {
+            "type": "number",
+            "title": "Lon"
+          },
+          "accuracy": {
+            "type": "number",
+            "title": "Accuracy",
+            "description": "GPS accuracy, metres"
+          },
+          "declared_use": {
+            "$ref": "#/components/schemas/DeclaredUse"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "files",
+          "captured_at",
+          "lat",
+          "lon",
+          "accuracy",
+          "declared_use"
+        ],
+        "title": "Body_submit_inspection_api_v1_public_inspections__token__post"
+      },
       "Body_upload_parcel_photos_api_v1_parcels__parcel_id__photos_post": {
         "properties": {
           "files": {
@@ -2255,6 +3230,134 @@
         "title": "CadastreRecord",
         "description": "Record as returned by an external cadastre registry (ГБД ЗКС) adapter."
       },
+      "ChainCheck": {
+        "properties": {
+          "intact": {
+            "type": "boolean",
+            "title": "Intact"
+          },
+          "length": {
+            "type": "integer",
+            "title": "Length"
+          },
+          "head": {
+            "type": "string",
+            "title": "Head"
+          },
+          "broken_at_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Broken At Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "intact",
+          "length",
+          "head"
+        ],
+        "title": "ChainCheck"
+      },
+      "CheckOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail",
+              "skip"
+            ],
+            "title": "Status"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "status",
+          "params"
+        ],
+        "title": "CheckOut"
+      },
+      "CrossCheck": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CrossCheckItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "mismatches": {
+            "type": "integer",
+            "title": "Mismatches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "mismatches"
+        ],
+        "title": "CrossCheck"
+      },
+      "CrossCheckItem": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "GBD_ZKS",
+              "SUBSIDIES"
+            ],
+            "title": "Source"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "mismatch",
+              "info"
+            ],
+            "title": "Status"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "status",
+          "code",
+          "params",
+          "is_demo"
+        ],
+        "title": "CrossCheckItem"
+      },
       "DashboardStats": {
         "properties": {
           "kpi": {
@@ -2317,6 +3420,17 @@
           "count"
         ],
         "title": "DayCount"
+      },
+      "DeclaredUse": {
+        "type": "string",
+        "enum": [
+          "CULTIVATED",
+          "BUILDING",
+          "FALLOW",
+          "CLEANED",
+          "OTHER"
+        ],
+        "title": "DeclaredUse"
       },
       "DemoResetResponse": {
         "properties": {
@@ -2428,6 +3542,54 @@
         ],
         "title": "EventOut"
       },
+      "EvidenceItem": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "INSPECTOR_PHOTO",
+              "OWNER_REPORT",
+              "SATELLITE"
+            ],
+            "title": "Kind"
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "ok",
+          "at",
+          "detail"
+        ],
+        "title": "EvidenceItem"
+      },
       "HealthOut": {
         "properties": {
           "status": {
@@ -2479,6 +3641,395 @@
           "storage"
         ],
         "title": "HealthOut"
+      },
+      "InspectionCreate": {
+        "properties": {
+          "due_hours": {
+            "type": "integer",
+            "maximum": 336.0,
+            "minimum": 1.0,
+            "title": "Due Hours",
+            "default": 48
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "title": "InspectionCreate"
+      },
+      "InspectionList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InspectionOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "InspectionList"
+      },
+      "InspectionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "parcel_id": {
+            "type": "string",
+            "title": "Parcel Id"
+          },
+          "cadastral_number": {
+            "type": "string",
+            "title": "Cadastral Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/InspectionStatus"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/InspectionReason"
+          },
+          "verdict": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/InspectionVerdict"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "requested_by": {
+            "type": "string",
+            "title": "Requested By"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "declared_use": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeclaredUse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "owner_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Comment"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LngLat"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "accuracy_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy M"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CheckOut"
+            },
+            "type": "array",
+            "title": "Checks"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "review_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Comment"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link",
+            "description": "Owner link; only while the request is open"
+          },
+          "photos": {
+            "items": {
+              "$ref": "#/components/schemas/PhotoOut"
+            },
+            "type": "array",
+            "title": "Photos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "code",
+          "parcel_id",
+          "cadastral_number",
+          "status",
+          "reason",
+          "verdict",
+          "note",
+          "requested_by",
+          "due_at",
+          "created_at",
+          "submitted_at",
+          "declared_use",
+          "owner_comment",
+          "device",
+          "accuracy_m",
+          "checks",
+          "reviewed_by",
+          "review_comment",
+          "reviewed_at",
+          "link",
+          "photos"
+        ],
+        "title": "InspectionOut"
+      },
+      "InspectionPublic": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "status": {
+            "$ref": "#/components/schemas/InspectionStatus"
+          },
+          "cadastral_number": {
+            "type": "string",
+            "title": "Cadastral Number"
+          },
+          "address_ru": {
+            "type": "string",
+            "title": "Address Ru"
+          },
+          "address_kk": {
+            "type": "string",
+            "title": "Address Kk"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/ParcelPurpose"
+          },
+          "due_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due At"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "centroid": {
+            "$ref": "#/components/schemas/LngLat"
+          },
+          "parcel": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parcel",
+            "description": "Parcel boundary (GeoJSON) to show where to stand"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "status",
+          "cadastral_number",
+          "address_ru",
+          "address_kk",
+          "purpose",
+          "due_at",
+          "note",
+          "centroid",
+          "parcel"
+        ],
+        "title": "InspectionPublic",
+        "description": "What the owner sees on the one-time link (no personal data of anyone)."
+      },
+      "InspectionReason": {
+        "type": "string",
+        "enum": [
+          "MANUAL",
+          "RISK",
+          "RANDOM",
+          "SIGNAL"
+        ],
+        "title": "InspectionReason"
+      },
+      "InspectionReview": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "ACCEPTED",
+              "REJECTED"
+            ],
+            "title": "Decision"
+          },
+          "comment": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decision",
+          "comment"
+        ],
+        "title": "InspectionReview"
+      },
+      "InspectionStatus": {
+        "type": "string",
+        "enum": [
+          "REQUESTED",
+          "SUBMITTED",
+          "ACCEPTED",
+          "REJECTED",
+          "EXPIRED"
+        ],
+        "title": "InspectionStatus"
+      },
+      "InspectionSubmitted": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "status": {
+            "$ref": "#/components/schemas/InspectionStatus"
+          },
+          "photos": {
+            "type": "integer",
+            "title": "Photos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "status",
+          "photos"
+        ],
+        "title": "InspectionSubmitted"
+      },
+      "InspectionVerdict": {
+        "type": "string",
+        "enum": [
+          "PASS",
+          "SUSPICIOUS",
+          "FAIL"
+        ],
+        "title": "InspectionVerdict"
       },
       "InspectorOut": {
         "properties": {
@@ -3447,6 +4998,145 @@
           "created_at"
         ],
         "title": "PhotoOut"
+      },
+      "PlanOut": {
+        "properties": {
+          "seed": {
+            "type": "string",
+            "title": "Seed",
+            "description": "Reproducible seed of the random control sample"
+          },
+          "created": {
+            "items": {
+              "$ref": "#/components/schemas/InspectionOut"
+            },
+            "type": "array",
+            "title": "Created"
+          }
+        },
+        "type": "object",
+        "required": [
+          "seed",
+          "created"
+        ],
+        "title": "PlanOut"
+      },
+      "PlanRequest": {
+        "properties": {
+          "size": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Size",
+            "default": 5
+          },
+          "random_share": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Random Share",
+            "default": 0.2
+          }
+        },
+        "type": "object",
+        "title": "PlanRequest"
+      },
+      "ResolutionEvidence": {
+        "properties": {
+          "since": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Since"
+          },
+          "sufficient": {
+            "type": "boolean",
+            "title": "Sufficient"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "since",
+          "sufficient",
+          "items"
+        ],
+        "title": "ResolutionEvidence"
+      },
+      "RiskFactorOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "points",
+          "params"
+        ],
+        "title": "RiskFactorOut"
+      },
+      "RiskItem": {
+        "properties": {
+          "parcel_id": {
+            "type": "string",
+            "title": "Parcel Id"
+          },
+          "cadastral_number": {
+            "type": "string",
+            "title": "Cadastral Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ParcelStatus"
+          },
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/RiskFactorOut"
+            },
+            "type": "array",
+            "title": "Factors"
+          },
+          "centroid": {
+            "$ref": "#/components/schemas/LngLat"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parcel_id",
+          "cadastral_number",
+          "status",
+          "score",
+          "factors",
+          "centroid"
+        ],
+        "title": "RiskItem"
       },
       "SatelliteImage": {
         "properties": {

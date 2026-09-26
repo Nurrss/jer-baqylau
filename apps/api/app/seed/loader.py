@@ -106,7 +106,8 @@ async def _transition(
     comment: str | None,
     meta: dict[str, Any] | None = None,
 ) -> None:
-    session.add(
+    await audit.link_to_chain(
+        session,
         StatusTransition(
             entity_type=entity_type,
             entity_id=entity_id,
@@ -116,7 +117,7 @@ async def _transition(
             comment=comment,
             meta=meta or {},
             created_at=at,
-        )
+        ),
     )
 
 

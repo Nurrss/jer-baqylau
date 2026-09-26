@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import io
 import uuid
 from dataclasses import dataclass
@@ -11,6 +12,8 @@ from functools import lru_cache
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+from reportlab.graphics.barcode.qr import QrCodeWidget
+from reportlab.graphics.shapes import Drawing
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
@@ -27,15 +30,17 @@ from reportlab.platypus import (
     Table,
     TableStyle,
 )
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.i18n import t
 from app.core.logging import get_logger
-from app.db.models import Photo
+from app.db.models import Act, Photo
 from app.domain.enums import Lang, ParcelStatus, PhotoOwnerType
 from app.providers.storage import StorageProvider
 from app.schemas.parcels import ParcelDetail
+from app.services import audit
 from app.services import parcels as parcel_service
 
 log = get_logger(__name__)
@@ -94,14 +99,43 @@ def _findings(detail: ParcelDetail, lang: Lang) -> list[str]:
     return items
 
 
+@dataclass(frozen=True, slots=True)
+class ActVerification:
+    """Registry data printed on the act: number, QR link and fingerprints."""
+
+    number: str
+    url: str
+    chain_head: str
+    chain_length: int
+    photo_count: int
+
+
+def _qr(url: str, size_mm: float = 30) -> Drawing:
+    widget = QrCodeWidget(url, barLevel="M")
+    x0, y0, x1, y1 = widget.getBounds()
+    size = size_mm * mm
+    drawing = Drawing(size, size, transform=[size / (x1 - x0), 0, 0, size / (y1 - y0), 0, 0])
+    drawing.add(widget)
+    return drawing
+
+
 def render_act(
-    detail: ParcelDetail, lang: Lang, inspector: str, photos: list[ActPhoto], now: datetime | None = None
+    detail: ParcelDetail,
+    lang: Lang,
+    inspector: str,
+    photos: list[ActPhoto],
+    now: datetime | None = None,
+    verification: ActVerification | None = None,
 ) -> bytes:
     _register_fonts()
     s = _styles()
     now = (now or datetime.now(TZ)).astimezone(TZ)
     fmt_date = lambda d: d.astimezone(TZ).strftime("%d.%m.%Y") if d else "—"  # noqa: E731
-    number = f"{detail.cadastral_number.replace(':', '')[-6:]}-{now:%y%m%d}"
+    number = (
+        verification.number
+        if verification
+        else f"{detail.cadastral_number.replace(':', '')[-6:]}-{now:%y%m%d}"
+    )
 
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
@@ -199,6 +233,21 @@ def render_act(
         photo_block.append(Paragraph(_escape(t(lang, "act-no-photos")), s["base"]))
     story.append(KeepTogether(photo_block))
 
+    if verification:
+        info = [
+            t(lang, "act-verify-number", number=verification.number),
+            t(lang, "act-verify-url", url=verification.url),
+            t(lang, "act-verify-chain", head=verification.chain_head[:16], count=verification.chain_length),
+            t(lang, "act-verify-photos", count=verification.photo_count),
+            t(lang, "act-verify-note"),
+        ]
+        verify_table = Table(
+            [[_qr(verification.url), [Paragraph(_escape(line), s["small"]) for line in info]]],
+            colWidths=[36 * mm, None],
+        )
+        verify_table.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
+        story.append(KeepTogether([Paragraph(_escape(t(lang, "act-section-verify")), s["h"]), verify_table]))
+
     signatures = Table(
         [
             [Paragraph(_escape(t(lang, "act-sign-inspector")), s["cellb"]), "", Paragraph(_escape(t(lang, "act-sign-owner")), s["cellb"])],
@@ -261,6 +310,30 @@ async def build_act(
                 ),
             )
         )
-    pdf = await asyncio.to_thread(render_act, detail, lang, inspector, photos)
-    filename = f"act_{detail.cadastral_number.replace(':', '-')}_{lang.value}.pdf"
+    # Register the act: its number, the audit-chain state and the evidence fingerprints are fixed now.
+    act_id = uuid.uuid4()
+    seq = int(await session.scalar(select(func.nextval("act_number_seq"))) or 0)
+    number = f"A-{datetime.now(TZ):%Y}-{seq:05d}"
+    head, length = await audit.chain_state(session)
+    photo_hashes = [p.sha256 for p in rows if p.sha256]
+    url = f"{get_settings().public_web_url.rstrip('/')}/verify/{act_id}"
+    verification = ActVerification(number, url, head, length, len(photo_hashes))
+    pdf = await asyncio.to_thread(render_act, detail, lang, inspector, photos, None, verification)
+    session.add(
+        Act(
+            id=act_id,
+            number=number,
+            parcel_id=parcel_id,
+            cadastral_number=detail.cadastral_number,
+            parcel_status=detail.status.value,
+            lang=lang,
+            pdf_sha256=hashlib.sha256(pdf).hexdigest(),
+            chain_head=head,
+            chain_length=length,
+            photo_hashes=photo_hashes,
+            issued_by=inspector,
+        )
+    )
+    await session.flush()
+    filename = f"act_{number}_{detail.cadastral_number.replace(':', '-')}_{lang.value}.pdf"
     return filename, pdf

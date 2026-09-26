@@ -52,6 +52,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_json: bool = False
     public_api_url: str = "http://localhost:8000"
+    # Web panel address (QR links on acts, owner inspection links).
+    public_web_url: str = "http://localhost:5173"
 
     # --- Database / cache ---
     database_url: str = "postgresql://jer:jer@localhost:54322/jer"

@@ -71,16 +71,48 @@ class EntityType(StrEnum):
     PARCEL = "PARCEL"
     SIGNAL = "SIGNAL"
     APPLICATION = "APPLICATION"
+    INSPECTION = "INSPECTION"
 
 
 class PhotoOwnerType(StrEnum):
     PARCEL = "PARCEL"
     SIGNAL = "SIGNAL"
+    INSPECTION = "INSPECTION"  # owner photo report (remote inspection)
 
 
 class PhotoSource(StrEnum):
     INSPECTOR = "INSPECTOR"
     CITIZEN = "CITIZEN"
+    OWNER = "OWNER"
+
+
+class InspectionStatus(StrEnum):
+    REQUESTED = "REQUESTED"  # link sent to the owner
+    SUBMITTED = "SUBMITTED"  # owner sent photos, anti-fraud verdict computed
+    ACCEPTED = "ACCEPTED"  # inspector accepted the report as evidence
+    REJECTED = "REJECTED"
+    EXPIRED = "EXPIRED"
+
+
+class InspectionReason(StrEnum):
+    MANUAL = "MANUAL"
+    RISK = "RISK"  # selected by the risk score
+    RANDOM = "RANDOM"  # random control sample
+    SIGNAL = "SIGNAL"
+
+
+class InspectionVerdict(StrEnum):
+    PASS = "PASS"
+    SUSPICIOUS = "SUSPICIOUS"
+    FAIL = "FAIL"
+
+
+class DeclaredUse(StrEnum):
+    CULTIVATED = "CULTIVATED"  # sown / cultivated
+    BUILDING = "BUILDING"  # construction / house
+    FALLOW = "FALLOW"  # not used this season
+    CLEANED = "CLEANED"  # dump removed / violation fixed
+    OTHER = "OTHER"
 
 
 class SubscriptionTarget(StrEnum):
@@ -97,6 +129,10 @@ class EventType(StrEnum):
     APPLICATION_STATUS_CHANGED = "application.status_changed"
     SATELLITE_SCAN_COMPLETED = "satellite.scan_completed"
     SATELLITE_HISTORY_READY = "satellite.history_ready"
+    INSPECTION_REQUESTED = "inspection.requested"
+    INSPECTION_SUBMITTED = "inspection.submitted"
+    INSPECTION_REVIEWED = "inspection.reviewed"
+    INSPECTION_PLAN_CREATED = "inspection.plan_created"
     DEMO_RESET = "demo.reset"
 
 

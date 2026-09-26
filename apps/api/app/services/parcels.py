@@ -248,6 +248,18 @@ async def apply_transition(
     if deadline_at is not None and deadline_at <= now and to in ACTIVE_VIOLATION_STATUSES:
         raise ValidationFailedError("deadline_at must be in the future", code="DEADLINE_IN_PAST")
 
+    if to is ParcelStatus.RESOLVED:
+        # No "fixed" on the inspector's word alone: fresh evidence must exist (see services/evidence.py).
+        from app.services.evidence import resolution_evidence
+
+        evidence = await resolution_evidence(session, parcel)
+        if not evidence.sufficient:
+            raise ValidationFailedError(
+                "Evidence is required to close the violation",
+                code="EVIDENCE_REQUIRED",
+                details=evidence.model_dump(mode="json"),
+            )
+
     if to is ParcelStatus.VIOLATION:
         resolved_type = violation_type or parcel.violation_type
         if resolved_type is None:

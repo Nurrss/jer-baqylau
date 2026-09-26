@@ -33,7 +33,11 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from app.domain.enums import (
     ApplicationStatus,
     ApplicationType,
+    DeclaredUse,
     EntityType,
+    InspectionReason,
+    InspectionStatus,
+    InspectionVerdict,
     Lang,
     OwnerType,
     ParcelPurpose,
@@ -87,6 +91,8 @@ def updated_at_col() -> Mapped[datetime]:
 
 
 signal_seq = Sequence("signal_tracking_seq", start=1, metadata=Base.metadata)
+inspection_seq = Sequence("inspection_code_seq", start=1, metadata=Base.metadata)
+act_seq = Sequence("act_number_seq", start=1, metadata=Base.metadata)
 
 
 class Parcel(Base):
@@ -176,6 +182,8 @@ class Photo(Base):
     taken_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     location: Mapped[WKBElement | None] = mapped_column(Geometry("POINT", srid=4326, spatial_index=False))
     uploaded_by: Mapped[str] = mapped_column(String(128), nullable=False)
+    sha256: Mapped[str | None] = mapped_column(String(64))  # of the stored image (evidence integrity)
+    phash: Mapped[str | None] = mapped_column(String(16), index=True)  # perceptual hash (duplicate detection)
     created_at: Mapped[datetime] = created_at_col()
 
     __table_args__ = (Index("ix_photos_owner", "owner_type", "owner_id"),)
@@ -218,6 +226,9 @@ class StatusTransition(Base):
     comment: Mapped[str | None] = mapped_column(Text)
     meta: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, server_default=text("'{}'::jsonb"))
     created_at: Mapped[datetime] = created_at_col()
+    # Hash chain (see app.domain.audit_chain): any later edit of this row breaks the chain.
+    prev_hash: Mapped[str | None] = mapped_column(String(64))
+    hash: Mapped[str | None] = mapped_column(String(64), unique=True)
 
     __table_args__ = (Index("ix_status_transitions_entity", "entity_type", "entity_id", "created_at"),)
 
@@ -309,3 +320,61 @@ class GeocodeCache(Base):
     address_ru: Mapped[str | None] = mapped_column(String(512))
     address_kk: Mapped[str | None] = mapped_column(String(512))
     created_at: Mapped[datetime] = created_at_col()
+
+
+class Act(Base):
+    """Registry of issued inspection acts: anyone can verify a printed act by its QR code."""
+
+    __tablename__ = "acts"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    number: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+    parcel_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("parcels.id", ondelete="CASCADE"), nullable=False)
+    cadastral_number: Mapped[str] = mapped_column(String(32), nullable=False)
+    parcel_status: Mapped[str] = mapped_column(String(32), nullable=False)
+    lang: Mapped[Lang] = mapped_column(str_enum(Lang, "lang"), nullable=False)
+    pdf_sha256: Mapped[str] = mapped_column(String(64), nullable=False)
+    chain_head: Mapped[str] = mapped_column(String(64), nullable=False)  # audit chain state when issued
+    chain_length: Mapped[int] = mapped_column(Integer, nullable=False)
+    photo_hashes: Mapped[list[str]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"))
+    issued_by: Mapped[str] = mapped_column(String(128), nullable=False)
+    created_at: Mapped[datetime] = created_at_col()
+
+
+class InspectionRequest(Base):
+    """Remote inspection: the owner is asked to photograph the parcel; anti-fraud checks the report."""
+
+    __tablename__ = "inspection_requests"
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    code: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
+    token: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)  # one-time owner link
+    parcel_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("parcels.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    reason: Mapped[InspectionReason] = mapped_column(
+        str_enum(InspectionReason, "inspection_reason"), nullable=False
+    )
+    status: Mapped[InspectionStatus] = mapped_column(
+        str_enum(InspectionStatus, "inspection_status"), nullable=False, index=True
+    )
+    note: Mapped[str | None] = mapped_column(Text)
+    requested_by: Mapped[str] = mapped_column(String(128), nullable=False)
+    due_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = created_at_col()
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    declared_use: Mapped[DeclaredUse | None] = mapped_column(str_enum(DeclaredUse, "declared_use"))
+    owner_comment: Mapped[str | None] = mapped_column(Text)
+    device_location: Mapped[WKBElement | None] = mapped_column(
+        Geometry("POINT", srid=4326, spatial_index=False)
+    )
+    accuracy_m: Mapped[float | None] = mapped_column(Float)
+    checks: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, nullable=False, server_default=text("'[]'::jsonb")
+    )
+    verdict: Mapped[InspectionVerdict | None] = mapped_column(
+        str_enum(InspectionVerdict, "inspection_verdict")
+    )
+    reviewed_by: Mapped[str | None] = mapped_column(String(128))
+    review_comment: Mapped[str | None] = mapped_column(Text)
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -25,6 +25,24 @@ import httpx
 GREEN, RED, DIM, RESET = "\033[32m", "\033[31m", "\033[2m", "\033[0m"
 
 
+def jpeg_with_gps(lat: float, lon: float) -> bytes:
+    """A small JPEG whose EXIF GPS points at the parcel (stands in for a phone photo on site)."""
+    import io
+
+    from PIL import Image
+
+    def dms(value: float) -> tuple[float, float, float]:
+        d = int(value)
+        m = int((value - d) * 60)
+        return (float(d), float(m), round(((value - d) * 60 - m) * 60, 4))
+
+    exif = Image.Exif()
+    exif[0x8825] = {1: "N", 2: dms(lat), 3: "E", 4: dms(lon)}
+    buffer = io.BytesIO()
+    Image.new("RGB", (64, 48), (110, 130, 90)).save(buffer, format="JPEG", exif=exif)
+    return buffer.getvalue()
+
+
 class SmokeError(RuntimeError):
     pass
 
@@ -150,7 +168,32 @@ class Smoke:
             headers=self.auth,
         )
         check(bad.status_code == 409, "invalid transition VIOLATION → RESOLVED rejected with 409")
-        for target_status in ("IN_REMEDIATION", "RESOLVED"):
+        parcel = self.post(
+            f"/parcels/{hit['id']}/transitions", {"to": "IN_REMEDIATION", "comment": "E2E: предписание"}
+        )
+        check(parcel["status"] == "IN_REMEDIATION", "parcel → IN_REMEDIATION (citizen notified)")
+        refused = self.http.post(
+            f"{self.api}/parcels/{hit['id']}/transitions",
+            json={"to": "RESOLVED", "comment": "E2E"},
+            headers=self.auth,
+        )
+        check(refused.status_code == 422, "«resolved» without evidence refused (EVIDENCE_REQUIRED)")
+        upload = self.http.post(
+            f"{self.api}/parcels/{hit['id']}/photos",
+            files=[
+                (
+                    "files",
+                    (
+                        "evidence.jpg",
+                        jpeg_with_gps(hit["centroid"]["lat"], hit["centroid"]["lon"]),
+                        "image/jpeg",
+                    ),
+                )
+            ],
+            headers=self.auth,
+        )
+        check(upload.status_code == 201, "inspector photo with GPS on the parcel uploaded as evidence")
+        for target_status in ("RESOLVED",):
             parcel = self.post(
                 f"/parcels/{hit['id']}/transitions", {"to": target_status, "comment": f"E2E: {target_status}"}
             )
