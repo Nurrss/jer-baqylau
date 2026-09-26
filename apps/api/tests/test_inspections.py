@@ -222,7 +222,9 @@ async def test_crosscheck_flags_declared_crop_without_vegetation(
     year = datetime.now(UTC).year
     rows = (
         await session.execute(
-            text("SELECT id, cadastral_number, area_ha FROM parcels WHERE purpose = 'AGRICULTURE' AND status <> 'RETURNED_TO_STATE'")
+            text(
+                "SELECT id, cadastral_number, area_ha FROM parcels WHERE purpose = 'AGRICULTURE' AND status <> 'RETURNED_TO_STATE'"
+            )
         )
     ).all()
     target = None
