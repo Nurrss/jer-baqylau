@@ -1,7 +1,7 @@
 # CLAUDE.md — правила проекта «ЖерБақылау»
 
 Сервис мониторинга земель: веб-панель инспектора (React + MapLibre) и Telegram-бот для граждан (aiogram 3), общий бэкенд FastAPI + PostGIS (Supabase).
-Полное ТЗ: `PROMPT_Claude_Code_ZemKontrol.md`. План и фазы: `docs/PLAN.md`. Решения: `docs/DECISIONS.md`.
+Полное ТЗ: `PROMPT_Claude_Code_ZemKontrol.md`. План и фазы: `docs/PLAN.md`. Решения: `docs/DECISIONS.md`. Дальнейший план: `docs/ROADMAP.md`. Передача проекта, доступы и подводные камни: `docs/HANDOFF.md`.
 
 ## Язык
 - Общение с командой, документация и коммиты (описательная часть) — на русском. Идентификаторы в коде — на английском.
@@ -26,11 +26,11 @@ apps/web          React 18 + Vite + TS
 packages/seed     GeoJSON, заявления, база знаний, organizers/
 supabase          SQL: RLS, realtime publication, бакеты
 scripts           кроссплатформенные Python-скрипты (seed, demo_reset, e2e_smoke, set_webhook, gen_types)
-docs              PLAN, DECISIONS, ARCHITECTURE, API, DEPLOY, DEMO_SCRIPT
+docs              PLAN, DECISIONS, ARCHITECTURE, API, DEPLOY, DEMO_SCRIPT, ROADMAP, HANDOFF
 ```
 
 ## Зоны ответственности
-Сейчас проект ведёт один человек, но зоны сохраняются, чтобы второй мог подключиться и чтобы параллельные субагенты не конфликтовали:
+Проект передаётся следующему разработчику (см. `docs/HANDOFF.md`); зоны сохраняются, чтобы можно было работать вдвоём и чтобы параллельные субагенты не конфликтовали:
 - **A (web):** `apps/web/**`, деплой Vercel. Не трогает `apps/api`, кроме чтения `openapi.json`.
 - **B (backend+bot):** `apps/api/**`, `packages/seed/**`, `supabase/**`, `scripts/**`, деплой Railway/Supabase.
 - **Общее (меняется только осознанно, с записью в `docs/DECISIONS.md`):** контракт API (`apps/api/openapi.json`, `apps/web/src/api/schema.d.ts`), корневые конфиги, `docs/`.
