@@ -58,7 +58,10 @@ export function ParcelTransitionDialog({
   const evidence = useEvidence(parcel.id, needsEvidence)
   const evidenceOk = !needsEvidence || evidence.data?.sufficient === true
   const valid =
-    comment.trim().length >= 3 && (!needsType || violationType !== '') && (!needsType || deadline) && evidenceOk
+    comment.trim().length >= 3 &&
+    (!needsType || violationType !== '') &&
+    (!needsType || deadline) &&
+    evidenceOk
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()

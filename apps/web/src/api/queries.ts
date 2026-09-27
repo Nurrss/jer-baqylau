@@ -241,7 +241,9 @@ export function useInspection(id: string | null) {
   return useQuery({
     queryKey: qkx.inspection(id ?? ''),
     queryFn: async () =>
-      unwrap(await api.GET('/api/v1/inspection-requests/{request_id}', { params: { path: { request_id: id! } } })),
+      unwrap(
+        await api.GET('/api/v1/inspection-requests/{request_id}', { params: { path: { request_id: id! } } }),
+      ),
     enabled: Boolean(id),
   })
 }
@@ -305,7 +307,9 @@ export function useEvidence(parcelId: string, enabled = true) {
   return useQuery({
     queryKey: qkx.evidence(parcelId),
     queryFn: async () =>
-      unwrap(await api.GET('/api/v1/parcels/{parcel_id}/evidence', { params: { path: { parcel_id: parcelId } } })),
+      unwrap(
+        await api.GET('/api/v1/parcels/{parcel_id}/evidence', { params: { path: { parcel_id: parcelId } } }),
+      ),
     enabled,
   })
 }
@@ -314,7 +318,11 @@ export function useCrosscheck(parcelId: string, enabled: boolean) {
   return useQuery({
     queryKey: qkx.crosscheck(parcelId),
     queryFn: async () =>
-      unwrap(await api.GET('/api/v1/parcels/{parcel_id}/crosscheck', { params: { path: { parcel_id: parcelId } } })),
+      unwrap(
+        await api.GET('/api/v1/parcels/{parcel_id}/crosscheck', {
+          params: { path: { parcel_id: parcelId } },
+        }),
+      ),
     enabled,
     staleTime: 5 * 60_000,
   })
@@ -324,7 +332,9 @@ export function useParcelSatellite(parcelId: string, enabled: boolean) {
   return useQuery({
     queryKey: qkx.satellite(parcelId),
     queryFn: async () =>
-      unwrap(await api.GET('/api/v1/parcels/{parcel_id}/satellite', { params: { path: { parcel_id: parcelId } } })),
+      unwrap(
+        await api.GET('/api/v1/parcels/{parcel_id}/satellite', { params: { path: { parcel_id: parcelId } } }),
+      ),
     enabled,
     // While the history is being built in the background, poll (realtime also notifies).
     refetchInterval: (query) => (query.state.data?.status === 'loading' ? 5000 : false),
@@ -353,7 +363,8 @@ export function usePublicInspection(token: string) {
 export function usePublicAct(actId: string) {
   return useQuery({
     queryKey: ['public-act', actId],
-    queryFn: async () => unwrap(await api.GET('/api/v1/public/acts/{act_id}', { params: { path: { act_id: actId } } })),
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v1/public/acts/{act_id}', { params: { path: { act_id: actId } } })),
     retry: false,
   })
 }

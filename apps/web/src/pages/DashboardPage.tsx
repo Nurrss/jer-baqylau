@@ -1,4 +1,13 @@
-import { AlarmClock, AreaChart, Clock3, Hourglass, Megaphone, ShieldAlert, ShieldCheck, Wrench } from 'lucide-react'
+import {
+  AlarmClock,
+  AreaChart,
+  Clock3,
+  Hourglass,
+  Megaphone,
+  ShieldAlert,
+  ShieldCheck,
+  Wrench,
+} from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -72,7 +81,9 @@ function AuditIntegrity() {
       title={query.data.head}
       className={cn(
         'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm',
-        intact ? 'border-success/40 bg-success/5 text-success' : 'border-destructive/50 bg-destructive/10 text-destructive',
+        intact
+          ? 'border-success/40 bg-success/5 text-success'
+          : 'border-destructive/50 bg-destructive/10 text-destructive',
       )}
     >
       {intact ? <ShieldCheck className="size-4" /> : <ShieldAlert className="size-4" />}

@@ -6,7 +6,13 @@ import { useDateFns } from '@/lib/dates'
 import { cn } from '@/lib/utils'
 
 /** What proves the violation is gone. "Resolved" needs at least one item (server enforces it too). */
-export function EvidenceList({ evidence, loading }: { evidence: ResolutionEvidence | undefined; loading: boolean }) {
+export function EvidenceList({
+  evidence,
+  loading,
+}: {
+  evidence: ResolutionEvidence | undefined
+  loading: boolean
+}) {
   const { t } = useTranslation()
   const { dateTime } = useDateFns()
   if (loading || !evidence) return <Skeleton className="h-24" />
@@ -41,7 +47,9 @@ export function EvidenceList({ evidence, loading }: { evidence: ResolutionEviden
         ))}
       </ul>
       {evidence.since && (
-        <p className="text-xs text-muted-foreground">{t('evidence.since', { date: dateTime(evidence.since) })}</p>
+        <p className="text-xs text-muted-foreground">
+          {t('evidence.since', { date: dateTime(evidence.since) })}
+        </p>
       )}
     </div>
   )

@@ -30,7 +30,9 @@ export function InspectionLink({ inspection }: { inspection: Inspection }) {
   return (
     <div className="grid justify-items-center gap-3 rounded-xl border bg-muted/40 p-4 text-center">
       <QrCode value={inspection.link} />
-      <p className="text-xs text-muted-foreground">{t('inspections.linkHint', { date: dateTime(inspection.due_at) })}</p>
+      <p className="text-xs text-muted-foreground">
+        {t('inspections.linkHint', { date: dateTime(inspection.due_at) })}
+      </p>
       <div className="flex w-full items-center gap-2 rounded-lg border bg-card px-3 py-2">
         <span className="min-w-0 flex-1 truncate text-left font-mono text-xs">{inspection.link}</span>
         <Button
@@ -114,10 +116,19 @@ export function RequestInspectionDialog({
             </div>
             <div className="grid gap-2">
               <Label htmlFor="inspection-note">{t('inspections.note')}</Label>
-              <Textarea id="inspection-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} />
+              <Textarea
+                id="inspection-note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                maxLength={500}
+              />
             </div>
-            <p className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">{t('inspections.antifraudHint')}</p>
-            {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
+            <p className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">
+              {t('inspections.antifraudHint')}
+            </p>
+            {error && (
+              <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
+            )}
             <DialogFooter>
               <Button variant="outline" onClick={onClose}>
                 {t('common.cancel')}

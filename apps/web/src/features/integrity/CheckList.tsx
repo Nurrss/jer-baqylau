@@ -10,8 +10,14 @@ const ICONS = {
   skip: <CircleMinus className="size-4 text-muted-foreground" />,
 }
 
-function checkText(t: (key: string, opts?: Record<string, unknown>) => string, check: InspectionCheck): string {
-  const variant = check.code === 'SATELLITE' && check.params.reason === 'owner_admits_non_use' ? 'warn_admits' : check.status
+function checkText(
+  t: (key: string, opts?: Record<string, unknown>) => string,
+  check: InspectionCheck,
+): string {
+  const variant =
+    check.code === 'SATELLITE' && check.params.reason === 'owner_admits_non_use'
+      ? 'warn_admits'
+      : check.status
   return t(`checks.${check.code}.${variant}`, check.params)
 }
 
@@ -43,7 +49,12 @@ export function VerdictBadge({ verdict }: { verdict: InspectionVerdict | null | 
     FAIL: 'bg-destructive/10 text-destructive border-destructive/30',
   }[verdict]
   return (
-    <span className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold', style)}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold',
+        style,
+      )}
+    >
       {verdict === 'PASS' ? ICONS.pass : verdict === 'FAIL' ? ICONS.fail : ICONS.warn}
       {t(`verdict.${verdict}`)}
     </span>

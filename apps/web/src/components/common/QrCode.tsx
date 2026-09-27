@@ -3,7 +3,15 @@ import { useEffect, useState } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
-export function QrCode({ value, size = 168, className }: { value: string; size?: number; className?: string }) {
+export function QrCode({
+  value,
+  size = 168,
+  className,
+}: {
+  value: string
+  size?: number
+  className?: string
+}) {
   const [src, setSrc] = useState<string | null>(null)
   useEffect(() => {
     let alive = true
@@ -16,6 +24,12 @@ export function QrCode({ value, size = 168, className }: { value: string; size?:
   }, [value, size])
   if (!src) return <Skeleton className={cn('rounded-lg', className)} style={{ width: size, height: size }} />
   return (
-    <img src={src} alt="QR" width={size} height={size} className={cn('rounded-lg border bg-white p-1', className)} />
+    <img
+      src={src}
+      alt="QR"
+      width={size}
+      height={size}
+      className={cn('rounded-lg border bg-white p-1', className)}
+    />
   )
 }

@@ -52,7 +52,8 @@ function FileCheck({ expected }: { expected: string }) {
         >
           {result.match ? <FileCheck2 className="size-4 shrink-0" /> : <FileX2 className="size-4 shrink-0" />}
           <span>
-            <span className="font-medium">{result.name}</span> — {t(result.match ? 'verify.fileMatch' : 'verify.fileMismatch')}
+            <span className="font-medium">{result.name}</span> —{' '}
+            {t(result.match ? 'verify.fileMatch' : 'verify.fileMismatch')}
           </span>
         </div>
       )}
@@ -111,7 +112,12 @@ export function VerifyPage() {
       </Card>
 
       <Card className="grid gap-2 p-5">
-        <div className={cn('flex items-center gap-2 font-semibold', chain.intact ? 'text-success' : 'text-destructive')}>
+        <div
+          className={cn(
+            'flex items-center gap-2 font-semibold',
+            chain.intact ? 'text-success' : 'text-destructive',
+          )}
+        >
           {chain.intact ? <ShieldCheck className="size-5" /> : <ShieldAlert className="size-5" />}
           {t(chain.intact ? 'verify.chainIntact' : 'verify.chainBroken')}
         </div>

@@ -4,7 +4,14 @@ import { useTranslation } from 'react-i18next'
 import MapGL, { Layer, Marker, Source } from 'react-map-gl/maplibre'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useCreatePlan, useInspection, useInspections, useParcels, useReviewInspection, useRisk } from '@/api/queries'
+import {
+  useCreatePlan,
+  useInspection,
+  useInspections,
+  useParcels,
+  useReviewInspection,
+  useRisk,
+} from '@/api/queries'
 import type { Inspection, InspectionStatus, RiskItem } from '@/api/types'
 import { EmptyState, ErrorState } from '@/components/common/States'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -42,9 +49,13 @@ const STATUS_TABS: Record<string, InspectionStatus[]> = {
 
 function InspectionStatusBadge({ status }: { status: InspectionStatus }) {
   const { t } = useTranslation()
-  const variant = { REQUESTED: 'secondary', SUBMITTED: 'warning', ACCEPTED: 'success', REJECTED: 'destructive', EXPIRED: 'outline' }[
-    status
-  ] as 'secondary' | 'warning' | 'success' | 'destructive' | 'outline'
+  const variant = {
+    REQUESTED: 'secondary',
+    SUBMITTED: 'warning',
+    ACCEPTED: 'success',
+    REJECTED: 'destructive',
+    EXPIRED: 'outline',
+  }[status] as 'secondary' | 'warning' | 'success' | 'destructive' | 'outline'
   return <Badge variant={variant}>{t(`inspectionStatus.${status}`)}</Badge>
 }
 
@@ -63,7 +74,10 @@ function RiskRow({ item }: { item: RiskItem }) {
         <span className="text-lg font-semibold tabular-nums">{item.score}</span>
         <span className="h-1.5 overflow-hidden rounded-full bg-muted">
           <span
-            className={cn('block h-full rounded-full', item.score >= 50 ? 'bg-destructive' : item.score >= 25 ? 'bg-accent' : 'bg-primary')}
+            className={cn(
+              'block h-full rounded-full',
+              item.score >= 50 ? 'bg-destructive' : item.score >= 25 ? 'bg-accent' : 'bg-primary',
+            )}
             style={{ width: `${item.score}%` }}
           />
         </span>
@@ -141,7 +155,14 @@ function PlanDialog({ onClose }: { onClose: () => void }) {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="plan-size">{t('plan.size')}</Label>
-                <Input id="plan-size" type="number" min={1} max={20} value={size} onChange={(e) => setSize(Number(e.target.value))} />
+                <Input
+                  id="plan-size"
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={size}
+                  onChange={(e) => setSize(Number(e.target.value))}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="plan-random">{t('plan.randomShare')}</Label>
@@ -185,7 +206,7 @@ function ReportMap({ inspection }: { inspection: Inspection }) {
   const parcels = useParcels().data
   const style = useMemo(() => baseStyle(), [])
   const parcel = parcels?.features.find((f) => f.id === inspection.parcel_id)
-  const center = inspection.device ?? parcel?.properties ? inspection.device : null
+  const center = (inspection.device ?? parcel?.properties) ? inspection.device : null
   if (!parcel && !inspection.device) return null
   const points = parcel ? (parcel.geometry.coordinates as number[][][][]).flat(2) : []
   const lon = center?.lon ?? (points.length ? points.reduce((s, p) => s + p[0]!, 0) / points.length : 71.36)
@@ -201,8 +222,16 @@ function ReportMap({ inspection }: { inspection: Inspection }) {
       >
         {parcel && (
           <Source id="report-parcel" type="geojson" data={parcel}>
-            <Layer id="report-parcel-fill" type="fill" paint={{ 'fill-color': PARCEL_STATUS_COLORS[parcel.properties.status], 'fill-opacity': 0.25 }} />
-            <Layer id="report-parcel-line" type="line" paint={{ 'line-color': '#0b6aa8', 'line-width': 2.5 }} />
+            <Layer
+              id="report-parcel-fill"
+              type="fill"
+              paint={{ 'fill-color': PARCEL_STATUS_COLORS[parcel.properties.status], 'fill-opacity': 0.25 }}
+            />
+            <Layer
+              id="report-parcel-line"
+              type="line"
+              paint={{ 'line-color': '#0b6aa8', 'line-width': 2.5 }}
+            />
           </Source>
         )}
         {inspection.device && (
@@ -215,7 +244,15 @@ function ReportMap({ inspection }: { inspection: Inspection }) {
   )
 }
 
-function ReviewDialog({ inspection, decision, onClose }: { inspection: Inspection; decision: 'ACCEPTED' | 'REJECTED'; onClose: () => void }) {
+function ReviewDialog({
+  inspection,
+  decision,
+  onClose,
+}: {
+  inspection: Inspection
+  decision: 'ACCEPTED' | 'REJECTED'
+  onClose: () => void
+}) {
   const { t } = useTranslation()
   const errorMessage = useErrorMessage()
   const review = useReviewInspection(inspection.id)
@@ -244,13 +281,22 @@ function ReviewDialog({ inspection, decision, onClose }: { inspection: Inspectio
           </DialogHeader>
           <div className="grid gap-2">
             <Label htmlFor="review-comment">{t('transition.comment')} *</Label>
-            <Textarea id="review-comment" value={comment} onChange={(e) => setComment(e.target.value)} autoFocus />
+            <Textarea
+              id="review-comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              autoFocus
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={onClose}>
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={comment.trim().length < 3 || review.isPending} variant={decision === 'REJECTED' ? 'destructive' : 'success'}>
+            <Button
+              type="submit"
+              disabled={comment.trim().length < 3 || review.isPending}
+              variant={decision === 'REJECTED' ? 'destructive' : 'success'}
+            >
               {review.isPending && <Loader2 className="animate-spin" />} {t('common.confirm')}
             </Button>
           </DialogFooter>
@@ -295,14 +341,21 @@ function ReportPanel({ id, onClose }: { id: string; onClose: () => void }) {
             {item.status === 'SUBMITTED' && (
               <Section title={t('inspections.decision')}>
                 <div className="flex flex-wrap gap-2">
-                  <Button size="sm" variant="success" disabled={item.verdict === 'FAIL'} onClick={() => setDecision('ACCEPTED')}>
+                  <Button
+                    size="sm"
+                    variant="success"
+                    disabled={item.verdict === 'FAIL'}
+                    onClick={() => setDecision('ACCEPTED')}
+                  >
                     {t('inspections.decide.ACCEPTED')}
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => setDecision('REJECTED')}>
                     {t('inspections.decide.REJECTED')}
                   </Button>
                 </div>
-                {item.verdict === 'FAIL' && <p className="mt-2 text-xs text-destructive">{t('inspections.failNote')}</p>}
+                {item.verdict === 'FAIL' && (
+                  <p className="mt-2 text-xs text-destructive">{t('inspections.failNote')}</p>
+                )}
               </Section>
             )}
             {item.checks.length > 0 && (
@@ -319,7 +372,11 @@ function ReportPanel({ id, onClose }: { id: string; onClose: () => void }) {
               <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
                 <dt className="text-muted-foreground">{t('signals.parcel')}</dt>
                 <dd>
-                  <button type="button" className="font-mono text-primary hover:underline" onClick={() => navigate(`/map?parcel=${item.parcel_id}`)}>
+                  <button
+                    type="button"
+                    className="font-mono text-primary hover:underline"
+                    onClick={() => navigate(`/map?parcel=${item.parcel_id}`)}
+                  >
                     {item.cadastral_number}
                   </button>
                 </dd>
@@ -348,7 +405,9 @@ function ReportPanel({ id, onClose }: { id: string; onClose: () => void }) {
                   </>
                 )}
               </dl>
-              {item.owner_comment && <p className="mt-3 rounded-lg bg-muted/60 p-3 text-sm">«{item.owner_comment}»</p>}
+              {item.owner_comment && (
+                <p className="mt-3 rounded-lg bg-muted/60 p-3 text-sm">«{item.owner_comment}»</p>
+              )}
               {item.review_comment && (
                 <p className="mt-2 text-xs text-muted-foreground">
                   {t('inspections.reviewComment')}: «{item.review_comment}»
@@ -359,7 +418,9 @@ function ReportPanel({ id, onClose }: { id: string; onClose: () => void }) {
               <Section title={t('inspections.evidence')}>
                 <div className="grid gap-3">
                   <ReportMap inspection={item} />
-                  {item.device && <p className="text-xs text-muted-foreground">{t('inspections.mapLegend')}</p>}
+                  {item.device && (
+                    <p className="text-xs text-muted-foreground">{t('inspections.mapLegend')}</p>
+                  )}
                   <PhotoGallery photos={item.photos} />
                 </div>
               </Section>
@@ -367,7 +428,9 @@ function ReportPanel({ id, onClose }: { id: string; onClose: () => void }) {
           </>
         )}
       </div>
-      {item && decision && <ReviewDialog inspection={item} decision={decision} onClose={() => setDecision(null)} />}
+      {item && decision && (
+        <ReviewDialog inspection={item} decision={decision} onClose={() => setDecision(null)} />
+      )}
     </aside>
   )
 }
@@ -446,7 +509,11 @@ export function InspectionsPage() {
                 ) : inspections.isError ? (
                   <ErrorState error={inspections.error} onRetry={() => void inspections.refetch()} />
                 ) : !inspections.data?.items.length ? (
-                  <EmptyState icon={<ClipboardCheck className="size-6" />} title={t('inspections.empty')} description={t('inspections.emptyHint')} />
+                  <EmptyState
+                    icon={<ClipboardCheck className="size-6" />}
+                    title={t('inspections.empty')}
+                    description={t('inspections.emptyHint')}
+                  />
                 ) : (
                   <ul className="divide-y">
                     {inspections.data.items.map((item) => (
@@ -454,10 +521,17 @@ export function InspectionsPage() {
                         <button
                           type="button"
                           onClick={() => setParams({ id: item.id })}
-                          className={cn('flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/60', selected === item.id && 'bg-primary/5')}
+                          className={cn(
+                            'flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/60',
+                            selected === item.id && 'bg-primary/5',
+                          )}
                         >
                           {item.photos[0] ? (
-                            <img src={item.photos[0].thumb_url} alt="" className="size-10 rounded object-cover" />
+                            <img
+                              src={item.photos[0].thumb_url}
+                              alt=""
+                              className="size-10 rounded object-cover"
+                            />
                           ) : (
                             <span className="grid size-10 place-items-center rounded bg-muted">
                               <ClipboardCheck className="size-4 text-muted-foreground" />
@@ -466,10 +540,13 @@ export function InspectionsPage() {
                           <span className="min-w-0 flex-1">
                             <span className="flex items-center gap-2">
                               <span className="font-mono text-sm font-semibold">{item.code}</span>
-                              <span className="font-mono text-xs text-muted-foreground">{item.cadastral_number}</span>
+                              <span className="font-mono text-xs text-muted-foreground">
+                                {item.cadastral_number}
+                              </span>
                             </span>
                             <span className="block text-xs text-muted-foreground">
-                              {t(`inspectionReason.${item.reason}`)} · {relative(item.submitted_at ?? item.created_at)}
+                              {t(`inspectionReason.${item.reason}`)} ·{' '}
+                              {relative(item.submitted_at ?? item.created_at)}
                             </span>
                           </span>
                           <VerdictBadge verdict={item.verdict} />

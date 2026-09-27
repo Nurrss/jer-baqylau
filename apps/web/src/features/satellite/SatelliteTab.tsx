@@ -1,6 +1,15 @@
 import { Loader2, Satellite } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import { useParcelSatellite } from '@/api/queries'
 import { ErrorState } from '@/components/common/States'
 import { Badge } from '@/components/ui/badge'
@@ -40,7 +49,10 @@ export function SatelliteTab({ parcelId }: { parcelId: string }) {
   if (query.isError || !data) return <ErrorState error={query.error} onRetry={() => void query.refetch()} />
 
   const points: Point[] = data.points.map((p) => ({ ts: new Date(p.date).getTime(), ndvi: p.ndvi }))
-  const monthFmt = new Intl.DateTimeFormat(i18n.language === 'kk' ? 'kk-KZ' : 'ru-RU', { month: 'short', year: '2-digit' })
+  const monthFmt = new Intl.DateTimeFormat(i18n.language === 'kk' ? 'kk-KZ' : 'ru-RU', {
+    month: 'short',
+    year: '2-digit',
+  })
 
   return (
     <>
@@ -100,7 +112,9 @@ export function SatelliteTab({ parcelId }: { parcelId: string }) {
           </div>
         )}
         {points.length > 0 && (
-          <p className="mt-2 text-xs text-muted-foreground">{t('satellite.legend', { threshold: data.threshold })}</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t('satellite.legend', { threshold: data.threshold })}
+          </p>
         )}
       </Section>
 
@@ -109,10 +123,13 @@ export function SatelliteTab({ parcelId }: { parcelId: string }) {
           <ul className="grid gap-1.5">
             {data.yearly_peaks.map((p) => (
               <li key={p.year} className="grid grid-cols-[3rem_1fr_2.5rem] items-center gap-2 text-sm">
-                <span className="tabular-nums text-muted-foreground">{p.year}</span>
+                <span className="text-muted-foreground tabular-nums">{p.year}</span>
                 <span className="h-2 overflow-hidden rounded-full bg-muted">
                   <span
-                    className={cn('block h-full rounded-full', p.peak < data.threshold ? 'bg-destructive' : 'bg-primary')}
+                    className={cn(
+                      'block h-full rounded-full',
+                      p.peak < data.threshold ? 'bg-destructive' : 'bg-primary',
+                    )}
                     style={{ width: `${Math.max(0, Math.min(1, p.peak)) * 100}%` }}
                   />
                 </span>
@@ -136,7 +153,9 @@ export function SatelliteTab({ parcelId }: { parcelId: string }) {
                     className="aspect-square w-full rounded-md border object-cover [image-rendering:pixelated]"
                   />
                 </a>
-                <figcaption className="text-center text-[11px] text-muted-foreground">{date(img.date)}</figcaption>
+                <figcaption className="text-center text-[11px] text-muted-foreground">
+                  {date(img.date)}
+                </figcaption>
               </figure>
             ))}
           </div>

@@ -99,7 +99,8 @@ export function ParcelInspections({ parcel }: { parcel: ParcelDetail }) {
                   <span className="flex-1">
                     <span className="block font-mono text-xs font-semibold">{item.code}</span>
                     <span className="block text-xs text-muted-foreground">
-                      {t(`inspectionStatus.${item.status}`)} · {relative(item.submitted_at ?? item.created_at)}
+                      {t(`inspectionStatus.${item.status}`)} ·{' '}
+                      {relative(item.submitted_at ?? item.created_at)}
                     </span>
                   </span>
                   <VerdictBadge verdict={item.verdict} />
@@ -118,7 +119,11 @@ export function ParcelInspections({ parcel }: { parcel: ParcelDetail }) {
         <p className="text-xs text-muted-foreground">{t('inspections.requestHint')}</p>
       </div>
       {open && (
-        <RequestInspectionDialog parcelId={parcel.id} cadastral={parcel.cadastral_number} onClose={() => setOpen(false)} />
+        <RequestInspectionDialog
+          parcelId={parcel.id}
+          cadastral={parcel.cadastral_number}
+          onClose={() => setOpen(false)}
+        />
       )}
     </Section>
   )

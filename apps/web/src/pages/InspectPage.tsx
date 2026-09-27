@@ -1,5 +1,16 @@
 import { useMutation } from '@tanstack/react-query'
-import { Camera, CheckCircle2, Clock, Loader2, LocateFixed, MapPin, Send, ShieldCheck, Trash2, TriangleAlert } from 'lucide-react'
+import {
+  Camera,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  LocateFixed,
+  MapPin,
+  Send,
+  ShieldCheck,
+  Trash2,
+  TriangleAlert,
+} from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useParams } from 'react-router-dom'
@@ -67,7 +78,10 @@ function CameraCapture({ disabled, onShot }: { disabled: boolean; onShot: (shot:
     let stream: MediaStream | null = null
     let cancelled = false
     navigator.mediaDevices
-      ?.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } }, audio: false })
+      ?.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 } },
+        audio: false,
+      })
       .then((s) => {
         if (cancelled) {
           s.getTracks().forEach((track) => track.stop())
@@ -231,7 +245,11 @@ export function InspectPage() {
         <div
           className={cn(
             'flex items-center gap-2 rounded-lg p-3 text-sm',
-            geoError ? 'bg-destructive/10 text-destructive' : accuracyOk ? 'bg-success/10 text-success' : 'bg-muted',
+            geoError
+              ? 'bg-destructive/10 text-destructive'
+              : accuracyOk
+                ? 'bg-success/10 text-success'
+                : 'bg-muted',
           )}
         >
           {geoError ? (
@@ -245,7 +263,9 @@ export function InspectPage() {
             {geoError
               ? t(`inspect.geo.${geoError}`)
               : fix
-                ? t(accuracyOk ? 'inspect.geo.good' : 'inspect.geo.weak', { accuracy: Math.round(fix.accuracy) })
+                ? t(accuracyOk ? 'inspect.geo.good' : 'inspect.geo.weak', {
+                    accuracy: Math.round(fix.accuracy),
+                  })
                 : t('inspect.geo.waiting')}
           </span>
         </div>
@@ -296,7 +316,9 @@ export function InspectPage() {
               onClick={() => setDeclared(use)}
               className={cn(
                 'rounded-lg border px-3 py-2.5 text-left text-sm transition-colors',
-                declared === use ? 'border-primary bg-primary/10 font-medium ring-2 ring-primary/40' : 'hover:bg-muted',
+                declared === use
+                  ? 'border-primary bg-primary/10 font-medium ring-2 ring-primary/40'
+                  : 'hover:bg-muted',
               )}
             >
               <span className="flex items-center gap-2">
@@ -308,12 +330,19 @@ export function InspectPage() {
         </div>
         <div className="grid gap-2">
           <Label htmlFor="owner-comment">{t('inspect.comment')}</Label>
-          <Textarea id="owner-comment" value={comment} maxLength={1000} onChange={(e) => setComment(e.target.value)} />
+          <Textarea
+            id="owner-comment"
+            value={comment}
+            maxLength={1000}
+            onChange={(e) => setComment(e.target.value)}
+          />
         </div>
       </Card>
 
       {submit.isError && (
-        <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">{errorMessage(submit.error)}</p>
+        <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+          {errorMessage(submit.error)}
+        </p>
       )}
       <Button size="lg" disabled={!ready} onClick={() => submit.mutate()}>
         {submit.isPending ? <Loader2 className="animate-spin" /> : <Send />} {t('inspect.send')}
