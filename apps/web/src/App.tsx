@@ -11,6 +11,7 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { HomePage } from '@/pages/HomePage'
 import { InspectionsPage } from '@/pages/InspectionsPage'
 import { InspectPage } from '@/pages/InspectPage'
+import { LandAppPage } from '@/pages/LandAppPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { MapPage } from '@/pages/MapPage'
 import { SignalsPage } from '@/pages/SignalsPage'
@@ -63,6 +64,7 @@ export default function App() {
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/inspect/:token" element={<InspectPage />} />
+            <Route path="/app" element={<LandAppPage />} />
             <Route path="/verify/:id" element={<VerifyPage />} />
             <Route
               element={

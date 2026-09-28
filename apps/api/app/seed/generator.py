@@ -112,15 +112,15 @@ BLOCKS: list[Block] = [
 FUND_SEED = 4242
 FUND_BLOCKS: list[Block] = [
     Block(
-        key="fund-izhs-samal2", quarter=906, anchor_lat=42.93180, anchor_lon=71.33720, rows=3, cols=5,
-        cell_w=(24, 30), cell_h=(36, 46), rotation_deg=-47, jitter=1.5, purpose=ParcelPurpose.IZHS,
+        key="fund-izhs-samal2", quarter=906, anchor_lat=42.93308, anchor_lon=71.34045, rows=3, cols=5,
+        cell_w=(22, 26), cell_h=(34, 40), rotation_deg=-58, jitter=1.2, purpose=ParcelPurpose.IZHS,
         district_ru="Тараз, мкр. Самал-2", district_kk="Тараз, Самал-2 ш/а",
     ),
     Block(
-        key="fund-agro-buryl", quarter=907, anchor_lat=42.99650, anchor_lon=71.25850, rows=2, cols=3,
-        cell_w=(300, 450), cell_h=(280, 420), rotation_deg=5, jitter=20.0, purpose=ParcelPurpose.AGRICULTURE,
+        key="fund-agro-buryl", quarter=907, anchor_lat=42.99370, anchor_lon=71.24803, rows=2, cols=3,
+        cell_w=(250, 330), cell_h=(220, 280), rotation_deg=5, jitter=15.0, purpose=ParcelPurpose.AGRICULTURE,
         district_ru="Байзакский район", district_kk="Байзақ ауданы", rural=True,
-        locality_ru="окрестности с. Бурыл", locality_kk="Бурыл а. маңы", cut_corners=True,
+        locality_ru="окрестности с. Бурыл", locality_kk="Бурыл а. маңы",
     ),
 ]  # fmt: skip
 

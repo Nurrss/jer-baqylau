@@ -21,7 +21,13 @@ import { toast } from 'sonner'
 import { useSignals } from '@/api/queries'
 import { Logo } from '@/components/common/Logo'
 import { Tooltip } from '@/components/ui/misc'
-import { playChime, useRealtimeEvents, useRealtimeStatus, type SignalCreatedPayload } from '@/lib/realtime'
+import {
+  playChime,
+  useRealtimeEvents,
+  useRealtimeStatus,
+  type ApplicationSubmittedPayload,
+  type SignalCreatedPayload,
+} from '@/lib/realtime'
 import { cn } from '@/lib/utils'
 import { CommandPalette } from '@/features/guide/CommandPalette'
 import { HelpDialog } from '@/features/guide/HelpDialog'
@@ -183,7 +189,24 @@ export function AppShell() {
     },
     [navigate, t],
   )
-  useRealtimeEvents(onSignalCreated)
+  const onApplicationSubmitted = useCallback(
+    (payload: ApplicationSubmittedPayload) => {
+      if (useUiStore.getState().soundEnabled) playChime()
+      toast(t('realtime.newApplication', { number: payload.tracking_number }), {
+        description: t('realtime.newApplicationHint', {
+          applicant: payload.applicant,
+          count: payload.parcels.length,
+        }),
+        duration: 10_000,
+        action: {
+          label: t('realtime.openApplication'),
+          onClick: () => navigate(`/applications?id=${payload.application_id}`),
+        },
+      })
+    },
+    [navigate, t],
+  )
+  useRealtimeEvents(onSignalCreated, onApplicationSubmitted)
 
   return (
     <div className="flex h-full">

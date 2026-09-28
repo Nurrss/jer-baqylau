@@ -31,6 +31,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { HistoryTimeline } from '@/features/common/History'
 import { Section } from '@/features/common/Section'
 import { CrossCheckSection, ParcelInspections } from '@/features/integrity/ParcelIntegrity'
+import { LandFundSection } from '@/features/land/LandFundSection'
 import { SatelliteTab } from '@/features/satellite/SatelliteTab'
 import { PhotoGallery, PhotoUploader } from '@/features/common/PhotoGallery'
 import { daysUntil, fromDateInput, toDateInput, useDateFns } from '@/lib/dates'
@@ -377,6 +378,9 @@ export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: 
           {parcel && (
             <div className="mt-1.5 flex flex-wrap items-center gap-2">
               <StatusBadge kind="parcel" status={parcel.status} />
+              {(parcel.allocation_status === 'OFFERED' || parcel.allocation_status === 'RESERVED') && (
+                <Badge variant="secondary">{t(`allocation.${parcel.allocation_status}`)}</Badge>
+              )}
               {parcel.deadline_at && (
                 <DeadlineChip
                   deadline={parcel.deadline_at}
@@ -457,6 +461,7 @@ export function ParcelPanel({ parcelId, onClose }: { parcelId: string; onClose: 
                 <Section title={t('parcel.characteristics')}>
                   <Characteristics parcel={parcel} />
                 </Section>
+                <LandFundSection parcel={parcel} />
                 <ParcelInspections parcel={parcel} />
                 <CrossCheckSection parcelId={parcel.id} />
                 <CadastreCheck parcelId={parcel.id} />

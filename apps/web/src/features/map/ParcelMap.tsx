@@ -16,7 +16,7 @@ import MapGL, {
   type MapRef,
 } from 'react-map-gl/maplibre'
 import type { ParcelFeatureCollection, ParcelProperties, SignalSummary } from '@/api/types'
-import { NDVI_STOPS, PARCEL_STATUS_COLORS, SIGNAL_STATUS_COLORS } from '@/lib/status'
+import { ALLOCATION_COLORS, NDVI_STOPS, PARCEL_STATUS_COLORS, SIGNAL_STATUS_COLORS } from '@/lib/status'
 import { formatArea } from '@/lib/utils'
 import { useUiStore } from '@/store/ui'
 import { buildParcelFilter } from './filters'
@@ -27,7 +27,16 @@ const SIGNAL_LAYERS = ['signal-point', 'signal-clusters'] as const
 
 function statusColor(): ExpressionSpecification {
   const pairs = Object.entries(PARCEL_STATUS_COLORS).flat()
-  return ['match', ['get', 'status'], ...pairs, '#94a3b8'] as unknown as ExpressionSpecification
+  // Free state land (and land under an application) has its own colour, whatever the status.
+  return [
+    'match',
+    ['get', 'allocation_status'],
+    'OFFERED',
+    ALLOCATION_COLORS.OFFERED,
+    'RESERVED',
+    ALLOCATION_COLORS.RESERVED,
+    ['match', ['get', 'status'], ...pairs, '#94a3b8'],
+  ] as unknown as ExpressionSpecification
 }
 
 function ndviColor(): ExpressionSpecification {

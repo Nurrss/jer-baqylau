@@ -1,9 +1,8 @@
-import { Check, Copy, Loader2, Send } from 'lucide-react'
+import { Check, Copy, Info, Loader2, MessageCircle, Send } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useRequestInspection } from '@/api/queries'
 import type { Inspection } from '@/api/types'
-import { QrCode } from '@/components/common/QrCode'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -18,33 +17,38 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useDateFns } from '@/lib/dates'
 import { useErrorMessage } from '@/lib/useErrorMessage'
-import { copyToClipboard } from '@/lib/utils'
+import { cn, copyToClipboard } from '@/lib/utils'
 
 const DUE_OPTIONS = [24, 48, 72, 168]
 
+/** Where the owner's one-time link went: straight to their Telegram, or a link to pass on manually. */
 export function InspectionLink({ inspection }: { inspection: Inspection }) {
   const { t } = useTranslation()
   const { dateTime } = useDateFns()
   const [copied, setCopied] = useState(false)
   if (!inspection.link) return null
+  const copy = async () => {
+    if (await copyToClipboard(inspection.link!)) {
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1500)
+    }
+  }
   return (
-    <div className="grid justify-items-center gap-3 rounded-xl border bg-muted/40 p-4 text-center">
-      <QrCode value={inspection.link} />
-      <p className="text-xs text-muted-foreground">
-        {t('inspections.linkHint', { date: dateTime(inspection.due_at) })}
-      </p>
-      <div className="flex w-full items-center gap-2 rounded-lg border bg-card px-3 py-2">
+    <div className="grid min-w-0 grid-cols-1 gap-2 text-sm">
+      {inspection.owner_telegram ? (
+        <p className="flex gap-2 rounded-lg border border-success/40 bg-success/5 p-3 text-success">
+          <MessageCircle className="mt-0.5 size-4 shrink-0" />
+          <span>{t('inspections.sentToTelegram', { date: dateTime(inspection.due_at) })}</span>
+        </p>
+      ) : (
+        <p className="flex gap-2 rounded-lg border border-warning/50 bg-warning/5 p-3">
+          <Info className="mt-0.5 size-4 shrink-0 text-warning" />
+          <span>{t('inspections.noTelegram', { date: dateTime(inspection.due_at) })}</span>
+        </p>
+      )}
+      <div className="flex items-center gap-2 rounded-lg border bg-card px-3 py-2">
         <span className="min-w-0 flex-1 truncate text-left font-mono text-xs">{inspection.link}</span>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={async () => {
-            if (await copyToClipboard(inspection.link!)) {
-              setCopied(true)
-              window.setTimeout(() => setCopied(false), 1500)
-            }
-          }}
-        >
+        <Button size="sm" variant="outline" onClick={copy}>
           {copied ? <Check /> : <Copy />} {copied ? t('common.copied') : t('common.copy')}
         </Button>
       </div>
@@ -55,10 +59,12 @@ export function InspectionLink({ inspection }: { inspection: Inspection }) {
 export function RequestInspectionDialog({
   parcelId,
   cadastral,
+  ownerTelegram,
   onClose,
 }: {
   parcelId: string
   cadastral: string
+  ownerTelegram: boolean
   onClose: () => void
 }) {
   const { t } = useTranslation()
@@ -123,6 +129,19 @@ export function RequestInspectionDialog({
                 maxLength={500}
               />
             </div>
+            <p
+              className={cn(
+                'flex gap-2 rounded-lg p-3 text-xs',
+                ownerTelegram ? 'bg-success/10 text-success' : 'bg-warning/10',
+              )}
+            >
+              {ownerTelegram ? (
+                <MessageCircle className="size-4 shrink-0" />
+              ) : (
+                <Info className="size-4 shrink-0 text-warning" />
+              )}
+              {t(ownerTelegram ? 'inspections.willSendTelegram' : 'inspections.willNotSend')}
+            </p>
             <p className="rounded-lg bg-muted/60 p-3 text-xs text-muted-foreground">
               {t('inspections.antifraudHint')}
             </p>

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import {
   Camera,
   CheckCircle2,
+  MessageCircle,
   Clock,
   Loader2,
   LocateFixed,
@@ -13,7 +14,7 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { API_URL, toApiError } from '@/api/client'
 import { usePublicInspection } from '@/api/queries'
 import { DECLARED_USES, type DeclaredUse } from '@/api/types'
@@ -25,6 +26,7 @@ import { Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDateFns } from '@/lib/dates'
+import { telegramLocationManager, useTelegram, type TgWebApp } from '@/lib/telegram'
 import { useErrorMessage } from '@/lib/useErrorMessage'
 import { cn } from '@/lib/utils'
 
@@ -43,11 +45,47 @@ interface Fix {
   accuracy: number
 }
 
-/** Live position with high accuracy; the owner sees how precise the fix is before sending. */
-function usePosition() {
+const TG_POLL_MS = 8000
+
+/**
+ * Live position with high accuracy; the owner sees how precise the fix is before sending.
+ * Inside Telegram the Mini App location API is used (webviews often block the browser one).
+ */
+function usePosition(tg: TgWebApp | null, ready: boolean) {
   const [fix, setFix] = useState<Fix | null>(null)
   const [error, setError] = useState<string | null>(null)
   useEffect(() => {
+    if (!ready) return
+    const manager = telegramLocationManager(tg)
+    let alive = true
+    if (manager) {
+      let timer = 0
+      const poll = () => {
+        manager.getLocation((location) => {
+          if (!alive) return
+          if (location) {
+            setError(null)
+            setFix({
+              lat: location.latitude,
+              lon: location.longitude,
+              accuracy: location.horizontal_accuracy ?? 50,
+            })
+          } else {
+            setError(manager.isAccessRequested && !manager.isAccessGranted ? 'DENIED_TG' : 'UNAVAILABLE')
+          }
+          timer = window.setTimeout(poll, TG_POLL_MS)
+        })
+      }
+      manager.init(() => {
+        if (!alive) return
+        if (manager.isLocationAvailable) poll()
+        else setError('UNAVAILABLE')
+      })
+      return () => {
+        alive = false
+        window.clearTimeout(timer)
+      }
+    }
     if (!('geolocation' in navigator)) {
       queueMicrotask(() => setError('UNSUPPORTED'))
       return
@@ -60,8 +98,11 @@ function usePosition() {
       (err) => setError(err.code === err.PERMISSION_DENIED ? 'DENIED' : 'UNAVAILABLE'),
       { enableHighAccuracy: true, maximumAge: 0, timeout: 30_000 },
     )
-    return () => navigator.geolocation.clearWatch(id)
-  }, [])
+    return () => {
+      alive = false
+      navigator.geolocation.clearWatch(id)
+    }
+  }, [tg, ready])
   return { fix, error }
 }
 
@@ -157,7 +198,15 @@ export function InspectPage() {
   const { dateTime } = useDateFns()
   const errorMessage = useErrorMessage()
   const query = usePublicInspection(token)
-  const { fix, error: geoError } = usePosition()
+  const [params] = useSearchParams()
+  const { tg, ready: tgReady } = useTelegram()
+  const { fix, error: geoError } = usePosition(tg, tgReady)
+
+  useEffect(() => {
+    const lang =
+      params.get('lang') ?? (tg?.initDataUnsafe.user?.language_code?.startsWith('kk') ? 'kk' : null)
+    if (lang === 'ru' || lang === 'kk') void i18n.changeLanguage(lang)
+  }, [params, tg, i18n])
   const [shots, setShots] = useState<Shot[]>([])
   const [declared, setDeclared] = useState<DeclaredUse | null>(null)
   const [comment, setComment] = useState('')
@@ -208,6 +257,11 @@ export function InspectPage() {
     return (
       <PublicLayout>
         <Done code={submit.data.code} />
+        {tg && (
+          <Button size="lg" onClick={() => tg.close()}>
+            <MessageCircle /> {t('inspect.backToChat')}
+          </Button>
+        )}
       </PublicLayout>
     )
   }
@@ -269,6 +323,11 @@ export function InspectPage() {
                 : t('inspect.geo.waiting')}
           </span>
         </div>
+        {geoError === 'DENIED_TG' && (
+          <Button variant="outline" size="sm" onClick={() => tg?.LocationManager?.openSettings()}>
+            {t('inspect.geo.openSettings')}
+          </Button>
+        )}
         <p className="flex gap-2 text-xs text-muted-foreground">
           <MapPin className="size-4 shrink-0" /> {t('inspect.stayOnParcel')}
         </p>

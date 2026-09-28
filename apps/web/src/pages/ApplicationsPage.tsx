@@ -1,4 +1,4 @@
-import { BellRing, FileText, Loader2, Search, X } from 'lucide-react'
+import { BellRing, FileText, Loader2, MessageCircle, Search, X } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -21,11 +21,12 @@ import {
 } from '@/components/ui/dialog'
 import { Input, Textarea } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/misc'
+import { Checkbox, Tabs, TabsList, TabsTrigger } from '@/components/ui/misc'
 import { Skeleton } from '@/components/ui/skeleton'
 import { HistoryTimeline } from '@/features/common/History'
 import { Section } from '@/features/common/Section'
 import { toDateInput, useDateFns } from '@/lib/dates'
+import { formatArea } from '@/lib/utils'
 
 function TransitionDialog({
   application,
@@ -36,7 +37,7 @@ function TransitionDialog({
   target: ApplicationStatus
   onClose: () => void
 }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const errorMessage = useErrorMessage()
   const mutation = useApplicationTransition(application.id)
   const [commentRu, setCommentRu] = useState('')
@@ -44,7 +45,18 @@ function TransitionDialog({
   const [inspectionDate, setInspectionDate] = useState('')
   const [error, setError] = useState<string | null>(null)
   const needsDate = target === 'INSPECTION_SCHEDULED'
-  const valid = commentRu.trim().length >= 3 && commentKk.trim().length >= 3 && (!needsDate || inspectionDate)
+  const grants = target === 'APPROVED' && application.parcels.length > 0
+  // Housing: one parcel per citizen (first choice by default); agricultural lease: all fields.
+  const [granted, setGranted] = useState<string[]>(() =>
+    application.type === 'IZHS_ALLOCATION'
+      ? application.parcels.slice(0, 1).map((p) => p.id)
+      : application.parcels.map((p) => p.id),
+  )
+  const valid =
+    commentRu.trim().length >= 3 &&
+    commentKk.trim().length >= 3 &&
+    (!needsDate || inspectionDate) &&
+    (!grants || granted.length > 0)
 
   const submit = async (event: FormEvent) => {
     event.preventDefault()
@@ -56,6 +68,7 @@ function TransitionDialog({
         comment_ru: commentRu.trim(),
         comment_kk: commentKk.trim(),
         inspection_date: needsDate ? inspectionDate : null,
+        grant_parcel_ids: grants ? granted : null,
       })
       toast.success(
         result.subscribers_count
@@ -78,6 +91,27 @@ function TransitionDialog({
               <span className="font-mono">{application.tracking_number}</span> · {application.applicant_name}
             </DialogDescription>
           </DialogHeader>
+          {grants && (
+            <fieldset className="grid gap-2">
+              <legend className="mb-1 text-sm font-medium">{t('land.panel.grantTitle')}</legend>
+              {application.parcels.map((p) => (
+                <label key={p.id} className="flex items-center gap-3 rounded-lg border p-2 text-sm">
+                  <Checkbox
+                    checked={granted.includes(p.id)}
+                    onCheckedChange={(v) =>
+                      setGranted((prev) => (v === true ? [...prev, p.id] : prev.filter((id) => id !== p.id)))
+                    }
+                  />
+                  <span className="text-xs text-muted-foreground">{p.priority}.</span>
+                  <span className="font-mono font-semibold">{p.cadastral_number}</span>
+                  <span className="text-muted-foreground">
+                    {formatArea(p.area_ha, i18n.language)} {t('units.ha')}
+                  </span>
+                </label>
+              ))}
+              <p className="text-xs text-muted-foreground">{t(`land.panel.grantHint.${application.type}`)}</p>
+            </fieldset>
+          )}
           {needsDate && (
             <div className="grid gap-2">
               <Label htmlFor="inspection-date">{t('applications.inspectionDate')} *</Label>
@@ -174,6 +208,20 @@ function ApplicationPanel({ application, onClose }: { application: Application; 
           <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
             <dt className="text-muted-foreground">{t('applications.applicant')}</dt>
             <dd className="font-medium">{application.applicant_name}</dd>
+            {application.source === 'miniapp' && (
+              <>
+                <dt className="text-muted-foreground">{t('land.panel.source')}</dt>
+                <dd>
+                  <Badge variant="secondary">
+                    <MessageCircle className="size-3" /> Telegram Mini App
+                  </Badge>
+                </dd>
+                <dt className="text-muted-foreground">{t('land.panel.iin')}</dt>
+                <dd className="font-mono">{application.applicant_iin_masked}</dd>
+                <dt className="text-muted-foreground">{t('land.panel.phone')}</dt>
+                <dd className="font-mono">{application.applicant_phone_masked}</dd>
+              </>
+            )}
             <dt className="text-muted-foreground">{t('applications.submitted')}</dt>
             <dd>{dateTime(application.submitted_at)}</dd>
             {application.inspection_date && (
@@ -182,20 +230,24 @@ function ApplicationPanel({ application, onClose }: { application: Application; 
                 <dd>{date(application.inspection_date)}</dd>
               </>
             )}
-            <dt className="text-muted-foreground">{t('signals.parcel')}</dt>
-            <dd>
-              {application.parcel_id ? (
-                <button
-                  type="button"
-                  className="font-mono text-primary hover:underline"
-                  onClick={() => navigate(`/map?parcel=${application.parcel_id}`)}
-                >
-                  {application.parcel_cadastral_number}
-                </button>
-              ) : (
-                '—'
-              )}
-            </dd>
+            {application.parcels.length === 0 && (
+              <>
+                <dt className="text-muted-foreground">{t('signals.parcel')}</dt>
+                <dd>
+                  {application.parcel_id ? (
+                    <button
+                      type="button"
+                      className="font-mono text-primary hover:underline"
+                      onClick={() => navigate(`/map?parcel=${application.parcel_id}`)}
+                    >
+                      {application.parcel_cadastral_number}
+                    </button>
+                  ) : (
+                    '—'
+                  )}
+                </dd>
+              </>
+            )}
             <dt className="text-muted-foreground">{t('applications.subscribers')}</dt>
             <dd>
               <Badge variant="secondary">
@@ -203,8 +255,44 @@ function ApplicationPanel({ application, onClose }: { application: Application; 
               </Badge>
             </dd>
           </dl>
+          {application.applicant_comment && (
+            <p className="mt-3 rounded-lg bg-muted/60 p-3 text-sm">«{application.applicant_comment}»</p>
+          )}
           {comment && <p className="mt-3 rounded-lg bg-muted/60 p-3 text-sm">{comment}</p>}
         </Section>
+        {application.parcels.length > 0 && (
+          <Section title={t('land.panel.parcels', { count: application.parcels.length })}>
+            <ol className="grid gap-2">
+              {application.parcels.map((p) => (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/map?parcel=${p.id}`)}
+                    className="flex w-full items-center gap-3 rounded-lg border p-2 text-left text-sm hover:bg-muted"
+                  >
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-muted text-xs font-semibold">
+                      {p.priority}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-mono font-semibold">{p.cadastral_number}</span>
+                      <span className="block text-xs text-muted-foreground">
+                        {t(`purpose.${p.purpose}`)} · {formatArea(p.area_ha, i18n.language)} {t('units.ha')}
+                      </span>
+                    </span>
+                    {p.granted ? (
+                      <Badge variant="success">{t('land.panel.granted')}</Badge>
+                    ) : (
+                      <Badge variant="outline">{t(`allocation.${p.allocation_status}`)}</Badge>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ol>
+            {application.parcels.length > 1 && (
+              <p className="mt-2 text-xs text-muted-foreground">{t('land.panel.priorityNote')}</p>
+            )}
+          </Section>
+        )}
         <Section title={t('history.title')}>
           <HistoryTimeline items={application.history} kind="application" />
         </Section>

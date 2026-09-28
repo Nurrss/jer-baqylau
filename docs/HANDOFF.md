@@ -42,12 +42,12 @@ git clone https://github.com/Nurrss/jer-baqylau.git && cd jer-baqylau
 make setup                 # uv + npm зависимости, .env из .env.example
 make up                    # PostGIS + Redis + API в Docker, миграции и сид сами
 make dev-web               # http://localhost:5173, вход inspector@jer.kz / demo12345
-make test && make lint     # должно быть зелёным: 81 тест API + vitest, ruff, mypy, eslint
+make test && make lint     # должно быть зелёным: 87 тестов API + vitest, ruff, mypy, eslint
 ```
 
 Дальше:
 1. Пройдите тур в панели (кнопка `?` → «Обзор платформы») и сценарий из [DEMO_SCRIPT.md](DEMO_SCRIPT.md), включая блок «Честность».
-2. Прочитайте [CLAUDE.md](../CLAUDE.md) (правила проекта), [ARCHITECTURE.md](ARCHITECTURE.md) и [DECISIONS.md](DECISIONS.md) (ADR-001…016).
+2. Прочитайте [CLAUDE.md](../CLAUDE.md) (правила проекта), [ARCHITECTURE.md](ARCHITECTURE.md) и [DECISIONS.md](DECISIONS.md) (ADR-001…017).
 3. Положите `.env.production` в корень репозитория (он в `.gitignore`) и проверьте прод:
    ```bash
    JER_ENV_FILE=.env.production uv run --project apps/api python scripts/e2e_smoke.py --base-url https://jer-baqylau.vercel.app
@@ -91,6 +91,7 @@ curl https://jer-baqylau.vercel.app/health
 | Тесты | Создают БД `<db>_test` на локальном PostGIS и **отказываются** работать с не-localhost БД без `TEST_DATABASE_URL`, чтобы случайно не стереть прод |
 | Скрипты против прода | Нужен `JER_ENV_FILE=.env.production`. Ключи Supabase принимаются в старом (`anon`/`service_role`) и новом (`sb_publishable`/`sb_secret`) формате |
 | Данные Sentinel-2 | Отражательная способность в Earth Search уже гармонизирована: заявленный offset −0.1 применяется, только если значения не уходят в минус (`effective_offset`) |
+| Telegram Mini App `/app` | Telegram открывает Mini App только по HTTPS: кнопки появляются, когда `PUBLIC_WEB_URL` начинается с `https://` (на проде так и есть). Локально проверяйте в браузере, подставив подписанный `initData` (`app.core.telegram_webapp.sign_init_data`). Имя бота для ссылок — `VITE_TELEGRAM_BOT` (по умолчанию `take_a_place_bot`) |
 | Страница владельца `/inspect` | Камера и геолокация работают только по HTTPS (на проде так и есть). В снимках с canvas нет EXIF, поэтому проверка `EXIF_GPS` = `skip` |
 | React Compiler (eslint) | Нельзя вызывать `setState` синхронно в эффектах; используйте перемонтирование через `key` или колбэки |
 | Supabase Auth | Открытая регистрация ещё включена: выключите «Allow new users to sign up». API защищён списком `INSPECTOR_EMAILS` |
@@ -101,4 +102,4 @@ curl https://jer-baqylau.vercel.app/health
 2. Вычитка казахских текстов носителем языка (ROADMAP 1.1).
 3. Вынести спутник и PDF в отдельный воркер (ROADMAP 2.1). Сейчас это самое узкое место прода.
 4. Роли «инспектор / руководитель» и принцип четырёх глаз для принятия отчётов (ROADMAP 1.3).
-5. Автоматическая отправка ссылки фотоотчёта владельцу (ROADMAP 2.2).
+5. Привязка существующих правообладателей к Telegram / eGov (ROADMAP 2.2) — сейчас ссылка сама уходит только тем, кто получил землю через Mini App.

@@ -221,9 +221,25 @@ class Smoke:
             f"{app['tracking_number']} → INSPECTION_SCHEDULED ({result['subscribers_count']} subscribers pushed)",
         )
 
+    def land_fund(self) -> None:
+        step("State land fund (Telegram Mini App)")
+        fund = self.get("/land/fund")
+        check(fund["offered"] > 0, f"{fund['offered']} free parcels on the Mini App map")
+        resp = self.http.post(
+            f"{self.api}/miniapp/applications",
+            json={
+                "parcel_ids": [fund["features"][0]["id"]],
+                "full_name": "E2E Test",
+                "iin": "900101300017",
+                "phone": "+77012345678",
+            },
+        )
+        check(resp.status_code == 401, "applying without a Telegram signature is refused (401)")
+
     def run(self) -> None:
         self.health()
         self.login()
+        self.land_fund()
         self.signal_cycle()
         if self.args.with_application:
             self.application_cycle()

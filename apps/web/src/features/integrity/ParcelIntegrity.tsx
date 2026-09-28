@@ -79,7 +79,8 @@ export function ParcelInspections({ parcel }: { parcel: ParcelDetail }) {
   const [open, setOpen] = useState(false)
   const items = query.data?.items ?? []
   const hasOpen = items.some((i) => i.status === 'REQUESTED' || i.status === 'SUBMITTED')
-  const canRequest = parcel.status !== 'RETURNED_TO_STATE' && !hasOpen
+  const inFund = parcel.allocation_status === 'OFFERED' || parcel.allocation_status === 'RESERVED'
+  const canRequest = parcel.status !== 'RETURNED_TO_STATE' && !inFund && !hasOpen
   return (
     <Section title={t('inspections.parcelTitle')} icon={<ClipboardCheck className="size-3.5" />}>
       <div className="grid gap-2">
@@ -122,6 +123,7 @@ export function ParcelInspections({ parcel }: { parcel: ParcelDetail }) {
         <RequestInspectionDialog
           parcelId={parcel.id}
           cadastral={parcel.cadastral_number}
+          ownerTelegram={parcel.owner_telegram}
           onClose={() => setOpen(false)}
         />
       )}

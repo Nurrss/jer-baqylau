@@ -29,7 +29,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox, Switch } from '@/components/ui/misc'
 import { useDateFns } from '@/lib/dates'
-import { NDVI_STOPS, PARCEL_STATUS_COLORS } from '@/lib/status'
+import { ALLOCATION_COLORS, NDVI_STOPS, PARCEL_STATUS_COLORS } from '@/lib/status'
 import { useErrorMessage } from '@/lib/useErrorMessage'
 import { cn } from '@/lib/utils'
 import { useUiStore } from '@/store/ui'
@@ -280,12 +280,18 @@ export function Legend({ parcels }: { parcels: ParcelFeatureCollection | undefin
 
   const counts = useMemo(() => {
     const byStatus: Record<string, number> = {}
+    const fund = { OFFERED: 0, RESERVED: 0 }
     let overdue = 0
     for (const f of parcels?.features ?? []) {
+      const allocation = f.properties.allocation_status
+      if (allocation === 'OFFERED' || allocation === 'RESERVED') {
+        fund[allocation] += 1
+        continue
+      }
       byStatus[f.properties.status] = (byStatus[f.properties.status] ?? 0) + 1
       if (f.properties.is_overdue) overdue += 1
     }
-    return { byStatus, overdue, total: parcels?.features.length ?? 0 }
+    return { byStatus, fund, overdue, total: parcels?.features.length ?? 0 }
   }, [parcels])
 
   const activeFilters =
@@ -364,6 +370,27 @@ export function Legend({ parcels }: { parcels: ParcelFeatureCollection | undefin
                   </li>
                 )
               })}
+              {(['OFFERED', 'RESERVED'] as const).map((allocation) =>
+                counts.fund[allocation] ? (
+                  <li
+                    key={allocation}
+                    className="flex items-center gap-2.5 px-2 py-1.5 text-sm"
+                    title={t(`allocation.hint.${allocation}`)}
+                  >
+                    <span
+                      className="size-3.5 shrink-0 rounded-[4px] border-2"
+                      style={{
+                        borderColor: ALLOCATION_COLORS[allocation],
+                        backgroundColor: `${ALLOCATION_COLORS[allocation]}66`,
+                      }}
+                    />
+                    <span className="flex-1">{t(`allocation.${allocation}`)}</span>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {counts.fund[allocation]}
+                    </span>
+                  </li>
+                ) : null,
+              )}
             </ul>
           )}
 

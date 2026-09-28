@@ -8,7 +8,7 @@ export const REGION_BOUNDS: [[number, number], [number, number]] = [
 ]
 
 /** Raster base layers (no API keys): OpenStreetMap and Esri World Imagery; toggled by visibility. */
-export function baseStyle(): StyleSpecification {
+export function baseStyle(base: 'scheme' | 'satellite' = 'scheme'): StyleSpecification {
   return {
     version: 8,
     glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
@@ -32,8 +32,18 @@ export function baseStyle(): StyleSpecification {
     },
     layers: [
       { id: 'background', type: 'background', paint: { 'background-color': '#e9eef3' } },
-      { id: 'osm', type: 'raster', source: 'osm', layout: { visibility: 'visible' } },
-      { id: 'satellite', type: 'raster', source: 'satellite', layout: { visibility: 'none' } },
+      {
+        id: 'osm',
+        type: 'raster',
+        source: 'osm',
+        layout: { visibility: base === 'scheme' ? 'visible' : 'none' },
+      },
+      {
+        id: 'satellite',
+        type: 'raster',
+        source: 'satellite',
+        layout: { visibility: base === 'satellite' ? 'visible' : 'none' },
+      },
     ],
   }
 }

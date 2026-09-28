@@ -10,6 +10,7 @@ import type {
   SignalStatus,
   SignalTransitionRequest,
   InspectionStatus,
+  LandApplicationCreate,
 } from './types'
 
 export const qk = {
@@ -366,5 +367,67 @@ export function usePublicAct(actId: string) {
     queryFn: async () =>
       unwrap(await api.GET('/api/v1/public/acts/{act_id}', { params: { path: { act_id: actId } } })),
     retry: false,
+  })
+}
+
+// ── State land fund (Mini App + panel) ──────────────────────────────────────
+
+export function useLandFund() {
+  return useQuery({
+    queryKey: ['land-fund'],
+    queryFn: async () => unwrap(await api.GET('/api/v1/land/fund')),
+    staleTime: 15_000,
+  })
+}
+
+export function useCreateLandApplication(initData: string, lang: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (body: LandApplicationCreate) =>
+      unwrap(
+        await api.POST('/api/v1/miniapp/applications', {
+          body,
+          params: {
+            header: { 'X-Telegram-Init-Data': initData },
+            query: { lang: lang === 'kk' ? 'kk' : 'ru' },
+          },
+        }),
+      ),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['land-fund'] })
+      void qc.invalidateQueries({ queryKey: ['my-land-applications'] })
+    },
+  })
+}
+
+export function useMyLandApplications(initData: string | null) {
+  return useQuery({
+    queryKey: ['my-land-applications'],
+    queryFn: async () =>
+      unwrap(
+        await api.GET('/api/v1/miniapp/applications', {
+          params: { header: { 'X-Telegram-Init-Data': initData! } },
+        }),
+      ),
+    enabled: Boolean(initData),
+  })
+}
+
+export function useOfferParcel(parcelId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (offered: boolean) =>
+      unwrap(
+        offered
+          ? await api.POST('/api/v1/parcels/{parcel_id}/offer', { params: { path: { parcel_id: parcelId } } })
+          : await api.DELETE('/api/v1/parcels/{parcel_id}/offer', {
+              params: { path: { parcel_id: parcelId } },
+            }),
+      ),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: qk.parcel(parcelId) })
+      void qc.invalidateQueries({ queryKey: qk.parcels })
+      void qc.invalidateQueries({ queryKey: ['land-fund'] })
+    },
   })
 }

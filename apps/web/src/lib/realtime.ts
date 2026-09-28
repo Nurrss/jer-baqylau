@@ -45,6 +45,7 @@ function invalidate(qc: QueryClient, event: Pick<EventOut, 'type' | 'payload'>) 
     case 'parcel.status_changed':
     case 'parcel.updated':
       inv(qk.parcels)
+      inv(['land-fund'])
       inv(['violations'])
       inv(qk.dashboard)
       if (p.parcel_id) inv(qk.parcel(p.parcel_id))
@@ -58,6 +59,12 @@ function invalidate(qc: QueryClient, event: Pick<EventOut, 'type' | 'payload'>) 
       break
     case 'application.status_changed':
       inv(['applications'])
+      break
+    case 'application.submitted':
+      inv(['applications'])
+      inv(qk.parcels)
+      inv(['land-fund'])
+      inv(qk.dashboard)
       break
     case 'satellite.scan_completed':
       inv(qk.ndvi)
@@ -85,14 +92,27 @@ function invalidate(qc: QueryClient, event: Pick<EventOut, 'type' | 'payload'>) 
  * Subscribes to domain events: Supabase Realtime (postgres_changes on `events`) when configured,
  * otherwise polling `/api/v1/events`. Falls back to polling if the socket fails.
  */
-export function useRealtimeEvents(onSignalCreated: (payload: SignalCreatedPayload) => void) {
+export interface ApplicationSubmittedPayload {
+  application_id: string
+  tracking_number: string
+  type: string
+  parcels: string[]
+  applicant: string
+}
+
+export function useRealtimeEvents(
+  onSignalCreated: (payload: SignalCreatedPayload) => void,
+  onApplicationSubmitted?: (payload: ApplicationSubmittedPayload) => void,
+) {
   const qc = useQueryClient()
   const authenticated = useAuthStore((s) => s.status === 'authenticated')
   const setMode = useRealtimeStatus((s) => s.set)
   const callback = useRef(onSignalCreated)
+  const applicationCallback = useRef(onApplicationSubmitted)
   useEffect(() => {
     callback.current = onSignalCreated
-  }, [onSignalCreated])
+    applicationCallback.current = onApplicationSubmitted
+  }, [onSignalCreated, onApplicationSubmitted])
 
   useEffect(() => {
     if (!authenticated) return
@@ -107,6 +127,8 @@ export function useRealtimeEvents(onSignalCreated: (payload: SignalCreatedPayloa
       seen.add(event.id)
       invalidate(qc, event)
       if (event.type === 'signal.created') callback.current(event.payload as unknown as SignalCreatedPayload)
+      if (event.type === 'application.submitted')
+        applicationCallback.current?.(event.payload as unknown as ApplicationSubmittedPayload)
     }
 
     const poll = async () => {
