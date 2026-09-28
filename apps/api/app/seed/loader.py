@@ -27,6 +27,7 @@ from app.core.config import SEED_DIR
 from app.core.logging import get_logger
 from app.db.models import Application, Parcel, Photo, Signal, StatusTransition
 from app.domain.enums import (
+    AllocationStatus,
     ApplicationStatus,
     ApplicationType,
     EntityType,
@@ -185,6 +186,7 @@ async def _seed_parcels(session: AsyncSession, clock: _Clock) -> dict[str, Parce
             ),
             inspector_id=INSPECTOR_ACTOR if status is not ParcelStatus.OK else None,
             source=props.get("source", "seed"),
+            allocation_status=AllocationStatus(props.get("seed_allocation") or AllocationStatus.NONE),
         )
         session.add(parcel)
         parcels[cadastral] = parcel

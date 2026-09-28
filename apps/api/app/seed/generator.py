@@ -21,7 +21,7 @@ from shapely import affinity
 from shapely.geometry import MultiPolygon, Polygon, mapping
 from shapely.ops import unary_union
 
-from app.domain.enums import OwnerType, ParcelPurpose, ParcelStatus, ViolationType
+from app.domain.enums import AllocationStatus, OwnerType, ParcelPurpose, ParcelStatus, ViolationType
 
 SEED = 42
 M_PER_DEG_LAT = 111_132.0
@@ -103,6 +103,24 @@ BLOCKS: list[Block] = [
         cell_w=(300, 700), cell_h=(260, 600), rotation_deg=-38, jitter=30.0, purpose=ParcelPurpose.AGRICULTURE,
         district_ru="Байзакский район", district_kk="Байзақ ауданы", rural=True,
         locality_ru="окрестности с. Шайкорык", locality_kk="Шайқорық а. маңы", cut_corners=True,
+    ),
+]  # fmt: skip
+
+
+# State land fund offered to citizens in the Telegram Mini App. Generated with its own random
+# stream, so adding or changing these blocks never shifts the monitoring data above.
+FUND_SEED = 4242
+FUND_BLOCKS: list[Block] = [
+    Block(
+        key="fund-izhs-samal2", quarter=906, anchor_lat=42.93180, anchor_lon=71.33720, rows=3, cols=5,
+        cell_w=(24, 30), cell_h=(36, 46), rotation_deg=-47, jitter=1.5, purpose=ParcelPurpose.IZHS,
+        district_ru="Тараз, мкр. Самал-2", district_kk="Тараз, Самал-2 ш/а",
+    ),
+    Block(
+        key="fund-agro-buryl", quarter=907, anchor_lat=42.99650, anchor_lon=71.25850, rows=2, cols=3,
+        cell_w=(300, 450), cell_h=(280, 420), rotation_deg=5, jitter=20.0, purpose=ParcelPurpose.AGRICULTURE,
+        district_ru="Байзакский район", district_kk="Байзақ ауданы", rural=True,
+        locality_ru="окрестности с. Бурыл", locality_kk="Бурыл а. маңы", cut_corners=True,
     ),
 ]  # fmt: skip
 
@@ -271,7 +289,64 @@ def generate() -> dict[str, Any]:
                 },
             }
         )
+    features += _fund_features()
     return {"type": "FeatureCollection", "name": "jer-demo-parcels-taraz", "features": features}
+
+
+def _without_neighbours(geom: MultiPolygon, accepted: list[Polygon]) -> MultiPolygon:
+    """Remove sub-metre slivers left by coordinate rounding on edges shared with accepted parcels."""
+    neighbours = [a for a in accepted if a.intersects(geom)]
+    if not neighbours:
+        return geom
+    cleaned = geom.difference(unary_union(neighbours))
+    parts = [cleaned] if cleaned.geom_type == "Polygon" else list(cleaned.geoms)
+    return MultiPolygon([max((p for p in parts if p.geom_type == "Polygon"), key=lambda p: p.area)])
+
+
+def _address(block: Block, idx: int) -> tuple[str, str]:
+    if block.rural:
+        return (
+            f"{block.district_ru}, {block.locality_ru}, поле № {idx + 1}",
+            f"{block.district_kk}, {block.locality_kk}, № {idx + 1} алқап",
+        )
+    street = STREETS[(block.quarter + idx // block.cols) % len(STREETS)]
+    house = 2 * (idx % block.cols) + 1 + (idx // block.cols) * 40
+    return (
+        f"г. Тараз, {block.district_ru.split(', ')[1]}, {street.ru}, {house}",
+        f"Тараз қ., {block.district_kk.split(', ')[1]}, {street.kk}, {house}",
+    )
+
+
+def _fund_features() -> list[dict[str, Any]]:
+    rng = random.Random(FUND_SEED)
+    features = []
+    accepted: list[Polygon] = []
+    for block in FUND_BLOCKS:
+        for idx, poly in enumerate(_block_polygons(block, rng)):
+            purpose = block.purpose or block.purpose_mix[idx % len(block.purpose_mix)]
+            address_ru, address_kk = _address(block, idx)
+            geom = _without_neighbours(_to_wgs84(poly, block), accepted)
+            accepted.append(geom.geoms[0])
+            features.append(
+                {
+                    "type": "Feature",
+                    "geometry": mapping(geom),
+                    "properties": {
+                        "cadastral_number": f"{REGION_CODE}:{DISTRICT_CODE}:{block.quarter:03d}:{idx + 1:03d}",
+                        "purpose": purpose.value,
+                        "owner_type": OwnerType.STATE.value,
+                        "address_ru": address_ru,
+                        "address_kk": address_kk,
+                        "district": block.district_ru,
+                        "lease_until": None,
+                        "seed_status": ParcelStatus.OK.value,
+                        "seed_violation_type": None,
+                        "seed_deadline_days": None,
+                        "seed_allocation": AllocationStatus.OFFERED.value,
+                    },
+                }
+            )
+    return features
 
 
 def write(path: Path) -> int:

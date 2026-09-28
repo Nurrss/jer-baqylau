@@ -34,6 +34,7 @@ from app.core.config import get_settings
 from app.core.errors import ConflictError, NotFoundError, ValidationFailedError
 from app.db.models import InspectionRequest, NdviScan, Parcel, Photo
 from app.domain.enums import (
+    AllocationStatus,
     DeclaredUse,
     EntityType,
     EventType,
@@ -46,7 +47,7 @@ from app.domain.enums import (
 )
 from app.providers.satellite import UNUSED_NDVI_THRESHOLD
 from app.providers.storage import StorageProvider
-from app.services import audit
+from app.services import audit, notifier
 from app.services.photos import PhotoSpec, hamming, save_photos
 
 LOCATION_TOLERANCE_M = 30
@@ -120,6 +121,9 @@ async def create_request(
     parcel = await session.get(Parcel, parcel_id)
     if parcel is None:
         raise NotFoundError("Parcel not found", details={"parcel_id": str(parcel_id)})
+    if parcel.allocation_status in (AllocationStatus.OFFERED, AllocationStatus.RESERVED):
+        # Free state land has no right holder to ask for a report.
+        raise ConflictError("The parcel is in the state land fund", code="PARCEL_IN_FUND")
     open_request = await session.scalar(
         select(InspectionRequest.code).where(
             InspectionRequest.parcel_id == parcel_id,
@@ -167,6 +171,8 @@ async def create_request(
             "reason": reason.value,
         },
     )
+    # The right holder registered through the Mini App gets the link in Telegram right away.
+    await notifier.inspection_requested(session, request, parcel, public_link(request))
     return request
 
 
@@ -406,4 +412,7 @@ async def review(
         },
     )
     await session.flush()
+    parcel = await session.get(Parcel, request.parcel_id)
+    if parcel is not None:
+        await notifier.inspection_reviewed(session, request, parcel)
     return request

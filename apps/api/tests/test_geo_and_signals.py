@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.errors import RateLimitedError, ValidationFailedError
 from app.db.models import Parcel, Signal, StatusTransition
-from app.domain.enums import EntityType, Lang, ParcelStatus, SignalCategory
+from app.domain.enums import AllocationStatus, EntityType, Lang, ParcelStatus, SignalCategory
 from app.services import signals as service
 
 M_PER_DEG_LAT = 111_132.0
@@ -68,10 +68,17 @@ async def test_seed_parcels_are_valid_and_do_not_overlap(session: AsyncSession) 
 
 
 async def test_seed_distribution_and_areas(session: AsyncSession) -> None:
-    total = await session.scalar(select(func.count(Parcel.id)))
+    monitored = Parcel.allocation_status == AllocationStatus.NONE
+    total = await session.scalar(select(func.count(Parcel.id)).where(monitored))
     assert 40 <= (total or 0) <= 60
+    fund = await session.scalar(
+        select(func.count(Parcel.id)).where(Parcel.allocation_status == AllocationStatus.OFFERED)
+    )
+    assert (fund or 0) >= 15  # free state land for the Mini App
     rows = dict(
-        (await session.execute(select(Parcel.status, func.count()).group_by(Parcel.status))).tuples().all()
+        (await session.execute(select(Parcel.status, func.count()).where(monitored).group_by(Parcel.status)))
+        .tuples()
+        .all()
     )
     green = rows.get(ParcelStatus.OK, 0) + rows.get(ParcelStatus.RESOLVED, 0)
     red = rows.get(ParcelStatus.VIOLATION, 0) + rows.get(ParcelStatus.IN_REMEDIATION, 0)

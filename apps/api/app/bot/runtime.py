@@ -21,7 +21,7 @@ from fastapi import APIRouter, FastAPI, Header, Request, Response
 from sqlalchemy.dialects.postgresql import insert
 
 from app.bot.common import FsmTimeoutMiddleware, LanguageMiddleware
-from app.bot.handlers import general, knowledge, my, report, status
+from app.bot.handlers import general, knowledge, land, my, report, status
 from app.core.config import BotMode, Settings, get_settings
 from app.core.errors import ForbiddenError, NotFoundError
 from app.core.i18n import t
@@ -76,7 +76,13 @@ def build_dispatcher(storage: BaseStorage) -> Dispatcher:
         observer.outer_middleware(FsmTimeoutMiddleware())
     # Order matters: global cancel/start first, the catch-all fallback last.
     dp.include_routers(
-        general.router, status.router, knowledge.router, my.router, report.router, general.fallback_router
+        general.router,
+        status.router,
+        knowledge.router,
+        my.router,
+        report.router,
+        land.router,
+        general.fallback_router,
     )
     return dp
 
@@ -103,6 +109,7 @@ async def start_bot(app: FastAPI, settings: Settings) -> None:
             )
     except Exception as exc:
         log.warning("bot_set_commands_failed", error=str(exc))
+    await _set_menu_button(bot)
 
     if settings.bot_mode is BotMode.POLLING:
         await bot.delete_webhook(drop_pending_updates=False)
@@ -119,6 +126,23 @@ async def start_bot(app: FastAPI, settings: Settings) -> None:
             drop_pending_updates=False,
         )
         log.info("bot_started", mode="webhook", url=url)
+
+
+async def _set_menu_button(bot: Bot) -> None:
+    """The chat's menu button opens the land Mini App (Telegram requires HTTPS)."""
+    from aiogram.types import MenuButtonWebApp, WebAppInfo
+
+    from app.bot.common import lands_app_url
+
+    url = lands_app_url(None)  # the Mini App picks the user's language itself
+    if url is None:
+        return
+    try:
+        await bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(text=t(Lang.RU, "menu-button-lands"), web_app=WebAppInfo(url=url))
+        )
+    except Exception as exc:
+        log.warning("bot_set_menu_button_failed", error=str(exc))
 
 
 async def stop_bot() -> None:

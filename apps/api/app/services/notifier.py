@@ -8,9 +8,10 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.i18n import t
 from app.core.logging import get_logger
-from app.db.models import Application, Parcel, Signal, Subscription, TelegramUser
+from app.db.models import Application, InspectionRequest, Parcel, Signal, Subscription, TelegramUser
 from app.domain.enums import Lang, SignalStatus, SubscriptionTarget
 from app.providers.notification import Notification, NotificationButton, get_notification_provider
 from app.services.outbox import after_commit
@@ -132,3 +133,114 @@ async def application_status_changed(session: AsyncSession, application: Applica
             )
         )
     _dispatch(session, notifications)
+
+
+def web_app_url(path: str) -> str | None:
+    """Mini App URL for a button, or None when the panel is not served over HTTPS (Telegram requires it)."""
+    base = get_settings().public_web_url.rstrip("/")
+    return f"{base}{path}" if base.startswith("https://") else None
+
+
+async def _lang_of(session: AsyncSession, chat_id: int, default: Lang = Lang.RU) -> Lang:
+    return (await _langs(session, {chat_id})).get(chat_id, default)
+
+
+async def land_application_draft(
+    session: AsyncSession, application: Application, parcels: list[Parcel]
+) -> None:
+    """Ask the citizen to confirm the application formed in the Mini App."""
+    chat_id = application.applicant_chat_id
+    if chat_id is None:
+        return
+    lang = await _lang_of(session, chat_id)
+    lines = [
+        t(lang, "land-draft-title", number=application.tracking_number),
+        t(lang, f"app-type-{application.type.value}"),
+        "",
+    ]
+    for i, parcel in enumerate(parcels, start=1):
+        address = parcel.address_kk if lang is Lang.KK else parcel.address_ru
+        lines.append(
+            t(
+                lang,
+                "land-draft-parcel",
+                n=i,
+                cadastral=parcel.cadastral_number,
+                area=f"{float(parcel.area_ha):.2f}",
+                address=html.escape(address),
+            )
+        )
+    lines += [
+        "",
+        t(
+            lang,
+            "land-draft-applicant",
+            name=html.escape(application.applicant_name),
+            iin=application.applicant_iin_masked or "—",
+            phone=application.applicant_phone_masked or "—",
+        ),
+    ]
+    if len(parcels) > 1:
+        lines.append(t(lang, "land-draft-priority"))
+    lines += ["", t(lang, "land-draft-confirm-hint")]
+    _dispatch(
+        session,
+        [
+            Notification(
+                chat_id=chat_id,
+                text="\n".join(lines),
+                buttons=(
+                    NotificationButton(
+                        text=t(lang, "btn-land-confirm"), callback_data=f"land:confirm:{application.id}"
+                    ),
+                    NotificationButton(
+                        text=t(lang, "btn-land-cancel"), callback_data=f"land:cancel:{application.id}"
+                    ),
+                ),
+            )
+        ],
+    )
+
+
+async def inspection_requested(
+    session: AsyncSession, request: InspectionRequest, parcel: Parcel, link: str
+) -> bool:
+    """Send the remote-inspection link straight to the right holder's Telegram. False if unknown."""
+    chat_id = parcel.owner_chat_id
+    if chat_id is None:
+        return False
+    lang = await _lang_of(session, chat_id)
+    text = t(
+        lang,
+        "inspection-request",
+        cadastral=parcel.cadastral_number,
+        code=request.code,
+        due=f"{request.due_at:%d.%m.%Y %H:%M}",
+    )
+    if request.note:
+        text += "\n\n" + t(lang, "inspection-request-note", note=html.escape(request.note))
+    text += "\n\n" + t(lang, "inspection-request-hint")
+    app_url = web_app_url(f"/inspect/{request.token}?lang={lang.value}")
+    buttons = (
+        [NotificationButton(text=t(lang, "btn-inspection-open"), web_app_url=app_url)] if app_url else []
+    )
+    buttons.append(NotificationButton(text=t(lang, "btn-inspection-browser"), url=link))
+    _dispatch(session, [Notification(chat_id=chat_id, text=text, buttons=tuple(buttons))])
+    return True
+
+
+async def inspection_reviewed(session: AsyncSession, request: InspectionRequest, parcel: Parcel) -> None:
+    chat_id = parcel.owner_chat_id
+    if chat_id is None:
+        return
+    lang = await _lang_of(session, chat_id)
+    text = t(
+        lang,
+        "inspection-reviewed",
+        code=request.code,
+        cadastral=parcel.cadastral_number,
+        status=t(lang, f"inspection-status-{request.status.value}"),
+    )
+    if request.review_comment:
+        text += "\n\n" + t(lang, "notify-reason", reason=html.escape(request.review_comment))
+    _dispatch(session, [Notification(chat_id=chat_id, text=text)])

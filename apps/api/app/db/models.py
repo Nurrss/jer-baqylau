@@ -31,6 +31,7 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from app.domain.enums import (
+    AllocationStatus,
     ApplicationStatus,
     ApplicationType,
     DeclaredUse,
@@ -125,6 +126,16 @@ class Parcel(Base):
     ndvi_observed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     ndvi_scene_id: Mapped[str | None] = mapped_column(String(64))
     source: Mapped[str] = mapped_column(String(32), nullable=False, server_default="seed")
+    # State land fund: free parcels citizens can apply for in the Telegram Mini App.
+    allocation_status: Mapped[AllocationStatus] = mapped_column(
+        str_enum(AllocationStatus, "allocation_status"),
+        nullable=False,
+        server_default=AllocationStatus.NONE.value,
+        index=True,
+    )
+    # Telegram chat of the right holder (set when the parcel is granted through the Mini App):
+    # remote inspection links are sent straight there.
+    owner_chat_id: Mapped[int | None] = mapped_column(BigInteger, index=True)
     created_at: Mapped[datetime] = created_at_col()
     updated_at: Mapped[datetime] = updated_at_col()
 
@@ -206,10 +217,31 @@ class Application(Base):
     inspection_date: Mapped[date | None] = mapped_column(Date)
     parcel_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("parcels.id", ondelete="SET NULL"))
     submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    # Mini App applications: who applied (Telegram) and minimal, masked contact data.
+    source: Mapped[str] = mapped_column(String(16), nullable=False, server_default="seed")
+    applicant_chat_id: Mapped[int | None] = mapped_column(BigInteger, index=True)
+    applicant_iin_masked: Mapped[str | None] = mapped_column(String(16))
+    applicant_phone_masked: Mapped[str | None] = mapped_column(String(24))
+    applicant_comment: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = created_at_col()
     updated_at: Mapped[datetime] = updated_at_col()
 
     parcel: Mapped[Parcel | None] = relationship()
+
+
+class ApplicationParcel(Base):
+    """Parcels chosen in one land application, in the citizen's order of priority."""
+
+    __tablename__ = "application_parcels"
+
+    application_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("applications.id", ondelete="CASCADE"), primary_key=True
+    )
+    parcel_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("parcels.id", ondelete="CASCADE"), primary_key=True, index=True
+    )
+    priority: Mapped[int] = mapped_column(Integer, nullable=False)
+    granted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
 
 
 class StatusTransition(Base):

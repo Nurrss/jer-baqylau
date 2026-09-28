@@ -20,6 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import InspectionRequest, NdviScan, Parcel, Signal, StatusTransition
 from app.domain.enums import (
+    AllocationStatus,
     EntityType,
     EventType,
     InspectionReason,
@@ -60,7 +61,9 @@ async def compute_risks(session: AsyncSession, now: datetime | None = None) -> l
     rows = (
         await session.execute(
             select(Parcel, func.ST_X(Parcel.centroid), func.ST_Y(Parcel.centroid)).where(
-                Parcel.status != ParcelStatus.RETURNED_TO_STATE
+                Parcel.status != ParcelStatus.RETURNED_TO_STATE,
+                # Free land of the state fund has nobody to inspect yet.
+                Parcel.allocation_status.not_in([AllocationStatus.OFFERED, AllocationStatus.RESERVED]),
             )
         )
     ).all()

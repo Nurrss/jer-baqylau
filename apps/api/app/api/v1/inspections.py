@@ -40,17 +40,14 @@ async def to_out(
     if not requests:
         return []
     ids = [r.id for r in requests]
-    cadastral = dict(
-        (
-            await session.execute(
-                select(Parcel.id, Parcel.cadastral_number).where(
-                    Parcel.id.in_({r.parcel_id for r in requests})
-                )
+    parcels = {
+        pid: (number, chat_id)
+        for pid, number, chat_id in await session.execute(
+            select(Parcel.id, Parcel.cadastral_number, Parcel.owner_chat_id).where(
+                Parcel.id.in_({r.parcel_id for r in requests})
             )
         )
-        .tuples()
-        .all()
-    )
+    }
     device = {
         rid: (x, y)
         for rid, x, y in await session.execute(
@@ -67,7 +64,7 @@ async def to_out(
             id=str(r.id),
             code=r.code,
             parcel_id=str(r.parcel_id),
-            cadastral_number=cadastral.get(r.parcel_id, ""),
+            cadastral_number=parcels.get(r.parcel_id, ("", None))[0],
             status=r.status,
             reason=r.reason,
             verdict=r.verdict,
@@ -85,6 +82,7 @@ async def to_out(
             review_comment=r.review_comment,
             reviewed_at=r.reviewed_at,
             link=service.public_link(r) if r.status is InspectionStatus.REQUESTED else None,
+            owner_telegram=parcels.get(r.parcel_id, ("", None))[1] is not None,
             photos=photos.get(r.id, []),
         )
         for r in requests

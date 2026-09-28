@@ -44,6 +44,7 @@ class InspectionOut(ApiModel):
     review_comment: str | None
     reviewed_at: datetime | None
     link: str | None = Field(description="Owner link; only while the request is open")
+    owner_telegram: bool = Field(description="The right holder is linked to Telegram: the link is sent there")
     photos: list[PhotoOut]
 
 

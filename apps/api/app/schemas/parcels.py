@@ -5,7 +5,7 @@ from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
-from app.domain.enums import OwnerType, ParcelPurpose, ParcelStatus, ViolationType
+from app.domain.enums import AllocationStatus, OwnerType, ParcelPurpose, ParcelStatus, ViolationType
 from app.schemas.common import ApiModel, LngLat, PhotoOut, TransitionOut
 from app.schemas.signals import SignalSummary
 
@@ -26,6 +26,8 @@ class ParcelProperties(ApiModel):
     ndvi: float | None
     ndvi_flagged: bool
     open_signals_count: int
+    allocation_status: AllocationStatus = Field(description="Place in the state land fund")
+    owner_telegram: bool = Field(description="The right holder is linked to Telegram (Mini App)")
 
 
 class ParcelFeature(ApiModel):

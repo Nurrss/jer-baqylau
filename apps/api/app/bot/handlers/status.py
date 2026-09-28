@@ -89,7 +89,7 @@ async def show_status(message: Message, state: FSMContext, tr: Tr) -> None:
         subscribed = application is not None and await service.is_subscribed(
             session, message.from_user.id, application.id
         )
-    if application is None:
+    if application is None or application.status in (ApplicationStatus.DRAFT, ApplicationStatus.CANCELLED):
         await message.answer(tr("status-not-found", number=number))
         return
     await state.clear()

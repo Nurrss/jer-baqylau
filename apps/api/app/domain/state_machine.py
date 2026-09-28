@@ -32,6 +32,8 @@ SIGNAL_TRANSITIONS: Mapping[SignalStatus, frozenset[SignalStatus]] = {
 }
 
 APPLICATION_TRANSITIONS: Mapping[ApplicationStatus, frozenset[ApplicationStatus]] = {
+    # A Mini App draft becomes an application only after the citizen confirms it in Telegram.
+    ApplicationStatus.DRAFT: frozenset({ApplicationStatus.UNDER_REVIEW, ApplicationStatus.CANCELLED}),
     ApplicationStatus.UNDER_REVIEW: frozenset(
         {ApplicationStatus.INSPECTION_SCHEDULED, ApplicationStatus.APPROVED, ApplicationStatus.REJECTED}
     ),
@@ -40,6 +42,7 @@ APPLICATION_TRANSITIONS: Mapping[ApplicationStatus, frozenset[ApplicationStatus]
     ),
     ApplicationStatus.APPROVED: frozenset(),
     ApplicationStatus.REJECTED: frozenset(),
+    ApplicationStatus.CANCELLED: frozenset(),
 }
 
 # Parcel statuses that mean "an active violation exists" (drawn red on the map).

@@ -9,12 +9,14 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.errors import NotFoundError
+from app.core.errors import InvalidTransitionError, NotFoundError
 from app.db.models import Application, Parcel, Subscription, TelegramUser
 from app.domain.enums import ApplicationStatus, EntityType, EventType, Lang, SubscriptionTarget
 from app.domain.state_machine import allowed_transitions, ensure_transition
 from app.schemas.misc import ApplicationList, ApplicationOut, ApplicationTransitionRequest
 from app.services import audit, notifier
+
+CITIZEN_ONLY = (ApplicationStatus.DRAFT, ApplicationStatus.CANCELLED)
 
 
 async def get_application(
@@ -67,6 +69,9 @@ async def to_out_many(session: AsyncSession, applications: list[Application]) ->
         .all()
     )
     history = await audit.histories(session, EntityType.APPLICATION, ids)
+    from app.services.land import parcels_of  # land imports this module
+
+    chosen = await parcels_of(session, ids)
     return [
         ApplicationOut(
             id=str(a.id),
@@ -84,6 +89,11 @@ async def to_out_many(session: AsyncSession, applications: list[Application]) ->
             subscribers_count=int(subscribers.get(a.id, 0)),
             allowed_transitions=allowed_transitions(EntityType.APPLICATION, a.status),
             history=history[a.id],
+            source=a.source,
+            applicant_iin_masked=a.applicant_iin_masked,
+            applicant_phone_masked=a.applicant_phone_masked,
+            applicant_comment=a.applicant_comment,
+            parcels=chosen.get(a.id, []),
         )
         for a in applications
     ]
@@ -100,6 +110,9 @@ async def list_applications(
     query = select(Application)
     if statuses:
         query = query.where(Application.status.in_(statuses))
+    else:
+        # Unconfirmed Mini App drafts are the citizen's business, not the akimat's.
+        query = query.where(Application.status.not_in(CITIZEN_ONLY))
     if q:
         like = f"%{q.strip()}%"
         query = query.where(Application.tracking_number.ilike(like) | Application.applicant_name.ilike(like))
@@ -111,6 +124,12 @@ async def transition(
     session: AsyncSession, application_id: uuid.UUID, request: ApplicationTransitionRequest, actor: str
 ) -> Application:
     application = await get_application(session, application_id, for_update=True)
+    if application.status in CITIZEN_ONLY or request.to in (*CITIZEN_ONLY, ApplicationStatus.UNDER_REVIEW):
+        # Drafts are confirmed or cancelled only by the citizen in Telegram.
+        raise InvalidTransitionError(
+            "Only the citizen can confirm or cancel a draft",
+            details={"from": application.status.value, "to": request.to.value},
+        )
     ensure_transition(EntityType.APPLICATION, application.status, request.to)
     previous = application.status
     application.status = request.to
@@ -119,6 +138,9 @@ async def transition(
     if request.inspection_date is not None:
         application.inspection_date = request.inspection_date
     application.updated_at = datetime.now(UTC)
+    from app.services.land import apply_decision
+
+    await apply_decision(session, application, request.grant_parcel_ids, actor)
     await audit.record_transition(
         session,
         entity_type=EntityType.APPLICATION,

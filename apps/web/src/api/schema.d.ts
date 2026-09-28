@@ -447,6 +447,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/land/fund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Free state land on the map (public) */
+        get: operations["land_fund_api_v1_land_fund_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/miniapp/applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The citizen's own land applications (Mini App) */
+        get: operations["my_applications_api_v1_miniapp_applications_get"];
+        put?: never;
+        /** Form an application in the Mini App; the bot then asks to confirm it in Telegram */
+        post: operations["create_application_api_v1_miniapp_applications_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/parcels/{parcel_id}/offer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Offer a state-owned parcel to citizens (it appears in the Mini App) */
+        post: operations["offer_parcel_api_v1_parcels__parcel_id__offer_post"];
+        /** Withdraw a parcel from the land fund */
+        delete: operations["withdraw_parcel_api_v1_parcels__parcel_id__offer_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit/verify": {
         parameters: {
             query?: never;
@@ -666,6 +719,12 @@ export interface components {
             /** @description Audit log unchanged since the act was issued */
             chain_at_issue: components["schemas"]["ChainCheck"];
         };
+        /**
+         * AllocationStatus
+         * @description Place of a parcel in the state land fund (земельный фонд акимата).
+         * @enum {string}
+         */
+        AllocationStatus: "NONE" | "OFFERED" | "RESERVED" | "ALLOCATED";
         /** ApplicationList */
         ApplicationList: {
             /** Items */
@@ -709,12 +768,43 @@ export interface components {
             allowed_transitions: components["schemas"]["ApplicationStatus"][];
             /** History */
             history: components["schemas"]["TransitionOut"][];
+            /**
+             * Source
+             * @description seed | miniapp
+             */
+            source: string;
+            /** Applicant Iin Masked */
+            applicant_iin_masked: string | null;
+            /** Applicant Phone Masked */
+            applicant_phone_masked: string | null;
+            /** Applicant Comment */
+            applicant_comment: string | null;
+            /**
+             * Parcels
+             * @description Fund parcels chosen in the Mini App, by priority
+             */
+            parcels: components["schemas"]["ApplicationParcelOut"][];
+        };
+        /** ApplicationParcelOut */
+        ApplicationParcelOut: {
+            /** Id */
+            id: string;
+            /** Cadastral Number */
+            cadastral_number: string;
+            /** Area Ha */
+            area_ha: number;
+            purpose: components["schemas"]["ParcelPurpose"];
+            /** Priority */
+            priority: number;
+            /** Granted */
+            granted: boolean;
+            allocation_status: components["schemas"]["AllocationStatus"];
         };
         /**
          * ApplicationStatus
          * @enum {string}
          */
-        ApplicationStatus: "UNDER_REVIEW" | "INSPECTION_SCHEDULED" | "APPROVED" | "REJECTED";
+        ApplicationStatus: "DRAFT" | "UNDER_REVIEW" | "INSPECTION_SCHEDULED" | "APPROVED" | "REJECTED" | "CANCELLED";
         /** ApplicationTransitionRequest */
         ApplicationTransitionRequest: {
             to: components["schemas"]["ApplicationStatus"];
@@ -724,12 +814,17 @@ export interface components {
             comment_kk: string;
             /** Inspection Date */
             inspection_date?: string | null;
+            /**
+             * Grant Parcel Ids
+             * @description Approve: which of the chosen fund parcels to allocate (default by type)
+             */
+            grant_parcel_ids?: string[] | null;
         };
         /**
          * ApplicationType
          * @enum {string}
          */
-        ApplicationType: "PURPOSE_CHANGE" | "LEASE_EXTENSION" | "IZHS_ALLOCATION";
+        ApplicationType: "PURPOSE_CHANGE" | "LEASE_EXTENSION" | "IZHS_ALLOCATION" | "AGRO_LEASE";
         /** AuthConfig */
         AuthConfig: {
             /**
@@ -1029,6 +1124,11 @@ export interface components {
              * @description Owner link; only while the request is open
              */
             link: string | null;
+            /**
+             * Owner Telegram
+             * @description The right holder is linked to Telegram: the link is sent there
+             */
+            owner_telegram: boolean;
             /** Photos */
             photos: components["schemas"]["PhotoOut"][];
         };
@@ -1124,6 +1224,55 @@ export interface components {
             /** Avg Reaction Hours */
             avg_reaction_hours: number | null;
         };
+        /** LandApplicationCreate */
+        LandApplicationCreate: {
+            /**
+             * Parcel Ids
+             * @description In order of priority
+             */
+            parcel_ids: string[];
+            /**
+             * Full Name
+             * @description Фамилия Имя Отчество
+             */
+            full_name: string;
+            /** Iin */
+            iin: string;
+            /** Phone */
+            phone: string;
+            /** Comment */
+            comment?: string | null;
+        };
+        /** LandApplicationDraft */
+        LandApplicationDraft: {
+            /** Id */
+            id: string;
+            /** Tracking Number */
+            tracking_number: string;
+            status: components["schemas"]["ApplicationStatus"];
+            type: components["schemas"]["ApplicationType"];
+            /** Parcels */
+            parcels: number;
+        };
+        /**
+         * LandFund
+         * @description GeoJSON FeatureCollection of free (OFFERED) and pending (RESERVED) fund parcels.
+         */
+        LandFund: {
+            /**
+             * Type
+             * @default FeatureCollection
+             */
+            type?: string;
+            /** Features */
+            features: {
+                [key: string]: unknown;
+            }[];
+            /** Offered */
+            offered: number;
+            /** Reserved */
+            reserved: number;
+        };
         /**
          * Lang
          * @enum {string}
@@ -1142,6 +1291,15 @@ export interface components {
             email: string;
             /** Password */
             password: string;
+        };
+        /** MiniAppApplication */
+        MiniAppApplication: {
+            /** Tracking Number */
+            tracking_number: string;
+            status: components["schemas"]["ApplicationStatus"];
+            type: components["schemas"]["ApplicationType"];
+            /** Parcels */
+            parcels: components["schemas"]["ApplicationParcelOut"][];
         };
         /** NdviLayer */
         NdviLayer: {
@@ -1197,6 +1355,12 @@ export interface components {
             /** Scene Id */
             scene_id?: string | null;
         };
+        /** OfferOut */
+        OfferOut: {
+            /** Parcel Id */
+            parcel_id: string;
+            allocation_status: components["schemas"]["AllocationStatus"];
+        };
         /**
          * OwnerType
          * @enum {string}
@@ -1230,6 +1394,13 @@ export interface components {
             ndvi_flagged: boolean;
             /** Open Signals Count */
             open_signals_count: number;
+            /** @description Place in the state land fund */
+            allocation_status: components["schemas"]["AllocationStatus"];
+            /**
+             * Owner Telegram
+             * @description The right holder is linked to Telegram (Mini App)
+             */
+            owner_telegram: boolean;
             /** Geometry */
             geometry: {
                 [key: string]: unknown;
@@ -1319,6 +1490,13 @@ export interface components {
             ndvi_flagged: boolean;
             /** Open Signals Count */
             open_signals_count: number;
+            /** @description Place in the state land fund */
+            allocation_status: components["schemas"]["AllocationStatus"];
+            /**
+             * Owner Telegram
+             * @description The right holder is linked to Telegram (Mini App)
+             */
+            owner_telegram: boolean;
         };
         /**
          * ParcelPurpose
@@ -3072,6 +3250,257 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CrossCheck"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    land_fund_api_v1_land_fund_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LandFund"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    my_applications_api_v1_miniapp_applications_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Telegram.WebApp.initData of the Mini App */
+                "X-Telegram-Init-Data"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MiniAppApplication"][];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_application_api_v1_miniapp_applications_post: {
+        parameters: {
+            query?: {
+                lang?: components["schemas"]["Lang"] | null;
+            };
+            header?: {
+                /** @description Telegram.WebApp.initData of the Mini App */
+                "X-Telegram-Init-Data"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LandApplicationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LandApplicationDraft"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    offer_parcel_api_v1_parcels__parcel_id__offer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferOut"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    withdraw_parcel_api_v1_parcels__parcel_id__offer_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                parcel_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferOut"];
                 };
             };
             /** @description Not authenticated */

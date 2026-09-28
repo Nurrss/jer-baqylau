@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import date, datetime
 from typing import Any, Literal
 
@@ -7,6 +8,7 @@ from pydantic import Field, model_validator
 
 from app.domain.enums import ApplicationStatus, ApplicationType, ParcelStatus, ViolationType
 from app.schemas.common import ApiModel, TransitionOut
+from app.schemas.land import ApplicationParcelOut
 
 # ── Applications ────────────────────────────────────────────────────────────
 
@@ -27,6 +29,13 @@ class ApplicationOut(ApiModel):
     subscribers_count: int
     allowed_transitions: list[ApplicationStatus]
     history: list[TransitionOut]
+    source: str = Field(description="seed | miniapp")
+    applicant_iin_masked: str | None
+    applicant_phone_masked: str | None
+    applicant_comment: str | None
+    parcels: list[ApplicationParcelOut] = Field(
+        description="Fund parcels chosen in the Mini App, by priority"
+    )
 
 
 class ApplicationList(ApiModel):
@@ -39,6 +48,9 @@ class ApplicationTransitionRequest(ApiModel):
     comment_ru: str = Field(min_length=3, max_length=2000)
     comment_kk: str = Field(min_length=3, max_length=2000)
     inspection_date: date | None = None
+    grant_parcel_ids: list[uuid.UUID] | None = Field(
+        default=None, description="Approve: which of the chosen fund parcels to allocate (default by type)"
+    )
 
     @model_validator(mode="after")
     def _inspection_date_required(self) -> ApplicationTransitionRequest:

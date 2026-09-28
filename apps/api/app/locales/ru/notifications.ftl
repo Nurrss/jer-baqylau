@@ -57,3 +57,29 @@ sstatus-NEW = новый
 sstatus-IN_REVIEW = в работе
 sstatus-CONFIRMED = подтверждён
 sstatus-REJECTED = отклонён
+
+## Заявка на землю из Mini App
+
+land-draft-title = 📝 Проверьте заявку { $number }
+land-draft-parcel = { $n }. <b>{ $cadastral }</b> — { $area } га, { $address }
+land-draft-applicant = 👤 { $name } · ИИН { $iin } · { $phone }
+land-draft-priority = Участки указаны в порядке приоритета.
+land-draft-confirm-hint = Нажмите «Подтвердить», чтобы отправить заявку в акимат.
+btn-land-confirm = ✅ Подтвердить и отправить
+btn-land-cancel = ✖️ Отменить
+application-status-DRAFT = 📝 ожидает подтверждения
+application-status-CANCELLED = ✖️ отменено
+
+## Дистанционная проверка участка
+
+inspection-request = 📷 Земельная инспекция просит фотоотчёт по вашему участку <b>{ $cadastral }</b> (запрос { $code }). Срок — до { $due }.
+inspection-request-note = Что снять: { $note }
+inspection-request-hint = Откройте проверку, находясь на участке: приложение запросит геолокацию и камеру. Фото из галереи не принимаются.
+btn-inspection-open = 📷 Открыть проверку
+btn-inspection-browser = Открыть в браузере
+inspection-reviewed = 🔔 Фотоотчёт { $code } по участку { $cadastral }: { $status }
+inspection-status-ACCEPTED = ✅ принят инспектором
+inspection-status-REJECTED = ❌ отклонён инспектором
+inspection-status-SUBMITTED = ⏳ на проверке
+inspection-status-REQUESTED = ожидает отчёта
+inspection-status-EXPIRED = ⌛ срок истёк

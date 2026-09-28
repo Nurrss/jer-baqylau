@@ -94,6 +94,8 @@ def _properties(parcel: Parcel, is_overdue: bool, open_signals: int) -> dict[str
         "ndvi": parcel.ndvi,
         "ndvi_flagged": parcel.ndvi_flagged,
         "open_signals_count": int(open_signals or 0),
+        "allocation_status": parcel.allocation_status,
+        "owner_telegram": parcel.owner_chat_id is not None,
     }
 
 

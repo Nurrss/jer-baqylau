@@ -23,6 +23,7 @@ class NotificationButton:
     text: str
     callback_data: str | None = None
     url: str | None = None
+    web_app_url: str | None = None  # opens a Telegram Mini App (HTTPS only)
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,13 +61,20 @@ class TelegramNotificationProvider:
 
     async def send(self, notification: Notification) -> bool:
         from aiogram.exceptions import TelegramAPIError, TelegramForbiddenError
-        from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+        from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
         markup = None
         if notification.buttons:
             markup = InlineKeyboardMarkup(
                 inline_keyboard=[
-                    [InlineKeyboardButton(text=b.text, callback_data=b.callback_data, url=b.url)]
+                    [
+                        InlineKeyboardButton(
+                            text=b.text,
+                            callback_data=b.callback_data,
+                            url=b.url,
+                            web_app=WebAppInfo(url=b.web_app_url) if b.web_app_url else None,
+                        )
+                    ]
                     for b in notification.buttons
                 ]
             )

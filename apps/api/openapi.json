@@ -2042,6 +2042,361 @@
         }
       }
     },
+    "/api/v1/land/fund": {
+      "get": {
+        "tags": [
+          "land fund"
+        ],
+        "summary": "Free state land on the map (public)",
+        "operationId": "land_fund_api_v1_land_fund_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LandFund"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/miniapp/applications": {
+      "post": {
+        "tags": [
+          "land fund"
+        ],
+        "summary": "Form an application in the Mini App; the bot then asks to confirm it in Telegram",
+        "operationId": "create_application_api_v1_miniapp_applications_post",
+        "parameters": [
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Lang"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Lang"
+            }
+          },
+          {
+            "name": "X-Telegram-Init-Data",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Telegram.WebApp.initData of the Mini App",
+              "title": "X-Telegram-Init-Data"
+            },
+            "description": "Telegram.WebApp.initData of the Mini App"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LandApplicationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LandApplicationDraft"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "land fund"
+        ],
+        "summary": "The citizen's own land applications (Mini App)",
+        "operationId": "my_applications_api_v1_miniapp_applications_get",
+        "parameters": [
+          {
+            "name": "X-Telegram-Init-Data",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Telegram.WebApp.initData of the Mini App",
+              "title": "X-Telegram-Init-Data"
+            },
+            "description": "Telegram.WebApp.initData of the Mini App"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MiniAppApplication"
+                  },
+                  "title": "Response My Applications Api V1 Miniapp Applications Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/parcels/{parcel_id}/offer": {
+      "post": {
+        "tags": [
+          "land fund"
+        ],
+        "summary": "Offer a state-owned parcel to citizens (it appears in the Mini App)",
+        "operationId": "offer_parcel_api_v1_parcels__parcel_id__offer_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfferOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "land fund"
+        ],
+        "summary": "Withdraw a parcel from the land fund",
+        "operationId": "withdraw_parcel_api_v1_parcels__parcel_id__offer_delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "parcel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Parcel Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfferOut"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/audit/verify": {
       "get": {
         "tags": [
@@ -2860,6 +3215,17 @@
         "title": "ActPublic",
         "description": "What anyone scanning the QR code on a printed act can see (no personal data)."
       },
+      "AllocationStatus": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "OFFERED",
+          "RESERVED",
+          "ALLOCATED"
+        ],
+        "title": "AllocationStatus",
+        "description": "Place of a parcel in the state land fund (земельный фонд акимата)."
+      },
       "ApplicationList": {
         "properties": {
           "items": {
@@ -2984,6 +3350,52 @@
             },
             "type": "array",
             "title": "History"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "seed | miniapp"
+          },
+          "applicant_iin_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicant Iin Masked"
+          },
+          "applicant_phone_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicant Phone Masked"
+          },
+          "applicant_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Applicant Comment"
+          },
+          "parcels": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationParcelOut"
+            },
+            "type": "array",
+            "title": "Parcels",
+            "description": "Fund parcels chosen in the Mini App, by priority"
           }
         },
         "type": "object",
@@ -3002,17 +3414,65 @@
           "updated_at",
           "subscribers_count",
           "allowed_transitions",
-          "history"
+          "history",
+          "source",
+          "applicant_iin_masked",
+          "applicant_phone_masked",
+          "applicant_comment",
+          "parcels"
         ],
         "title": "ApplicationOut"
+      },
+      "ApplicationParcelOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "cadastral_number": {
+            "type": "string",
+            "title": "Cadastral Number"
+          },
+          "area_ha": {
+            "type": "number",
+            "title": "Area Ha"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/ParcelPurpose"
+          },
+          "priority": {
+            "type": "integer",
+            "title": "Priority"
+          },
+          "granted": {
+            "type": "boolean",
+            "title": "Granted"
+          },
+          "allocation_status": {
+            "$ref": "#/components/schemas/AllocationStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "cadastral_number",
+          "area_ha",
+          "purpose",
+          "priority",
+          "granted",
+          "allocation_status"
+        ],
+        "title": "ApplicationParcelOut"
       },
       "ApplicationStatus": {
         "type": "string",
         "enum": [
+          "DRAFT",
           "UNDER_REVIEW",
           "INSPECTION_SCHEDULED",
           "APPROVED",
-          "REJECTED"
+          "REJECTED",
+          "CANCELLED"
         ],
         "title": "ApplicationStatus"
       },
@@ -3044,6 +3504,22 @@
               }
             ],
             "title": "Inspection Date"
+          },
+          "grant_parcel_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Parcel Ids",
+            "description": "Approve: which of the chosen fund parcels to allocate (default by type)"
           }
         },
         "type": "object",
@@ -3059,7 +3535,8 @@
         "enum": [
           "PURPOSE_CHANGE",
           "LEASE_EXTENSION",
-          "IZHS_ALLOCATION"
+          "IZHS_ALLOCATION",
+          "AGRO_LEASE"
         ],
         "title": "ApplicationType"
       },
@@ -3854,6 +4331,11 @@
             "title": "Link",
             "description": "Owner link; only while the request is open"
           },
+          "owner_telegram": {
+            "type": "boolean",
+            "title": "Owner Telegram",
+            "description": "The right holder is linked to Telegram: the link is sent there"
+          },
           "photos": {
             "items": {
               "$ref": "#/components/schemas/PhotoOut"
@@ -3885,6 +4367,7 @@
           "review_comment",
           "reviewed_at",
           "link",
+          "owner_telegram",
           "photos"
         ],
         "title": "InspectionOut"
@@ -4116,6 +4599,124 @@
         ],
         "title": "Kpi"
       },
+      "LandApplicationCreate": {
+        "properties": {
+          "parcel_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Parcel Ids",
+            "description": "In order of priority"
+          },
+          "full_name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Full Name",
+            "description": "Фамилия Имя Отчество"
+          },
+          "iin": {
+            "type": "string",
+            "maxLength": 12,
+            "minLength": 12,
+            "title": "Iin"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 10,
+            "title": "Phone"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parcel_ids",
+          "full_name",
+          "iin",
+          "phone"
+        ],
+        "title": "LandApplicationCreate"
+      },
+      "LandApplicationDraft": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tracking_number": {
+            "type": "string",
+            "title": "Tracking Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ApplicationType"
+          },
+          "parcels": {
+            "type": "integer",
+            "title": "Parcels"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tracking_number",
+          "status",
+          "type",
+          "parcels"
+        ],
+        "title": "LandApplicationDraft"
+      },
+      "LandFund": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "default": "FeatureCollection"
+          },
+          "features": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Features"
+          },
+          "offered": {
+            "type": "integer",
+            "title": "Offered"
+          },
+          "reserved": {
+            "type": "integer",
+            "title": "Reserved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "features",
+          "offered",
+          "reserved"
+        ],
+        "title": "LandFund",
+        "description": "GeoJSON FeatureCollection of free (OFFERED) and pending (RESERVED) fund parcels."
+      },
       "Lang": {
         "type": "string",
         "enum": [
@@ -4163,6 +4764,35 @@
           "password"
         ],
         "title": "LoginRequest"
+      },
+      "MiniAppApplication": {
+        "properties": {
+          "tracking_number": {
+            "type": "string",
+            "title": "Tracking Number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ApplicationStatus"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ApplicationType"
+          },
+          "parcels": {
+            "items": {
+              "$ref": "#/components/schemas/ApplicationParcelOut"
+            },
+            "type": "array",
+            "title": "Parcels"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tracking_number",
+          "status",
+          "type",
+          "parcels"
+        ],
+        "title": "MiniAppApplication"
       },
       "NdviLayer": {
         "properties": {
@@ -4335,6 +4965,23 @@
         ],
         "title": "NdviReadingOut"
       },
+      "OfferOut": {
+        "properties": {
+          "parcel_id": {
+            "type": "string",
+            "title": "Parcel Id"
+          },
+          "allocation_status": {
+            "$ref": "#/components/schemas/AllocationStatus"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parcel_id",
+          "allocation_status"
+        ],
+        "title": "OfferOut"
+      },
       "OwnerType": {
         "type": "string",
         "enum": [
@@ -4423,6 +5070,15 @@
           "open_signals_count": {
             "type": "integer",
             "title": "Open Signals Count"
+          },
+          "allocation_status": {
+            "$ref": "#/components/schemas/AllocationStatus",
+            "description": "Place in the state land fund"
+          },
+          "owner_telegram": {
+            "type": "boolean",
+            "title": "Owner Telegram",
+            "description": "The right holder is linked to Telegram (Mini App)"
           },
           "geometry": {
             "additionalProperties": true,
@@ -4551,6 +5207,8 @@
           "ndvi",
           "ndvi_flagged",
           "open_signals_count",
+          "allocation_status",
+          "owner_telegram",
           "geometry",
           "centroid",
           "bbox",
@@ -4697,6 +5355,15 @@
           "open_signals_count": {
             "type": "integer",
             "title": "Open Signals Count"
+          },
+          "allocation_status": {
+            "$ref": "#/components/schemas/AllocationStatus",
+            "description": "Place in the state land fund"
+          },
+          "owner_telegram": {
+            "type": "boolean",
+            "title": "Owner Telegram",
+            "description": "The right holder is linked to Telegram (Mini App)"
           }
         },
         "type": "object",
@@ -4715,7 +5382,9 @@
           "is_overdue",
           "ndvi",
           "ndvi_flagged",
-          "open_signals_count"
+          "open_signals_count",
+          "allocation_status",
+          "owner_telegram"
         ],
         "title": "ParcelProperties"
       },

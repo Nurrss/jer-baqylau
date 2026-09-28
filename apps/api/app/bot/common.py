@@ -18,6 +18,7 @@ from aiogram.types import (
     Message,
     ReplyKeyboardMarkup,
     TelegramObject,
+    WebAppInfo,
 )
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
@@ -62,7 +63,15 @@ def both(key: str) -> set[str]:
     return {t(lang, key) for lang in Lang}
 
 
-MENU_KEYS = ("menu-status", "menu-knowledge", "menu-report", "menu-my", "menu-help", "btn-cancel")
+MENU_KEYS = (
+    "menu-lands",
+    "menu-status",
+    "menu-knowledge",
+    "menu-report",
+    "menu-my",
+    "menu-help",
+    "btn-cancel",
+)
 
 
 def menu_texts() -> set[str]:
@@ -164,6 +173,11 @@ class KbCb(CallbackData, prefix="kb"):
     n: int = 0
 
 
+class LandCb(CallbackData, prefix="land"):
+    action: str  # confirm | cancel
+    id: str
+
+
 class ReportCb(CallbackData, prefix="rep"):
     action: str  # cat | submit | edit | editstep | cancel
     value: str = ""
@@ -172,9 +186,20 @@ class ReportCb(CallbackData, prefix="rep"):
 # ── Keyboards ───────────────────────────────────────────────────────────────
 
 
+def lands_app_url(lang: Lang | None) -> str | None:
+    """Mini App with the free state land (Telegram only opens HTTPS Mini Apps)."""
+    base = get_settings().public_web_url.rstrip("/")
+    if not base.startswith("https://"):
+        return None
+    return f"{base}/app?lang={lang.value}" if lang else f"{base}/app"
+
+
 def main_menu(tr: Tr) -> ReplyKeyboardMarkup:
+    url = lands_app_url(tr.lang)
+    lands = [[KeyboardButton(text=tr("menu-lands"), web_app=WebAppInfo(url=url))]] if url else []
     return ReplyKeyboardMarkup(
         keyboard=[
+            *lands,
             [KeyboardButton(text=tr("menu-status")), KeyboardButton(text=tr("menu-knowledge"))],
             [KeyboardButton(text=tr("menu-report"))],
             [KeyboardButton(text=tr("menu-my")), KeyboardButton(text=tr("menu-help"))],

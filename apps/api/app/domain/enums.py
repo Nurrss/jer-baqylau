@@ -55,16 +55,28 @@ class SignalCategory(StrEnum):
 
 
 class ApplicationStatus(StrEnum):
+    DRAFT = "DRAFT"  # formed in the Mini App, waiting for the citizen's confirmation in Telegram
     UNDER_REVIEW = "UNDER_REVIEW"
     INSPECTION_SCHEDULED = "INSPECTION_SCHEDULED"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
+    CANCELLED = "CANCELLED"  # the citizen cancelled the draft
 
 
 class ApplicationType(StrEnum):
     PURPOSE_CHANGE = "PURPOSE_CHANGE"
     LEASE_EXTENSION = "LEASE_EXTENSION"
     IZHS_ALLOCATION = "IZHS_ALLOCATION"
+    AGRO_LEASE = "AGRO_LEASE"  # lease of agricultural land from the state fund
+
+
+class AllocationStatus(StrEnum):
+    """Place of a parcel in the state land fund (земельный фонд акимата)."""
+
+    NONE = "NONE"  # not in the fund: owned or leased, or not offered
+    OFFERED = "OFFERED"  # free, citizens can apply in the Mini App
+    RESERVED = "RESERVED"  # an application for it is under review
+    ALLOCATED = "ALLOCATED"  # granted to a citizen through an application
 
 
 class EntityType(StrEnum):
@@ -127,6 +139,7 @@ class EventType(StrEnum):
     PARCEL_UPDATED = "parcel.updated"
     PHOTO_ADDED = "photo.added"
     APPLICATION_STATUS_CHANGED = "application.status_changed"
+    APPLICATION_SUBMITTED = "application.submitted"
     SATELLITE_SCAN_COMPLETED = "satellite.scan_completed"
     SATELLITE_HISTORY_READY = "satellite.history_ready"
     INSPECTION_REQUESTED = "inspection.requested"

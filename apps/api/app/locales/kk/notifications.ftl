@@ -58,3 +58,29 @@ sstatus-NEW = жаңа
 sstatus-IN_REVIEW = жұмыста
 sstatus-CONFIRMED = расталды
 sstatus-REJECTED = қабылданбады
+
+## Mini App-тан жерге өтінім
+
+land-draft-title = 📝 { $number } өтінімін тексеріңіз
+land-draft-parcel = { $n }. <b>{ $cadastral }</b> — { $area } га, { $address }
+land-draft-applicant = 👤 { $name } · ЖСН { $iin } · { $phone }
+land-draft-priority = Учаскелер басымдық ретімен көрсетілген.
+land-draft-confirm-hint = Өтінімді әкімдікке жіберу үшін «Растау» батырмасын басыңыз.
+btn-land-confirm = ✅ Растау және жіберу
+btn-land-cancel = ✖️ Болдырмау
+application-status-DRAFT = 📝 растауды күтуде
+application-status-CANCELLED = ✖️ болдырылмады
+
+## Учаскені қашықтан тексеру
+
+inspection-request = 📷 Жер инспекциясы сіздің <b>{ $cadastral }</b> учаскеңіз бойынша фотоесеп сұрайды ({ $code } сұрауы). Мерзімі — { $due } дейін.
+inspection-request-note = Нені түсіру керек: { $note }
+inspection-request-hint = Тексеруді учаскеде тұрып ашыңыз: қосымша геолокация мен камераны сұрайды. Галереядағы фотолар қабылданбайды.
+btn-inspection-open = 📷 Тексеруді ашу
+btn-inspection-browser = Браузерде ашу
+inspection-reviewed = 🔔 { $cadastral } учаскесі бойынша { $code } фотоесебі: { $status }
+inspection-status-ACCEPTED = ✅ инспектор қабылдады
+inspection-status-REJECTED = ❌ инспектор қабылдамады
+inspection-status-SUBMITTED = ⏳ тексеруде
+inspection-status-REQUESTED = есепті күтуде
+inspection-status-EXPIRED = ⌛ мерзімі өтті
