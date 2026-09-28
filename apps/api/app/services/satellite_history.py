@@ -27,7 +27,7 @@ from app.domain.enums import EventType, ParcelPurpose, ViolationType
 from app.providers.satellite import UNUSED_NDVI_THRESHOLD, get_satellite_provider
 from app.providers.storage import StorageProvider, get_storage
 from app.schemas.parcels import NdviPoint, ParcelSatellite, SatelliteImage, YearPeak
-from app.services import audit
+from app.services import audit, satellite
 
 log = get_logger(__name__)
 
@@ -38,9 +38,8 @@ GROWING_MONTHS = range(5, 9)  # May–August: differences between used and unuse
 
 _in_progress: set[uuid.UUID] = set()
 _tasks: set[asyncio.Task[None]] = set()
-# One heavy raster job at a time; a finished (or failed) attempt is not repeated for a while,
+# Jobs share satellite.RASTER_SLOT with the scan; a finished (or failed) attempt is not repeated for a while,
 # so a panel polling a parcel without usable scenes does not restart the download every 5 s.
-_job_slot = asyncio.Semaphore(1)
 _last_attempt: dict[uuid.UUID, datetime] = {}
 RETRY_AFTER = timedelta(minutes=30)
 
@@ -191,7 +190,7 @@ async def _fetch_item(client: httpx.AsyncClient, stac_url: str, scene_id: str) -
 
 
 async def _build_history(parcel_id: uuid.UUID) -> None:
-    async with _job_slot:
+    async with satellite.RASTER_SLOT:
         await _build_history_now(parcel_id)
 
 

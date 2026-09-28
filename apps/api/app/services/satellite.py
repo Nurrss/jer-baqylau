@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 from datetime import UTC, datetime
 
@@ -17,8 +18,17 @@ from app.services import audit
 
 log = get_logger(__name__)
 
+# Raster reads are memory-heavy and the API container has 512 MB: the periodic/manual scan and
+# per-parcel history jobs never run at the same time (ADR-016).
+RASTER_SLOT = asyncio.Semaphore(1)
+
 
 async def run_scan(session: AsyncSession, provider: SatelliteProvider) -> SatelliteScanResult:
+    async with RASTER_SLOT:
+        return await _run_scan(session, provider)
+
+
+async def _run_scan(session: AsyncSession, provider: SatelliteProvider) -> SatelliteScanResult:
     rows = (
         await session.execute(
             select(Parcel, func.ST_AsGeoJSON(Parcel.geometry, 7)).where(
